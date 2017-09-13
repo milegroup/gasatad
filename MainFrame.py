@@ -764,7 +764,7 @@ class MainFrame ( wx.Frame ):
         
     def appInformation(self, event):
         
-        description = 'Daniel Pereira Alonso\nTutor: Leandro Rodríguez Liñares\nCotutora: María José Lado Touriño\nCurso 2016/2017'
+        description = 'Graphical Application for Statistical Analysis of TAbulated Data\n\nDaniel Pereira Alonso\nLeandro Rodríguez Liñares\nMaría José Lado Touriño\n2017'
         
         info = wx.AboutDialogInfo()
     
