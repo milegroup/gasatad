@@ -63,7 +63,7 @@ class MainFrame ( wx.Frame ):
                 
         self.SetMenuBar( self.m_menubar1 )
         
-        self.m_menubar1.SetFocus()
+        # self.m_menubar1.SetFocus()
         
         gbSizer3 = wx.GridBagSizer( 0, 0 )
         gbSizer3.SetFlexibleDirection( wx.BOTH )
