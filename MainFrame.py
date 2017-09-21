@@ -264,10 +264,85 @@ class MainFrame ( wx.Frame ):
         
         #A controller object is created
         self.controller = Controller()   
+
+        HelpString = (
+            "      -help: shows this information\n"
+            "      -loadCSV fileName: loads CSV file\n"
+            )
+
+        if (len(sys.argv) != 1 and sys.platform=='linux2'):
+            arguments = sys.argv[1:]
+            possibleArguments = ['-help','-loadCSV']
+
+            for argument in arguments:
+            	if argument[0] == '-':
+            		if argument not in possibleArguments:
+            			print "\n** ERROR: command '"+argument+"' not recognized **\n"
+            			print "** GASATaD terminal mode commands:"
+            			print HelpString
+            			sys.exit(0)
+            
+            if "-help" in arguments:
+            	print ("\n** GASATaD: terminal mode **\n")
+                print HelpString
+                sys.exit(0)
+
+            else:
+                if "-loadCSV" in arguments:
+                    CSVFileName = arguments[arguments.index("-loadCSV")+1]
+                    print "Loading CSV file: "+CSVFileName
+                    self.OpenCVSFileNoGUI(CSVFileName)
+
+
     
     
     
-    def OpenFile(self, event):        
+    def OpenCVSFileNoGUI(self, fileName):       
+        
+        self.data = None
+        
+        try:
+                self.Datafile = open(fileName, 'r')            
+                self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
+                
+                self.controller.OpenFile(self.data, os.path.basename(fileName))                    
+                self.m_menuItem2.Enable(True)
+                
+                self.m_textCtrl1.SetValue(str(len(self.data.columns)))
+                self.m_textCtrl2.SetValue(str(len(self.data.index)))  
+                
+                self.m_textCtrl11.Clear()
+                self.m_textCtrl21.Clear()
+                    
+        except:
+            
+            print("Error: ", sys.exc_info()[0])
+            print("There was some problem with the file")
+            return 
+
+        self.fillInGrid()
+        self.descriptiveStatsBtn.Enable()
+        self.newColumnBtn.Enable()
+        self.resetDataBtn.Enable()
+        self.deleteColumnsBtn.Enable()
+        self.exportDataBtn.Enable()
+        self.m_grid2.Enable()
+        self.m_menuItem4.Enable()
+        self.histogramBtn.Enable()
+        self.scatterPlotBtn.Enable()
+        self.pieChartBtn.Enable()
+        self.boxPlotBtn.Enable()
+        self.barChartBtn.Enable()
+        self.significanceTestBtn.Enable()   
+        if self.controller.nullValuesInFile(self.data):
+            self.informationAboutNullValues()
+
+        print "File: "+fileName+" loaded"
+
+
+
+
+    def OpenFile(self, event, fileName = None):       
         
         self.Datafile = None
         self.data = None
