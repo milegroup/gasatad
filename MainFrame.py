@@ -839,7 +839,7 @@ class MainFrame ( wx.Frame ):
         
     def appInformation(self, event):
         
-        description = 'Graphical Application for Statistical Analysis of TAbulated Data\n\nDaniel Pereira Alonso\nLeandro Rodríguez Liñares\nMaría José Lado Touriño\n2017'
+        description = u'Graphical Application for Statistical Analysis of TAbulated Data\n\nDaniel Pereira Alonso\nLeandro Rodr\u00EDguez Liñares\nMar\u00EDa Jos\u00E9 Lado Touriño'
         
         info = wx.AboutDialogInfo()
     
@@ -847,6 +847,7 @@ class MainFrame ( wx.Frame ):
         info.SetName('GASATaD')
         info.SetVersion('0.9')
         info.SetDescription(description)
+        info.SetCopyright(u"\u00A9 2017");
         
         wx.AboutBox(info)
 
