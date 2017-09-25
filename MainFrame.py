@@ -32,6 +32,10 @@ class MainFrame ( wx.Frame ):
         width, height = wx.GetDisplaySize()
         
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+        if platform != "darwin":
+            icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
+            self.SetIcon(icon)
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
                 
