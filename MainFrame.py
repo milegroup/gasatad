@@ -18,6 +18,8 @@ from SignificanceTestInterface import SignificanceTestInterface
 from Model import OptionsInExportInterface
 from BasicStatisticsInterface import BasicStatisticsInterface
 
+from sys import platform
+
 ###########################################################################
 ## Class MainFrame
 ###########################################################################
