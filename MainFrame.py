@@ -276,7 +276,7 @@ class MainFrame ( wx.Frame ):
             "      -loadCSV fileName: loads CSV file\n"
             )
 
-        if (len(sys.argv) != 1 and sys.platform=='linux2'):
+        if (len(sys.argv) != 1 and (sys.platform=='linux2' or sys.platform=='darwin')):
             arguments = sys.argv[1:]
             possibleArguments = ['-help','-loadCSV']
 
