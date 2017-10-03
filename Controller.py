@@ -3,6 +3,11 @@ import sys
 import pandas
 from pandas import concat
 import numpy as np
+
+import sys
+if sys.platform=="darwin":
+    import matplotlib
+    matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt
 
 from Model import  ProgramState
