@@ -1,0 +1,7 @@
+LIST OF DEPENDENCIES:
+
+	- WxPython (https://wxpython.org/) -> L-GPL (Library General Public Licence)
+	- Matplotlib (http://matplotlib.org/) -> PSF (Python Software Foundation) License
+	- Pandas (http://pandas.pydata.org/) -> BSD (Berkeley Software Distribution)) License
+	- NumPy (http://www.numpy.org/) -> BSD License
+	- SciPy (https://www.scipy.org/) -> 2-clause BSD
