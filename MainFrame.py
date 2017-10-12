@@ -871,6 +871,7 @@ class MainFrame ( wx.Frame ):
         info.SetVersion('0.9')
         info.SetDescription(description)
         info.SetCopyright(u"\u00A9 2017");
+        info.SetIcon(wx.Icon(os.path.dirname(os.path.abspath(__file__)) + "/GasatadLogo.ico", wx.BITMAP_TYPE_ICO))
         
         wx.AboutBox(info)
 
