@@ -290,7 +290,7 @@ class MainFrame ( wx.Frame ):
 
         HelpString = (
             "      -help: shows this information\n"
-            "      -loadCSV fileName: loads CSV file\n"
+            "      -loadCSV fileName: loads CSV file (full path is required)\n"
             )
 
         if (len(sys.argv) != 1 and (sys.platform=='linux2' or sys.platform=='darwin')):
