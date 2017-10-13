@@ -1,6 +1,3 @@
-DEB:
-	Create man page
-
 WIN:
 	Build the .msi package
 
