@@ -10,3 +10,7 @@ WIN:
 MAC:
 	Build the package
 	Try to remove "python" fron the main app bar
+
+DEB:
+	Open file opens the explorer in "/usr/share/gasatad"
+	Terminal mode loading csv requires the full path of the files
