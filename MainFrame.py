@@ -48,7 +48,7 @@ class MainFrame ( wx.Frame ):
      
     def __init__( self, parent ):
 
-        # print "Invoked from directory:",self.dirFrom
+        print "Invoked from directory:",self.params['dirFrom']
         
         #Width and Height of the screen
         width, height = wx.GetDisplaySize()
@@ -377,7 +377,7 @@ class MainFrame ( wx.Frame ):
             
             self.fileExtensions = "Todos los archivos (*.*)|*.*"
             
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.dirFrom, defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
@@ -449,7 +449,7 @@ class MainFrame ( wx.Frame ):
             self.fileExtensions = "Todos los archivos (*.*)|*.*"
             
             
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.dirFrom, defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
@@ -871,7 +871,7 @@ class MainFrame ( wx.Frame ):
     
 
         info.SetName('GASATaD')
-        info.SetVersion('0.9')
+        info.SetVersion(str(self.params['version']))
         info.SetDescription(description)
         info.SetCopyright(u"\u00A9 2017");
         info.SetIcon(wx.Icon(os.path.dirname(os.path.abspath(__file__)) + "/GasatadLogo.ico", wx.BITMAP_TYPE_ICO))

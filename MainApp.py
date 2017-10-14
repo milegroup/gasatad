@@ -22,7 +22,9 @@ import os
 
 from MainFrame import MainFrame
 
-MainFrame.dirFrom=os.getcwd()
+MainFrame.params={}
+MainFrame.params['dirFrom']=os.getcwd()
+MainFrame.params['version']=0.9
 
 # Uncomment the following line before build .deb package
 # os.chdir("/usr/share/gasatad")
