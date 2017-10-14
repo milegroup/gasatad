@@ -48,12 +48,14 @@ class MainFrame ( wx.Frame ):
      
     def __init__( self, parent ):
 
-        print "Invoked from directory:",self.params['dirFrom']
+        # print "Invoked from directory:",self.params['dirFrom']
         
         #Width and Height of the screen
         width, height = wx.GetDisplaySize()
         
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+
+        
 
         if platform != "darwin":
             icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
@@ -79,6 +81,9 @@ class MainFrame ( wx.Frame ):
         self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Reset Data", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menu1.AppendItem(self.m_menuItem4)
         self.m_menuItem4.Enable(False)
+
+        self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menu1.AppendItem( self.m_menuItem6 )
         
         self.m_menuItem5 = wx.MenuItem( self.m_menu3, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menu3.AppendItem(self.m_menuItem5)
@@ -272,10 +277,14 @@ class MainFrame ( wx.Frame ):
         self.Maximize()
         
         #Binding between buttons and functions which will control the events
+
+        self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
+
         self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuItem1)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuItem2)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuItem4)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuItem5)
+        self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuItem6)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.createNewColumn, self.newColumnBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
@@ -365,6 +374,8 @@ class MainFrame ( wx.Frame ):
 
         print "File: "+fileName+" loaded"
 
+        self.params['dataPresent'] = True
+
 
 
 
@@ -426,6 +437,7 @@ class MainFrame ( wx.Frame ):
                         
                         self.informationAboutNullValues()
                         
+                    self.params['dataPresent'] = True
                     self.firstFileAdded()
 
         except:
@@ -620,6 +632,8 @@ class MainFrame ( wx.Frame ):
         self.m_textCtrl2.Clear()
         self.m_textCtrl11.Clear()
         self.m_textCtrl21.Clear()
+
+        self.params['dataPresent'] = False
 
 
     
@@ -831,7 +845,7 @@ class MainFrame ( wx.Frame ):
     
     def firstFileAdded(self):
         
-        dlg = wx.MessageDialog(None, "File has been added! Do you want to open an additional File? You can also open it later clicking on 'File' placed on the 'MenuBar'", "Additional File", wx.YES_NO | wx.ICON_INFORMATION)
+        dlg = wx.MessageDialog(None, "A file has been opened\nClick 'yes' to add another file to the data", "Additional File", wx.YES_NO | wx.ICON_INFORMATION)
             
             
         if dlg.ShowModal() == wx.ID_YES:
@@ -877,6 +891,19 @@ class MainFrame ( wx.Frame ):
         info.SetIcon(wx.Icon(os.path.dirname(os.path.abspath(__file__)) + "/GasatadLogo.ico", wx.BITMAP_TYPE_ICO))
         
         wx.AboutBox(info)
+
+    def closeApp(self,event):
+        #print "Closing application"
+        if self.params['dataPresent']:
+            dlg = wx.MessageDialog(self, "Do you really want to close GASATaD?","Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
+            result = dlg.ShowModal()
+            dlg.Destroy()
+            if result == wx.ID_OK:
+                self.Destroy()
+        else:
+            self.Destroy()
+
+
 
 class DeleteColumnsInterface ( wx.Dialog ):    
 
