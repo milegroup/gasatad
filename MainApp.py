@@ -18,9 +18,14 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import wx
+import os
 
 from MainFrame import MainFrame
 
+MainFrame.dirFrom=os.getcwd()
+
+# Uncomment the following line before build .deb package
+# os.chdir("/usr/share/gasatad")
 
 
 app = wx.App(False)

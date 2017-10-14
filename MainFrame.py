@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
 import wx
 import wx.grid
 import os
@@ -46,6 +47,8 @@ class MainFrame ( wx.Frame ):
     tagsAndValues = {}
      
     def __init__( self, parent ):
+
+        # print "Invoked from directory:",self.dirFrom
         
         #Width and Height of the screen
         width, height = wx.GetDisplaySize()
@@ -374,7 +377,7 @@ class MainFrame ( wx.Frame ):
             
             self.fileExtensions = "Todos los archivos (*.*)|*.*"
             
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.dirFrom, defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
@@ -446,7 +449,7 @@ class MainFrame ( wx.Frame ):
             self.fileExtensions = "Todos los archivos (*.*)|*.*"
             
             
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.dirFrom, defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
