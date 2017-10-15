@@ -71,14 +71,17 @@ class MainFrame ( wx.Frame ):
         self.m_menu3 = wx.Menu()
         self.m_menu4 = wx.Menu()
 
-        self.m_menuItem1 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open File", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItem1 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open main file", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menu1.AppendItem( self.m_menuItem1 )
         
-        self.m_menuItem2 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open Additional File", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItem2 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open additional file", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menu1.AppendItem( self.m_menuItem2 )
         self.m_menuItem2.Enable(False)
+        self.m_discardColumn = self.m_menu1.Append(wx.NewId(), "Discard first column", "", wx.ITEM_CHECK)
+        self.m_discardColumn.Check()
+        self.m_menu1.AppendSeparator()
         
-        self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Reset Data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_menu1.AppendItem(self.m_menuItem4)
         self.m_menuItem4.Enable(False)
 
@@ -103,7 +106,7 @@ class MainFrame ( wx.Frame ):
         #Information part of the interface
         sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Information" ), wx.VERTICAL )
         
-        self.m_staticText2 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"File:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Main file:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         self.m_staticText2.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
@@ -129,7 +132,7 @@ class MainFrame ( wx.Frame ):
         
         sbSizer2.Add( bSizer1, 1, wx.EXPAND|wx.LEFT, 5 )
         
-        self.m_staticText9 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Additional File:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText9 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
@@ -310,15 +313,15 @@ class MainFrame ( wx.Frame ):
             possibleArguments = ['-help','-loadCSV']
 
             for argument in arguments:
-            	if argument[0] == '-':
-            		if argument not in possibleArguments:
-            			print "\n** ERROR: command '"+argument+"' not recognized **\n"
-            			print "** GASATaD terminal mode commands:"
-            			print HelpString
-            			sys.exit(0)
+                if argument[0] == '-':
+                    if argument not in possibleArguments:
+                        print "\n** ERROR: command '"+argument+"' not recognized **\n"
+                        print "** GASATaD terminal mode commands:"
+                        print HelpString
+                        sys.exit(0)
             
             if "-help" in arguments:
-            	print ("\n** GASATaD: terminal mode **\n")
+                print ("\n** GASATaD: terminal mode **\n")
                 print HelpString
                 sys.exit(0)
 
@@ -398,12 +401,16 @@ class MainFrame ( wx.Frame ):
                 
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
+                discardCol = None
+
+                if self.m_discardColumn.IsChecked()==True:
+                    discardCol=0
+
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
+                    self.data = read_csv(self.Datafile, sep = None, index_col = discardCol, engine = 'python')
                 
                 if self.fileExtension == "xlsx":
-                    
-                    self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = 0)
+                    self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
                 
                 wOpenFile.Destroy()
 
@@ -473,12 +480,15 @@ class MainFrame ( wx.Frame ):
                 if ((self.Datafile is not None) and self.filename.rpartition(".")[-1] in ['csv', 'xlsx']):
                     
                     #self.fileExtension = self.filename.partition(".")[-1]
+                    discardCol = None
+                    if self.m_discardColumn.IsChecked()==True:
+                        discardCol=0
+
                     if self.fileExtension == "csv":
-                        self.data = read_csv(self.Datafile, delimiter = ',', index_col = 0)
+                        self.data = read_csv(self.Datafile, delimiter = ',', index_col = discardCol, engine = 'python')
                     
                     if self.fileExtension == "xlsx":
-                       
-                        self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = 0)
+                        self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
                     
                         
                     hasSameNumRows = self.controller.OpenAdditionalFile(self.data, self.filename)
