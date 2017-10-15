@@ -1,8 +1,6 @@
 ALL:
 	Scrollbars
-	Many problems reading csv files:
-		- Strings without quotes
-		- Long file names (test1.out.csv)
+	Problems reading csv files:
 		- Little information of errors
 WIN:
 	Build the .msi package

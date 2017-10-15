@@ -396,7 +396,8 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
                 
                 
-                self.fileExtension = self.filename.partition(".")[-1]
+                self.fileExtension = self.filename.rpartition(".")[-1]
+
                 if self.fileExtension == "csv":
                     self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
                 
@@ -467,9 +468,9 @@ class MainFrame ( wx.Frame ):
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
-                self.fileExtension = self.filename.partition(".")[-1]
+                self.fileExtension = self.filename.rpartition(".")[-1]
                 
-                if ((self.Datafile is not None) and self.filename.partition(".")[-1] in ['csv', 'xlsx']):
+                if ((self.Datafile is not None) and self.filename.rpartition(".")[-1] in ['csv', 'xlsx']):
                     
                     #self.fileExtension = self.filename.partition(".")[-1]
                     if self.fileExtension == "csv":
@@ -502,7 +503,7 @@ class MainFrame ( wx.Frame ):
     
                 else:
 
-                    if self.filename.partition(".")[-1] not in ['csv', 'xlsx']:
+                    if self.filename.rpartition(".")[-1] not in ['csv', 'xlsx']:
                         self.dlg = wx.MessageDialog(None, "The file format is incorrect", "Be careful!", wx.OK | wx.ICON_EXCLAMATION)
                         
                         if self.dlg.ShowModal() == wx.ID_OK:
