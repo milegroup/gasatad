@@ -42,6 +42,9 @@ class Controller():
 
 
     def ConcatDataFrame(self, dataFrame_1, dataFrame_2):
+
+        dataFrame_1.reset_index(drop=True, inplace=True)
+        dataFrame_2.reset_index(drop=True, inplace=True)
                
         nameColumns = list(dataFrame_1.columns)
         
@@ -92,7 +95,8 @@ class Controller():
         
         except:
             
-            print("Error: ", sys.exc_info()[0])
+            print "Error: ", sys.exc_info()[0]
+
     
     
     

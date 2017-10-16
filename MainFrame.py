@@ -341,7 +341,8 @@ class MainFrame ( wx.Frame ):
         
         try:
                 self.Datafile = open(fileName, 'r')            
-                self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
+                self.data = read_csv(self.Datafile, sep = None, header=0, index_col = 0, engine = 'python')
+                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 self.controller.OpenFile(self.data, os.path.basename(fileName))                    
                 self.m_menuItem2.Enable(True)
@@ -407,10 +408,12 @@ class MainFrame ( wx.Frame ):
                     discardCol=0
 
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = None, index_col = discardCol, engine = 'python')
+                    self.data = read_csv(self.Datafile, sep = None, header=0, index_col = discardCol, engine = 'python')
+                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 if self.fileExtension == "xlsx":
                     self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
+                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 wOpenFile.Destroy()
 
@@ -485,16 +488,18 @@ class MainFrame ( wx.Frame ):
                         discardCol=0
 
                     if self.fileExtension == "csv":
-                        self.data = read_csv(self.Datafile, delimiter = ',', index_col = discardCol, engine = 'python')
+                        self.data = read_csv(self.Datafile, delimiter = ',', header=0, index_col = discardCol, engine = 'python')
+                        self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                     
                     if self.fileExtension == "xlsx":
                         self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
+                        self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                     
                         
                     hasSameNumRows = self.controller.OpenAdditionalFile(self.data, self.filename)
+
                     
                     if hasSameNumRows:
-                        
                         self.fillInGrid()
                         self.descriptiveStatsBtn.Enable()
                         self.newColumnBtn.Enable()
