@@ -5,7 +5,6 @@ WIN:
 	Build the .msi package
 
 MAC:
-	Build the package
 	Try to remove "python" fron the main app bar
 
 DEB:
