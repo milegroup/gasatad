@@ -1,7 +1,6 @@
 ALL:
 	Scrollbars
-	Problems reading csv files:
-		- Little information of errors
+
 WIN:
 	Build the .msi package
 
