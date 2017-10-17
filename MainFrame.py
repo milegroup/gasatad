@@ -66,34 +66,49 @@ class MainFrame ( wx.Frame ):
         #MENU BAR
         self.m_menubar1 = wx.MenuBar( 0 )
         
-        self.m_menu1 = wx.Menu()
-        self.m_menu2 = wx.Menu()
-        self.m_menu3 = wx.Menu()
-        self.m_menu4 = wx.Menu()
+        self.m_fileMenu = wx.Menu()
+        self.m_optionsMenu = wx.Menu()
+        self.m_aboutMenu = wx.Menu()
 
-        self.m_menuItem1 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open main file", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menu1.AppendItem( self.m_menuItem1 )
+        self.m_menuItem1 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open main file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuItem1 )
         
-        self.m_menuItem2 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Open additional file", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menu1.AppendItem( self.m_menuItem2 )
+        self.m_menuItem2 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open additional file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuItem2 )
         self.m_menuItem2.Enable(False)
-        self.m_discardColumn = self.m_menu1.Append(wx.NewId(), "Discard first column", "", wx.ITEM_CHECK)
-        self.m_discardColumn.Check()
-        self.m_menu1.AppendSeparator()
+
         
-        self.m_menuItem4 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menu1.AppendItem(self.m_menuItem4)
+
+        self.m_discardColumn = self.m_optionsMenu.Append(wx.NewId(), u"Discard first column", "", wx.ITEM_CHECK)
+        self.m_discardColumn.Check()
+
+        self.m_optionsSubMenu = wx.Menu()
+        self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(wx.NewId(), u"Comma ,", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator2 = self.m_optionsSubMenu.Append(wx.NewId(), u"Semicolon ;", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator3 = self.m_optionsSubMenu.Append(wx.NewId(), u"Tabulator", "", wx.ITEM_RADIO)
+
+
+        self.m_optionsMenu.AppendMenu(wx.NewId(), u"CVS character separator",self.m_optionsSubMenu)
+
+
+        
+        self.m_menuItem4 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem(self.m_menuItem4)
         self.m_menuItem4.Enable(False)
 
-        self.m_menuItem6 = wx.MenuItem( self.m_menu1, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menu1.AppendItem( self.m_menuItem6 )
+        self.m_menuItem6 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuItem6 )
+
+
+
+       
         
-        self.m_menuItem5 = wx.MenuItem( self.m_menu3, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_menu3.AppendItem(self.m_menuItem5)
+        self.m_menuItem5 = wx.MenuItem( self.m_aboutMenu, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_aboutMenu.AppendItem(self.m_menuItem5)
         
-        self.m_menubar1.Append( self.m_menu1, u"File" )
-        #self.m_menubar1.Append( self.m_menu4, u"Edit")
-        self.m_menubar1.Append( self.m_menu3, u"About" )
+        self.m_menubar1.Append( self.m_fileMenu, u"File" )
+        self.m_menubar1.Append( self.m_optionsMenu, u"Options")
+        self.m_menubar1.Append( self.m_aboutMenu, u"About" )
                 
         self.SetMenuBar( self.m_menubar1 )
         
@@ -373,8 +388,6 @@ class MainFrame ( wx.Frame ):
         self.boxPlotBtn.Enable()
         self.barChartBtn.Enable()
         self.significanceTestBtn.Enable()   
-        if self.controller.nullValuesInFile(self.data):
-            self.informationAboutNullValues()
 
         print "File: "+fileName+" loaded"
 
@@ -398,17 +411,23 @@ class MainFrame ( wx.Frame ):
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
-                
-                
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
                 discardCol = None
+                sepChar = ''
 
-                if self.m_discardColumn.IsChecked()==True:
+                if self.m_discardColumn.IsChecked():
                     discardCol=0
 
+                if self.m_CVSSeparator1.IsChecked():
+                    sepChar=','
+                elif self.m_CVSSeparator2.IsChecked():
+                    sepChar=';'
+                elif self.m_CVSSeparator3.IsChecked():
+                    sepChar='\t'
+
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = None, header=0, index_col = discardCol, engine = 'python')
+                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, index_col = discardCol, engine = 'python')
                     self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 if self.fileExtension == "xlsx":
@@ -445,8 +464,7 @@ class MainFrame ( wx.Frame ):
                     self.significanceTestBtn.Enable()   
                     
                     if self.controller.nullValuesInFile(self.data):
-                        
-                        self.informationAboutNullValues()
+                       raise ValueError("There are null values in the file")
                         
                     self.params['dataPresent'] = True
                     self.firstFileAdded()
@@ -454,7 +472,9 @@ class MainFrame ( wx.Frame ):
         except:
             
             print("Error: ", sys.exc_info()[0])
-            self.dlg = wx.MessageDialog(None, "The file format is incorrect", "Be careful!", wx.OK | wx.ICON_EXCLAMATION)
+            type, value, traceback = sys.exc_info()
+            
+            self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
             
             if self.dlg.ShowModal() == wx.ID_OK:
             
@@ -462,7 +482,7 @@ class MainFrame ( wx.Frame ):
 
 
                 
-    def OpenAdditionalFile(self, *events):        
+    def OpenAdditionalFile(self, *events):       
         
         self.Datafile = None
         self.data = None
@@ -479,56 +499,58 @@ class MainFrame ( wx.Frame ):
                 self.directory = wOpenFile.GetDirectory()
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
                 self.fileExtension = self.filename.rpartition(".")[-1]
+
+                discardCol = None
+                sepChar = ''
+
+                if self.m_discardColumn.IsChecked():
+                    discardCol=0
+
+                if self.m_CVSSeparator1.IsChecked():
+                    sepChar=','
+                elif self.m_CVSSeparator2.IsChecked():
+                    sepChar=';'
+                elif self.m_CVSSeparator3.IsChecked():
+                    sepChar='\t'
+
+                if self.fileExtension == "csv":
+                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, index_col = discardCol, engine = 'python')
+                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                if ((self.Datafile is not None) and self.filename.rpartition(".")[-1] in ['csv', 'xlsx']):
-                    
-                    #self.fileExtension = self.filename.partition(".")[-1]
-                    discardCol = None
-                    if self.m_discardColumn.IsChecked()==True:
-                        discardCol=0
+                if self.fileExtension == "xlsx":
+                    self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
+                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
 
-                    if self.fileExtension == "csv":
-                        self.data = read_csv(self.Datafile, delimiter = ',', header=0, index_col = discardCol, engine = 'python')
-                        self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-                    
-                    if self.fileExtension == "xlsx":
-                        self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
-                        self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-                    
-                        
-                    hasSameNumRows = self.controller.OpenAdditionalFile(self.data, self.filename)
+                if (len(self.data.columns)==0):
+                    raise ValueError("There was a problem reading the columns of the file")
 
-                    
-                    if hasSameNumRows:
-                        self.fillInGrid()
-                        self.descriptiveStatsBtn.Enable()
-                        self.newColumnBtn.Enable()
-                        self.resetDataBtn.Enable()
-                        self.deleteColumnsBtn.Enable()
-                        self.exportDataBtn.Enable()
-                        self.significanceTestBtn.Enable()
-                        self.m_grid2.Enable()
-                    
-                        self.m_textCtrl11.SetValue(str(len(self.data.columns)))
-                        self.m_textCtrl21.SetValue(str(len(self.data.index)))
-                        self.m_menuItem2.Enable(False)
-                    else:
-                        
-                        self.notSameNumberOfRows()
-    
-                else:
+                if (self.Datafile is not None):
+                
+                    if self.controller.OpenAdditionalFile(self.data, self.filename)==False:
+                        raise ValueError("Number of rows do not match")
 
-                    if self.filename.rpartition(".")[-1] not in ['csv', 'xlsx']:
-                        self.dlg = wx.MessageDialog(None, "The file format is incorrect", "Be careful!", wx.OK | wx.ICON_EXCLAMATION)
-                        
-                        if self.dlg.ShowModal() == wx.ID_OK:
-            
-                            self.dlg.Destroy()
+                    if self.controller.nullValuesInFile(self.data):
+                       raise ValueError("There are null values in the file")
+
+                    self.fillInGrid()
+                    self.descriptiveStatsBtn.Enable()
+                    self.newColumnBtn.Enable()
+                    self.resetDataBtn.Enable()
+                    self.deleteColumnsBtn.Enable()
+                    self.exportDataBtn.Enable()
+                    self.significanceTestBtn.Enable()
+                    self.m_grid2.Enable()
+                
+                    self.m_textCtrl11.SetValue(str(len(self.data.columns)))
+                    self.m_textCtrl21.SetValue(str(len(self.data.index)))
+                    self.m_menuItem2.Enable(False)
         
         except:
             
             print("Error: ", sys.exc_info()[0])
-            self.dlg = wx.MessageDialog(None, "The file format is incorrect", "Be careful!", wx.OK | wx.ICON_EXCLAMATION)
+            type, value, traceback = sys.exc_info()
+
+            self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
             
             
             if self.dlg.ShowModal() == wx.ID_OK:
@@ -882,16 +904,7 @@ class MainFrame ( wx.Frame ):
         if dlg.ShowModal() == wx.ID_OK:
             
             dlg.Destroy()
-    
-            
-    def notSameNumberOfRows(self):
         
-        dlg = wx.MessageDialog(None, "The additional file has not the same number of rows as the first one! Please, check the file!", "Attention!", wx.OK | wx.ICON_INFORMATION)
-            
-            
-        if dlg.ShowModal() == wx.ID_OK:
-            
-            dlg.Destroy()      
         
     def appInformation(self, event):
         
