@@ -403,7 +403,7 @@ class MainFrame ( wx.Frame ):
         
         try:
             
-            self.fileExtensions = "Todos los archivos (*.*)|*.*"
+            self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
             
             wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
@@ -413,12 +413,12 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
-                discardCol = None
-                sepChar = ''
 
+                discardCol = None
                 if self.m_discardColumn.IsChecked():
                     discardCol=0
 
+                sepChar = ''
                 if self.m_CVSSeparator1.IsChecked():
                     sepChar=','
                 elif self.m_CVSSeparator2.IsChecked():
@@ -430,7 +430,7 @@ class MainFrame ( wx.Frame ):
                     self.data = read_csv(self.Datafile, sep = sepChar, header=0, index_col = discardCol, engine = 'python')
                     self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                if self.fileExtension == "xlsx":
+                if self.fileExtension == "xlsx" or self.fileExtension == "xls":
                     self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
                     self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
@@ -489,10 +489,9 @@ class MainFrame ( wx.Frame ):
 
         try:
             
-            self.fileExtensions = "Todos los archivos (*.*)|*.*"
-            
-            
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
+             
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard=self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
