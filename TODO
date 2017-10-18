@@ -2,7 +2,6 @@ ALL:
 	Scrollbars
 
 WIN:
-	Build the .msi package
 
 MAC:
 	Try to remove "python" fron the main app bar
