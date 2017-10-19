@@ -48,7 +48,9 @@ class MainFrame ( wx.Frame ):
      
     def __init__( self, parent ):
 
-        # print "Invoked from directory:",self.params['dirFrom']
+        self.configInit()
+
+        # print "Invoked from directory:",self.params['options']['dirfrom']
         
         #Width and Height of the screen
         width, height = wx.GetDisplaySize()
@@ -405,11 +407,12 @@ class MainFrame ( wx.Frame ):
             
             self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
             
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
+                self.params['options']['dirfrom'] = self.directory
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
@@ -491,11 +494,12 @@ class MainFrame ( wx.Frame ):
             
             self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
              
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['dirFrom'], defaultFile = '', wildcard=self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard=self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
             
             if wOpenFile.ShowModal() == wx.ID_OK:
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
+                self.params['options']['dirfrom'] = self.directory
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
@@ -883,14 +887,11 @@ class MainFrame ( wx.Frame ):
     def firstFileAdded(self):
         
         dlg = wx.MessageDialog(None, "A file has been opened\nClick 'yes' to add another file to the data", "Additional File", wx.YES_NO | wx.ICON_INFORMATION)
-            
-            
-        if dlg.ShowModal() == wx.ID_YES:
-            
+                        
+        if dlg.ShowModal() == wx.ID_YES:            
             self.OpenAdditionalFile()
     
-        else:
-            
+        else:  
             dlg.Destroy()
 
 
@@ -898,10 +899,8 @@ class MainFrame ( wx.Frame ):
     def informationAboutNullValues(self):
         
         dlg = wx.MessageDialog(None, "There are null values in this File", "Null Values", wx.OK | wx.ICON_INFORMATION)
-            
-            
+                        
         if dlg.ShowModal() == wx.ID_OK:
-            
             dlg.Destroy()
         
         
@@ -909,8 +908,7 @@ class MainFrame ( wx.Frame ):
         
         description = u'Graphical Application for Statistical Analysis of TAbulated Data\n\nDaniel Pereira Alonso\nLeandro Rodr\u00EDguez Liñares\nMar\u00EDa Jos\u00E9 Lado Touriño'
         
-        info = wx.AboutDialogInfo()
-    
+        info = wx.AboutDialogInfo()    
 
         info.SetName('GASATaD')
         info.SetVersion(str(self.params['version']))
@@ -927,9 +925,61 @@ class MainFrame ( wx.Frame ):
             result = dlg.ShowModal()
             dlg.Destroy()
             if result == wx.ID_OK:
+                self.configSave()
                 self.Destroy()
         else:
+            self.configSave()
             self.Destroy()
+
+
+    def configInit(self):
+        """If config dir and file does not exist, it is created
+        If config file exists, it is loaded"""
+        
+        from ConfigParser import SafeConfigParser
+
+        # print "Intializing configuration"
+        
+        if not os.path.exists(self.params['configDir']):
+            # print "Directory does not exists ... creating"
+            os.makedirs(self.params['configDir'])
+            
+        if os.path.exists(self.params['configFile']):
+            # print "Loading config"
+            self.configLoad()
+        else:
+            # print "Saving config"
+            self.configSave()
+
+    def configSave(self):
+        """ Saves configuration file"""
+        from ConfigParser import SafeConfigParser
+        options = SafeConfigParser()
+        
+        options.add_section('gasatad')
+        
+        for param in self.params['options'].keys():
+            options.set('gasatad',param,self.params['options'][param])
+        
+        tempF = open(self.params['configFile'],'w')
+        options.write(tempF)
+        tempF.close()
+
+        if platform=="win32":
+            import win32api,win32con
+            win32api.SetFileAttributes(self.configDir,win32con.FILE_ATTRIBUTE_HIDDEN)
+
+    def configLoad(self):
+        """ Loads configuration file"""
+        # print "Loading file",self.params['configFile']
+        from ConfigParser import SafeConfigParser
+        options=SafeConfigParser()
+        options.read(self.params['configFile'])
+        for section in options.sections():
+            for param,value in options.items(section):
+                self.params['options'][param]=value
+                # print "param",param,"  -  value",value
+
 
 
 

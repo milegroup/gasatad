@@ -22,10 +22,16 @@ import os
 
 from MainFrame import MainFrame
 
-MainFrame.params={}
-MainFrame.params['dirFrom']=os.getcwd()
-MainFrame.params['version']=0.9
-MainFrame.params['dataPresent']=False
+MainFrame.params = {}
+MainFrame.params['version'] = 0.9
+MainFrame.params['dataPresent'] = False
+MainFrame.params['configDir'] = os.path.expanduser('~')+os.sep+'.gasatad'
+MainFrame.params['configFile'] = MainFrame.params['configDir']+os.sep+"gasatad.cfg"
+
+# Factory options to write in file gasatad.cfg
+    # Keys must be lowercase
+MainFrame.params['options'] = {}  
+MainFrame.params['options']['dirfrom'] = os.getcwd()
 
 # Uncomment the following line before build .deb package
 # os.chdir("/usr/share/gasatad")
