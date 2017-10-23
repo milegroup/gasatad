@@ -81,8 +81,11 @@ class MainFrame ( wx.Frame ):
 
         
 
-        self.m_discardColumn = self.m_optionsMenu.Append(wx.NewId(), u"Discard first column", "", wx.ITEM_CHECK)
-        self.m_discardColumn.Check()
+        
+        self.m_discardColumn = self.m_optionsMenu.Append(100, u"Discard first column", "", wx.ITEM_CHECK)
+        self.Bind(wx.EVT_MENU_RANGE, self.discardColumnCheckboxChanged, id=100)
+        if self.params['options']['discardfirstcolumn']=="True":
+            self.m_discardColumn.Check()
 
         self.m_optionsSubMenu = wx.Menu()
         self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(wx.NewId(), u"Comma ,", "", wx.ITEM_RADIO)
@@ -317,6 +320,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.createBarChart, self.barChartBtn)
         self.Bind(wx.EVT_BUTTON, self.doSignificanceTest, self.significanceTestBtn)
         
+        
         #A controller object is created
         self.controller = Controller()   
 
@@ -349,7 +353,6 @@ class MainFrame ( wx.Frame ):
                     self.OpenCVSFileNoGUI(CSVFileName)
 
 
-    
     
     
     def OpenCVSFileNoGUI(self, fileName):       
@@ -418,7 +421,7 @@ class MainFrame ( wx.Frame ):
 
 
                 discardCol = None
-                if self.m_discardColumn.IsChecked():
+                if self.params['options']['discardfirstcolumn']=='True':
                     discardCol=0
 
                 sepChar = ''
@@ -506,7 +509,7 @@ class MainFrame ( wx.Frame ):
                 discardCol = None
                 sepChar = ''
 
-                if self.m_discardColumn.IsChecked():
+                if self.params['options']['discardfirstcolumn']=='True':
                     discardCol=0
 
                 if self.m_CVSSeparator1.IsChecked():
@@ -870,6 +873,13 @@ class MainFrame ( wx.Frame ):
         else:
             
             wx.MessageBox("There are no numerical variables", "Attention!")
+
+    
+    def discardColumnCheckboxChanged(self, event):
+        if self.m_discardColumn.IsChecked():
+            self.params['options']['discardfirstcolumn']='True'
+        else:
+            self.params['options']['discardfirstcolumn']='False'
     
         
         

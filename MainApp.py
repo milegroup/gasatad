@@ -32,6 +32,7 @@ MainFrame.params['configFile'] = MainFrame.params['configDir']+os.sep+"gasatad.c
     # Keys must be lowercase
 MainFrame.params['options'] = {}  
 MainFrame.params['options']['dirfrom'] = os.getcwd()
+MainFrame.params['options']['discardfirstcolumn'] = "True"
 
 # Uncomment the following line before build .deb package
 # os.chdir("/usr/share/gasatad")
