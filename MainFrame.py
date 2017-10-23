@@ -892,7 +892,6 @@ class MainFrame ( wx.Frame ):
             self.params['options']['sepchar']="Semicolon"
         if self.m_CVSSeparator3.IsChecked():
             self.params['options']['sepchar']="Tab"
-        print "Dícheslle!!"
     
         
         
