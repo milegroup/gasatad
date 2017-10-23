@@ -88,15 +88,19 @@ class MainFrame ( wx.Frame ):
             self.m_discardColumn.Check()
 
         self.m_optionsSubMenu = wx.Menu()
-        self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(wx.NewId(), u"Comma ,", "", wx.ITEM_RADIO)
-        self.m_CVSSeparator2 = self.m_optionsSubMenu.Append(wx.NewId(), u"Semicolon ;", "", wx.ITEM_RADIO)
-        self.m_CVSSeparator3 = self.m_optionsSubMenu.Append(wx.NewId(), u"Tabulator", "", wx.ITEM_RADIO)
-
+        self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(201, u"Comma ,", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator2 = self.m_optionsSubMenu.Append(202, u"Semicolon ;", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator3 = self.m_optionsSubMenu.Append(203, u"Tabulator", "", wx.ITEM_RADIO)
+        self.Bind(wx.EVT_MENU_RANGE, self.cvsCharacterSeparatorChanged, id=201, id2=203)
+        if self.params['options']['sepchar']=="Comma":
+            self.m_CVSSeparator1.Check()
+        elif self.params['options']['sepchar']=="Semicolon":
+            self.m_CVSSeparator2.Check()
+        elif self.params['options']['sepchar']=="Tab":
+            self.m_CVSSeparator3.Check()
 
         self.m_optionsMenu.AppendMenu(wx.NewId(), u"CVS character separator",self.m_optionsSubMenu)
 
-
-        
         self.m_menuItem4 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem(self.m_menuItem4)
         self.m_menuItem4.Enable(False)
@@ -425,11 +429,11 @@ class MainFrame ( wx.Frame ):
                     discardCol=0
 
                 sepChar = ''
-                if self.m_CVSSeparator1.IsChecked():
+                if self.params['options']['sepchar']=="Comma":
                     sepChar=','
-                elif self.m_CVSSeparator2.IsChecked():
+                elif self.params['options']['sepchar']=="Semicolon":
                     sepChar=';'
-                elif self.m_CVSSeparator3.IsChecked():
+                elif self.params['options']['sepchar']=="Tab":
                     sepChar='\t'
 
                 if self.fileExtension == "csv":
@@ -512,11 +516,11 @@ class MainFrame ( wx.Frame ):
                 if self.params['options']['discardfirstcolumn']=='True':
                     discardCol=0
 
-                if self.m_CVSSeparator1.IsChecked():
+                if self.params['options']['sepchar']=="Comma":
                     sepChar=','
-                elif self.m_CVSSeparator2.IsChecked():
+                elif self.params['options']['sepchar']=="Semicolon":
                     sepChar=';'
-                elif self.m_CVSSeparator3.IsChecked():
+                elif self.params['options']['sepchar']=="Tab":
                     sepChar='\t'
 
                 if self.fileExtension == "csv":
@@ -880,6 +884,15 @@ class MainFrame ( wx.Frame ):
             self.params['options']['discardfirstcolumn']='True'
         else:
             self.params['options']['discardfirstcolumn']='False'
+
+    def cvsCharacterSeparatorChanged(self, event):
+        if self.m_CVSSeparator1.IsChecked():
+            self.params['options']['sepchar']="Comma"
+        if self.m_CVSSeparator2.IsChecked():
+            self.params['options']['sepchar']="Semicolon"
+        if self.m_CVSSeparator3.IsChecked():
+            self.params['options']['sepchar']="Tab"
+        print "Dícheslle!!"
     
         
         
