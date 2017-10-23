@@ -68,19 +68,31 @@ class MainFrame ( wx.Frame ):
         #MENU BAR
         self.m_menubar1 = wx.MenuBar( 0 )
         
-        self.m_fileMenu = wx.Menu()
-        self.m_optionsMenu = wx.Menu()
-        self.m_aboutMenu = wx.Menu()
+        
+        
+        
 
-        self.m_menuItem1 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open main file", wx.EmptyString, wx.ITEM_NORMAL )
+        # ------------ File menu
+
+        self.m_fileMenu = wx.Menu()
+
+        self.m_menuItem1 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open new file", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuItem1 )
         
-        self.m_menuItem2 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open additional file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuItem2 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Add file", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuItem2 )
         self.m_menuItem2.Enable(False)
 
-        
+        self.m_menuItem4 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem(self.m_menuItem4)
+        self.m_menuItem4.Enable(False)
 
+        self.m_menuItem6 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuItem6 )
+
+        # ------------ Options menu
+
+        self.m_optionsMenu = wx.Menu()
         
         self.m_discardColumn = self.m_optionsMenu.Append(100, u"Discard first column", "", wx.ITEM_CHECK)
         self.Bind(wx.EVT_MENU_RANGE, self.discardColumnCheckboxChanged, id=100)
@@ -101,17 +113,13 @@ class MainFrame ( wx.Frame ):
 
         self.m_optionsMenu.AppendMenu(wx.NewId(), u"CVS character separator",self.m_optionsSubMenu)
 
-        self.m_menuItem4 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem(self.m_menuItem4)
-        self.m_menuItem4.Enable(False)
+        self.m_resetOptions = wx.MenuItem( self.m_optionsMenu, wx.ID_ANY, u"Reset options", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_optionsMenu.AppendItem(self.m_resetOptions)
 
-        self.m_menuItem6 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem( self.m_menuItem6 )
+        # ------------ About menu
 
+        self.m_aboutMenu = wx.Menu()
 
-
-       
-        
         self.m_menuItem5 = wx.MenuItem( self.m_aboutMenu, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_aboutMenu.AppendItem(self.m_menuItem5)
         
@@ -310,6 +318,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuItem1)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuItem2)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuItem4)
+        self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuItem5)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuItem6)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
@@ -683,6 +692,13 @@ class MainFrame ( wx.Frame ):
 
         self.params['dataPresent'] = False
 
+
+    def resetOptions(self,event):
+        print "## Reset options"
+        for key in self.params['optionsdefault'].keys():
+            self.params['options'][key] = self.params['optionsdefault'][key]
+        self.m_discardColumn.Check()
+        self.m_CVSSeparator1.Check()
 
     
     def deleteColumns(self, event):

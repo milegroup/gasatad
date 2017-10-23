@@ -30,10 +30,16 @@ MainFrame.params['configFile'] = MainFrame.params['configDir']+os.sep+"gasatad.c
 
 # Factory options to write in file gasatad.cfg
     # Keys must be lowercase
+
+MainFrame.params['optionsdefault'] = {}  
+MainFrame.params['optionsdefault']['dirfrom'] = os.getcwd()
+MainFrame.params['optionsdefault']['discardfirstcolumn'] = "True"
+MainFrame.params['optionsdefault']['sepchar'] = "Comma"
+
 MainFrame.params['options'] = {}  
-MainFrame.params['options']['dirfrom'] = os.getcwd()
-MainFrame.params['options']['discardfirstcolumn'] = "True"
-MainFrame.params['options']['sepchar'] = "Comma"
+for key in MainFrame.params['optionsdefault'].keys():
+    MainFrame.params['options'][key] = MainFrame.params['optionsdefault'][key]
+
 
 # Uncomment the following line before build .deb package
 # os.chdir("/usr/share/gasatad")
