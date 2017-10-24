@@ -2,6 +2,7 @@ ALL:
 	Scrollbars
 
 WIN:
+    Add xlrd
 
 MAC:
 	Try to remove "python" fron the main app bar
