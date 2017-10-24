@@ -38,6 +38,7 @@ from BasicStatisticsInterface import BasicStatisticsInterface
 
 from sys import platform
 
+
 ###########################################################################
 ## Class MainFrame
 ###########################################################################
@@ -281,16 +282,7 @@ class MainFrame ( wx.Frame ):
         
         # ------------------- Data table
 
-        import wx.grid as gridlib
-        
-        
-        # fgSizer8 = wx.GridSizer( 0, 0, 0, 0 )
-        #fgSizer8.SetFlexibleDirection( wx.BOTH )
-        #fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
-        
-        # self.m_grid2 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( (width*0.805),(height*0.89) ), wx.HSCROLL|wx.VSCROLL | wx.SHAPED )
-
-        self.m_grid2 = gridlib.Grid(self)
+        self.m_grid2 = wx.grid.Grid(self)
         
         # Grid
         self.m_grid2.CreateGrid( 45, 45 )
