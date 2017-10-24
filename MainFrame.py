@@ -285,12 +285,12 @@ class MainFrame ( wx.Frame ):
         
         # Columns
         self.m_grid2.EnableDragColMove( False )
-        self.m_grid2.EnableDragColSize( True )
+        self.m_grid2.EnableDragColSize( False )
         self.m_grid2.SetColLabelSize( 30 )
         self.m_grid2.SetColLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
         
         # Rows
-        self.m_grid2.EnableDragRowSize( True )
+        self.m_grid2.EnableDragRowSize( False )
         self.m_grid2.SetRowLabelSize( 80 )
         self.m_grid2.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
         
@@ -347,7 +347,9 @@ class MainFrame ( wx.Frame ):
         
         
         #A controller object is created
-        self.controller = Controller()   
+        self.controller = Controller()
+
+        self.CheckVersion()
 
         HelpString = (
             "      -help: shows this information\n"
@@ -379,6 +381,18 @@ class MainFrame ( wx.Frame ):
 
 
     
+    def CheckVersion(self):
+        from sys import argv
+        print "## Checking version"
+        print "##",argv[0]
+
+        platformString = ""
+        remoteFile = ""
+
+        if argv[0].endswith("gHRV.py"):
+            print "## Running GASATaD from source"
+            platformString = "src"
+            remoteVersionFile = "https://raw.github.com/milegroup/ghrv/master/ProgramVersions/src.txt"
     
     def OpenCVSFileNoGUI(self, fileName):       
         
