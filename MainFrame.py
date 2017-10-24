@@ -55,7 +55,7 @@ class MainFrame ( wx.Frame ):
         #Width and Height of the screen
         width, height = wx.GetDisplaySize()
         
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD", pos = wx.DefaultPosition, size = wx.Size( 500,300 ), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD", pos = wx.DefaultPosition, size = wx.Size( 500,300 ))
 
         
 
@@ -131,107 +131,115 @@ class MainFrame ( wx.Frame ):
         
         # self.m_menubar1.SetFocus()
         
-        gbSizer3 = wx.GridBagSizer( 0, 0 )
-        gbSizer3.SetFlexibleDirection( wx.BOTH )
-        gbSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_ALL )
+        globalSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        leftSizer = wx.BoxSizer(wx.VERTICAL)
+
+
+        #  -------------------- Information part of the interface
+
+        informationSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Information" ), wx.VERTICAL )
         
-        #Information part of the interface
-        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Information" ), wx.VERTICAL )
-        
-        self.m_staticText2 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Main file:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Main file:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         self.m_staticText2.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
-        sbSizer2.Add( self.m_staticText2, 0, wx.ALL, 5 )
+        informationSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
         
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText3 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText3.Wrap( -1 )
         bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl1 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        self.m_textCtrl1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
         bSizer1.Add( self.m_textCtrl1, 0, wx.ALL, 5 )
         self.m_textCtrl1.Enable(False)
         
-        self.m_staticText4 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText4 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         bSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl2 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        self.m_textCtrl2 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
         bSizer1.Add( self.m_textCtrl2, 0, wx.ALL, 5 )
         self.m_textCtrl2.Enable(False)
         
-        sbSizer2.Add( bSizer1, 1, wx.EXPAND|wx.LEFT, 5 )
+        informationSizer.Add( bSizer1, 1, wx.EXPAND|wx.LEFT, 5 )
         
-        self.m_staticText9 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText9 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText9.Wrap( -1 )
         self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
-        sbSizer2.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        informationSizer.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
         bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText31 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText31 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText31.Wrap( -1 )
         bSizer11.Add( self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl11 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        self.m_textCtrl11 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
         bSizer11.Add( self.m_textCtrl11, 0, wx.ALL, 5 )
         self.m_textCtrl11.Enable(False)
         
-        self.m_staticText41 = wx.StaticText( sbSizer2.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText41 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText41.Wrap( -1 )
         bSizer11.Add( self.m_staticText41, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl21 = wx.TextCtrl( sbSizer2.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        self.m_textCtrl21 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
         bSizer11.Add( self.m_textCtrl21, 0, wx.ALL, 5 )
         self.m_textCtrl21.Enable(False)
         
-        sbSizer2.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
+        informationSizer.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
        
+        leftSizer.Add(informationSizer,0)
+
+        #  -------------------- Buttons of the interface
         
-        gbSizer3.Add( sbSizer2, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 10 )
         
-        gSizer1 = wx.GridSizer( 0, 1, 0, 0 )
+        buttonsSizer = wx.BoxSizer(wx.VERTICAL)
 
         self.newColumnBtn = wx.Button( self, wx.ID_ANY, u"Add New Column", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.newColumnBtn.Enable( False )
         #self.newColumnBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.newColumnBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.newColumnBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset Data", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.resetDataBtn.Enable( False )
         #self.resetDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.deleteColumnsBtn = wx.Button( self, wx.ID_ANY, u"Delete Columns", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.deleteColumnsBtn.Enable( False )
         #self.deleteColumnsBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.deleteColumnsBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.deleteColumnsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export Data", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.exportDataBtn.Enable( False )
         #self.exportDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Descriptive Statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.descriptiveStatsBtn.Enable( False )
         #self.descriptiveStatsBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.descriptiveStatsBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.descriptiveStatsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.significanceTestBtn = wx.Button( self, wx.ID_ANY, u"Significance Test", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.significanceTestBtn.Enable( False )
         #self.significanceTestBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        gSizer1.Add( self.significanceTestBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        buttonsSizer.Add( self.significanceTestBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        gbSizer3.Add( gSizer1, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
+        leftSizer.Add( buttonsSizer, 0,  wx.ALL, 5 )
+
+        
+
+        #  -------------------- Buttons for plot
         
         gSizerChart = wx.GridSizer( 0, 2, 0, 0 )
         
@@ -267,14 +275,22 @@ class MainFrame ( wx.Frame ):
         self.barChartBtn.Enable(False)
         self.barChartBtn.SetToolTip(wx.ToolTip("Bar Chart"))  
         
-        gbSizer3.Add( gSizerChart, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
+        leftSizer.Add( gSizerChart, 0 )
+
+        globalSizer.Add( leftSizer, 0 )
+        
+        # ------------------- Data table
+
+        import wx.grid as gridlib
         
         
-        fgSizer8 = wx.FlexGridSizer( 0, 0, 0, 0 )
-        fgSizer8.SetFlexibleDirection( wx.BOTH )
-        fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
+        # fgSizer8 = wx.GridSizer( 0, 0, 0, 0 )
+        #fgSizer8.SetFlexibleDirection( wx.BOTH )
+        #fgSizer8.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.m_grid2 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( (width*0.805),(height*0.89) ), wx.HSCROLL|wx.VSCROLL | wx.SHAPED )
+        # self.m_grid2 = wx.grid.Grid( self, wx.ID_ANY, wx.DefaultPosition, wx.Size( (width*0.805),(height*0.89) ), wx.HSCROLL|wx.VSCROLL | wx.SHAPED )
+
+        self.m_grid2 = gridlib.Grid(self)
         
         # Grid
         self.m_grid2.CreateGrid( 45, 45 )
@@ -297,13 +313,18 @@ class MainFrame ( wx.Frame ):
 
         # Cell Defaults
         self.m_grid2.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_TOP )
-        fgSizer8.Add( self.m_grid2, 0, wx.ALL|wx.EXPAND, 5 )
-        self.m_grid2.Enable( False )
+
+        fgSizer8 = wx.BoxSizer(wx.VERTICAL)
+        fgSizer8.Add(self.m_grid2)
+        # fgSizer8.Add( self.m_grid2, 0, wx.ALL|wx.EXPAND, 5 )
+        self.m_grid2.Enable(False)
+        self.m_grid2.Show(True)
         
-        gbSizer3.Add( fgSizer8, wx.GBPosition( 0, 1 ), wx.GBSpan( 12, 12 ), wx.EXPAND, 5 )
+        # globalSizer.Add( fgSizer8, wx.GBPosition( 0, 1 ), wx.GBSpan( 12, 12 ), wx.EXPAND, 5 )
+        globalSizer.Add( fgSizer8, 0)
         
         #Options to show the GUI
-        self.SetSizer( gbSizer3 )
+        self.SetSizer( globalSizer )
         self.Layout()
         self.Centre( wx.BOTH )
         
@@ -484,6 +505,8 @@ class MainFrame ( wx.Frame ):
                     
                     if self.controller.nullValuesInFile(self.data):
                        raise ValueError("There are null values in the file")
+
+                    self.m_grid2.AutoSize()
                         
                     self.params['dataPresent'] = True
                     self.firstFileAdded()
@@ -563,6 +586,8 @@ class MainFrame ( wx.Frame ):
                     self.m_textCtrl11.SetValue(str(len(self.data.columns)))
                     self.m_textCtrl21.SetValue(str(len(self.data.index)))
                     self.m_menuItem2.Enable(False)
+
+                    self.m_grid2.AutoSize()
         
         except:
             
