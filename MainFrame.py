@@ -58,6 +58,8 @@ class MainFrame ( wx.Frame ):
         if platform != "darwin":
             icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
+
+        self.CheckVersion()
         
         # self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
                 
@@ -270,7 +272,26 @@ class MainFrame ( wx.Frame ):
         
         leftSizer.Add( gSizerChart, flag= wx.ALL | wx.EXPAND, border=5 )
 
-        globalSizer.Add( leftSizer, 0 )
+        # ------------------- Info about upgrades
+
+        if self.params['upgradable']:
+
+            import wx.lib.agw.gradientbutton as GB
+
+            leftSizer.AddStretchSpacer(1)
+            # self.upgradeButton = wx.Button( self, wx.ID_ANY, u"* New version: "+self.params['availableVersionToUpgrade']+" *", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.upgradeButton = GB.GradientButton(self, label = "New version available: "+self.params['availableVersionToUpgrade'])
+            self.upgradeButton.SetBaseColours(startcolour=wx.TheColourDatabase.Find('PALE GREEN'), foregroundcolour=wx.BLACK)
+            self.upgradeButton.SetPressedBottomColour(wx.TheColourDatabase.Find('LIGHT GREY'))
+            self.upgradeButton.SetPressedTopColour(wx.TheColourDatabase.Find('LIGHT GREY'))
+            boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+            boldFont.SetWeight(wx.BOLD)
+            self.upgradeButton.SetFont(boldFont)
+
+            leftSizer.Add( self.upgradeButton, flag= wx.ALL | wx.EXPAND, border=5 )
+
+
+        globalSizer.Add( leftSizer, flag = wx.EXPAND|wx.ALL, border=10 )
         
         # ------------------- Data table
 
@@ -305,7 +326,7 @@ class MainFrame ( wx.Frame ):
         self.m_grid2.Show(True)
         
         # globalSizer.Add( fgSizer8, wx.GBPosition( 0, 1 ), wx.GBSpan( 12, 12 ), wx.EXPAND, 5 )
-        globalSizer.Add( fgSizer8, 0)
+        globalSizer.Add( fgSizer8, flag= wx.ALL | wx.EXPAND, border=10 )
         
         #Options to show the GUI
         self.SetSizer( globalSizer )
@@ -349,8 +370,6 @@ class MainFrame ( wx.Frame ):
         #A controller object is created
         self.controller = Controller()
 
-        self.CheckVersion()
-
         HelpString = (
             "      -help: shows this information\n"
             "      -loadCSV fileName: loads CSV file (full path is required)\n"
@@ -383,16 +402,36 @@ class MainFrame ( wx.Frame ):
     
     def CheckVersion(self):
         from sys import argv
-        print "## Checking version"
-        print "##",argv[0]
+        import urllib2
 
         platformString = ""
-        remoteFile = ""
+        remoteVersion = ""
+        remoteVersionFile = ""
 
-        if argv[0].endswith("gHRV.py"):
-            print "## Running GASATaD from source"
+        if argv[0].endswith("MainApp.py"):
+            # print "## Running GASATaD from source"
             platformString = "src"
-            remoteVersionFile = "https://raw.github.com/milegroup/ghrv/master/ProgramVersions/src.txt"
+            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/src.txt"
+
+        try:
+            remoteFile = urllib2.urlopen(remoteVersionFile)
+            remoteVersion=remoteFile.readline().strip()
+            remoteFile.close()
+            # print "## Version available in GASATaD web page: ", remoteVersion
+        except urllib2.URLError:
+            # print "## I couldn't check for updates"
+            None
+
+        if remoteVersion:
+            # print "## Version file exists"
+            if float(remoteVersion) > float(self.params['version']):
+                self.params['upgradable'] = True
+                self.params['availableVersionToUpgrade'] = remoteVersion
+
+            # self.params['upgradable'] = True
+            # self.params['availableVersionToUpgrade'] = remoteVersion
+
+        
     
     def OpenCVSFileNoGUI(self, fileName):       
         
