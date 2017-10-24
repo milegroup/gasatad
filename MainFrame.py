@@ -53,26 +53,18 @@ class MainFrame ( wx.Frame ):
 
         # print "Invoked from directory:",self.params['options']['dirfrom']
         
-        #Width and Height of the screen
-        width, height = wx.GetDisplaySize()
-        
-        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD", pos = wx.DefaultPosition, size = wx.Size( 500,300 ))
-
-        
+        wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD")
 
         if platform != "darwin":
             icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
         
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
+        # self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
                 
         #MENU BAR
         self.m_menubar1 = wx.MenuBar( 0 )
         
         
-        
-        
-
         # ------------ File menu
 
         self.m_fileMenu = wx.Menu()
@@ -242,7 +234,7 @@ class MainFrame ( wx.Frame ):
 
         #  -------------------- Buttons for plot
         
-        gSizerChart = wx.GridSizer( 0, 2, 0, 0 )
+        gSizerChart = wx.GridSizer( 0, 3, 0, 0 )
         
         #Images needed for the buttons
         self.histogramBmp = wx.Image(str(os.path.dirname(__file__))+"/icons/histogram1.png", wx.BITMAP_TYPE_ANY).ConvertToBitmap()
@@ -276,7 +268,7 @@ class MainFrame ( wx.Frame ):
         self.barChartBtn.Enable(False)
         self.barChartBtn.SetToolTip(wx.ToolTip("Bar Chart"))  
         
-        leftSizer.Add( gSizerChart, 0 )
+        leftSizer.Add( gSizerChart, flag= wx.ALL | wx.EXPAND, border=5 )
 
         globalSizer.Add( leftSizer, 0 )
         
@@ -304,7 +296,7 @@ class MainFrame ( wx.Frame ):
         
 
         # Cell Defaults
-        self.m_grid2.SetDefaultCellAlignment( wx.ALIGN_LEFT, wx.ALIGN_TOP )
+        self.m_grid2.SetDefaultCellAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTER )
 
         fgSizer8 = wx.BoxSizer(wx.VERTICAL)
         fgSizer8.Add(self.m_grid2)
@@ -321,8 +313,15 @@ class MainFrame ( wx.Frame ):
         self.Centre( wx.BOTH )
         
         self.Show(True)
-        self.Move((0,0)) 
-        self.Maximize()
+        # self.Move((0,0))
+        widthScreen, heightScreen = wx.GetDisplaySize()
+        widthWindow = 1440
+        heightWindow = 900
+        if ((widthScreen>=widthWindow) and (heightScreen>heightWindow)):
+            self.SetSize((widthWindow,heightWindow)) 
+        else:
+            self.Maximize()
+        self.SetMinSize((1024,768))
         
         #Binding between buttons and functions which will control the events
 
@@ -424,6 +423,9 @@ class MainFrame ( wx.Frame ):
 
         self.params['dataPresent'] = True
 
+        self.m_grid2.AutoSize()
+        self.Layout()
+
 
 
 
@@ -499,6 +501,7 @@ class MainFrame ( wx.Frame ):
                        raise ValueError("There are null values in the file")
 
                     self.m_grid2.AutoSize()
+                    self.Layout()
                         
                     self.params['dataPresent'] = True
                     self.firstFileAdded()
@@ -580,6 +583,7 @@ class MainFrame ( wx.Frame ):
                     self.m_menuItem2.Enable(False)
 
                     self.m_grid2.AutoSize()
+                    self.Layout()
         
         except:
             
@@ -709,6 +713,11 @@ class MainFrame ( wx.Frame ):
 
         self.params['dataPresent'] = False
 
+        self.m_grid2.SetColLabelSize( 30 )
+        self.m_grid2.SetRowLabelSize( 80 )
+        #self.m_grid2.AutoSize()
+        self.Layout()
+
 
     def resetOptions(self,event):
         print "## Reset options"
@@ -739,6 +748,9 @@ class MainFrame ( wx.Frame ):
                     self.resetData(None)
                 else:
                     self.fillInGrid()
+                
+                self.m_grid2.AutoSize()
+                self.Layout()
   
             else:
             
@@ -764,7 +776,9 @@ class MainFrame ( wx.Frame ):
             
                 self.controller.addColumn(factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor)
                 
-                self.fillInGrid()            
+                self.fillInGrid()
+                self.m_grid2.AutoSize()
+                self.Layout()         
         else:
             
             wx.MessageBox("There are no numerical values", "Attention!")
