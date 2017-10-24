@@ -193,7 +193,7 @@ class MainFrame ( wx.Frame ):
         
         informationSizer.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
        
-        leftSizer.Add(informationSizer,0)
+        leftSizer.Add(informationSizer,flag= wx.ALL, border=5)
 
         #  -------------------- Buttons of the interface
         
@@ -236,7 +236,7 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer.Add( self.significanceTestBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        leftSizer.Add( buttonsSizer, 0,  wx.EXPAND, 5 )
+        leftSizer.Add( buttonsSizer, flag= wx.ALL | wx.EXPAND, border=5)
 
         
 
