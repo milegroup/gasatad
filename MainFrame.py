@@ -202,7 +202,7 @@ class MainFrame ( wx.Frame ):
 
         self.newColumnBtn = wx.Button( self, wx.ID_ANY, u"Add New Column", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.newColumnBtn.Enable( False )
-        #self.newColumnBtn.SetMinSize( wx.Size( -1,25 ) )
+        # self.newColumnBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.newColumnBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
@@ -236,7 +236,7 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer.Add( self.significanceTestBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        leftSizer.Add( buttonsSizer, 0,  wx.ALL, 5 )
+        leftSizer.Add( buttonsSizer, 0,  wx.EXPAND, 5 )
 
         
 
