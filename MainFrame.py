@@ -287,6 +287,7 @@ class MainFrame ( wx.Frame ):
             boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
             boldFont.SetWeight(wx.BOLD)
             self.upgradeButton.SetFont(boldFont)
+            self.Bind(wx.EVT_BUTTON, self.openBrowserDownload, id=self.upgradeButton.GetId())
 
             leftSizer.Add( self.upgradeButton, flag= wx.ALL | wx.EXPAND, border=5 )
 
@@ -403,21 +404,29 @@ class MainFrame ( wx.Frame ):
     def CheckVersion(self):
         from sys import argv
         import urllib2
+        import os
 
-        platformString = ""
         remoteVersion = ""
         remoteVersionFile = ""
 
         if argv[0].endswith("MainApp.py"):
             # print "## Running GASATaD from source"
-            platformString = "src"
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/src.txt"
+
+        if platform=="linux2" and argv[0]=="/usr/share/gasatad/MainApp.py":
+            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/deb.txt"
+
+        if platform=="darwin" and "XXX" in argv[0]:
+            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/mac.txt"
+
+        if platform=="win32" and argv[0].endswith(".exe"):
+            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/win.txt"
 
         try:
             remoteFile = urllib2.urlopen(remoteVersionFile)
             remoteVersion=remoteFile.readline().strip()
             remoteFile.close()
-            # print "## Version available in GASATaD web page: ", remoteVersion
+            print "## Version available in GASATaD web page: ", remoteVersion
         except urllib2.URLError:
             # print "## I couldn't check for updates"
             None
@@ -431,7 +440,10 @@ class MainFrame ( wx.Frame ):
             # self.params['upgradable'] = True
             # self.params['availableVersionToUpgrade'] = remoteVersion
 
-        
+    def openBrowserDownload(self,event):
+        import webbrowser
+        webbrowser.open("https://milegroup.github.io/gasatad/#download")
+
     
     def OpenCVSFileNoGUI(self, fileName):       
         
