@@ -59,7 +59,7 @@ class MainFrame ( wx.Frame ):
             icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
 
-        self.CheckVersion()
+        self.CheckUpdates()
         
         # self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
                 
@@ -401,7 +401,7 @@ class MainFrame ( wx.Frame ):
 
 
     
-    def CheckVersion(self):
+    def CheckUpdates(self):
         from sys import argv
         import urllib2
         import os
@@ -416,7 +416,7 @@ class MainFrame ( wx.Frame ):
         if platform=="linux2" and argv[0]=="/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/deb.txt"
 
-        if platform=="darwin" and "XXX" in argv[0]:
+        if platform=="darwin" and os.getcwd().startswith("/usr/local"):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/mac.txt"
 
         if platform=="win32" and argv[0].endswith(".exe"):
@@ -426,7 +426,7 @@ class MainFrame ( wx.Frame ):
             remoteFile = urllib2.urlopen(remoteVersionFile)
             remoteVersion=remoteFile.readline().strip()
             remoteFile.close()
-            print "## Version available in GASATaD web page: ", remoteVersion
+            # print "## Version available in GASATaD web page: ", remoteVersion
         except urllib2.URLError:
             # print "## I couldn't check for updates"
             None
