@@ -95,8 +95,8 @@ class MainFrame ( wx.Frame ):
             self.m_discardColumn.Check()
 
         self.m_optionsSubMenu = wx.Menu()
-        self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(201, u"Comma ,", "", wx.ITEM_RADIO)
-        self.m_CVSSeparator2 = self.m_optionsSubMenu.Append(202, u"Semicolon ;", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator1 = self.m_optionsSubMenu.Append(201, u"Comma", "", wx.ITEM_RADIO)
+        self.m_CVSSeparator2 = self.m_optionsSubMenu.Append(202, u"Semicolon", "", wx.ITEM_RADIO)
         self.m_CVSSeparator3 = self.m_optionsSubMenu.Append(203, u"Tabulator", "", wx.ITEM_RADIO)
         self.Bind(wx.EVT_MENU_RANGE, self.cvsCharacterSeparatorChanged, id=201, id2=203)
         if self.params['options']['sepchar']=="Comma":
