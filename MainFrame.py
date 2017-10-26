@@ -1101,7 +1101,7 @@ class MainFrame ( wx.Frame ):
 
         if platform=="win32":
             import win32api,win32con
-            win32api.SetFileAttributes(self.configDir,win32con.FILE_ATTRIBUTE_HIDDEN)
+            win32api.SetFileAttributes(self.params['configDir'],win32con.FILE_ATTRIBUTE_HIDDEN)
 
     def configLoad(self):
         """ Loads configuration file"""
