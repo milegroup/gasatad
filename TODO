@@ -1,7 +1,11 @@
 ALL:
+	Contextual menus
+	Help
+	Improve plots
+	Mark and detect nans
 
 WIN:
-    Add xlrd
+    Problem when reading xls or xlsx files in windows
 
 MAC:
 	Try to remove "python" fron the main app bar
