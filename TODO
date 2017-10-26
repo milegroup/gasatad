@@ -1,11 +1,10 @@
 ALL:
-	Scrollbars
 
 WIN:
     Add xlrd
 
 MAC:
 	Try to remove "python" fron the main app bar
-	Add xlrd installation (via pip) to MacOS installer
+	Improve detection of new versions: now, running GASATaD from source detects new binary versions for MacOS
 
 DEB:
