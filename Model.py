@@ -81,7 +81,7 @@ class ProgramState():
         self.additionalFileOpened = False
         
         self.informationFile = FileInformation()
-        self.informationAdditionalFile = FileInformation() 
+        # self.informationAdditionalFile = FileInformation() 
         
     def getDataToAnalyse(self):
         
@@ -143,27 +143,25 @@ class ProgramState():
         self.comboBoxStatus[nameComboBox] = status
 
     
-    def setInformationFile(self, nCols, nRows, name):
+    def setInformationFile(self, nCols, nRows):
         
         self.informationFile.setNumberOfCols(nCols)
         self.informationFile.setNumberOfRows(nRows)
-        self.informationFile.setNameOfFile(name)
         
         
-    def setInformationAdditionalFile(self, nCols, nRows, name):
+    # def setInformationAdditionalFile(self, nCols, nRows, name):
         
-        self.informationAdditionalFile.setNumberOfCols(nCols)
-        self.informationAdditionalFile.setNumberOfRows(nRows)
-        self.informationAdditionalFile.setNameOfFile(name)
+    #     self.informationAdditionalFile.setNumberOfCols(nCols)
+    #     self.informationAdditionalFile.setNumberOfRows(nRows)
+    #     self.informationAdditionalFile.setNameOfFile(name)
 
 class FileInformation():
 
     
-    def __init__(self, nCols = 0, nRows = 0, name = ''):
+    def __init__(self, nCols = 0, nRows = 0):
         
         self.numColumns = nCols
         self.numRows = nRows
-        self.nameOfFile = name
 
     
     def setNumberOfCols(self, nCols):
@@ -174,10 +172,7 @@ class FileInformation():
         
         self.numRows = nRows
         
-    def setNameOfFile(self, name):
-        
-        self.nameOfFile = name
-    
+   
     
        
         

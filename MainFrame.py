@@ -512,7 +512,7 @@ class MainFrame ( wx.Frame ):
                 self.data = read_csv(self.Datafile, sep = None, header=0, index_col = 0, engine = 'python')
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                self.controller.OpenFile(self.data, os.path.basename(fileName))  
+                self.controller.OpenFile(self.data)  
                 self.m_menuNewFile.Enable(False)                  
                 self.m_menuAddFile.Enable(True)
                     
@@ -591,7 +591,7 @@ class MainFrame ( wx.Frame ):
                 wOpenFile.Destroy()
 
                 if (self.Datafile is not None):
-                    self.controller.OpenFile(self.data, self.filename)
+                    self.controller.OpenFile(self.data)
                     
                     self.m_menuAddFile.Enable(True)
                     self.m_menuNewFile.Enable(False)                                            
@@ -683,7 +683,7 @@ class MainFrame ( wx.Frame ):
 
                 if (self.Datafile is not None):
                 
-                    if self.controller.OpenAdditionalFile(self.data, self.filename)==False:
+                    if self.controller.OpenAdditionalFile(self.data)==False:
                         raise ValueError("Number of rows do not match")
 
                     self.fillInGrid()

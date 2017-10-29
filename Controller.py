@@ -66,16 +66,16 @@ class Controller():
 
    
 
-    def OpenFile (self, data, nameOfFile):
+    def OpenFile (self, data):
          
         self.programState.quantitativeData = data
         self.programState.dataToAnalyse = data
 
-        self.programState.setInformationFile(len(data.columns), len(data.index), nameOfFile)
+        self.programState.setInformationFile(len(data.columns), len(data.index))
 
 
 
-    def OpenAdditionalFile (self,data, nameOfFile):
+    def OpenAdditionalFile (self,data):
          
         try:
             sameNumberRows = False
@@ -91,7 +91,7 @@ class Controller():
                 
                 self.programState.dataToAnalyse = self.ConcatDataFrame(self.programState.quantitativeData, self.programState.qualitativeData)
                 self.programState.quantitativeData = self.programState.dataToAnalyse
-                self.programState.setInformationAdditionalFile(len(data.columns), len(data.index), nameOfFile)
+                # self.programState.setInformationAdditionalFile(len(data.columns), len(data.index), nameOfFile)
     
             return sameNumberRows
         
