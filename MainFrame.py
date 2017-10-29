@@ -438,6 +438,7 @@ class MainFrame ( wx.Frame ):
                 self.fillInGrid()
             
             self.m_dataTable.AutoSize()
+            self.markNans()
             self.Layout()
         else:
             dlg.Destroy()
@@ -531,6 +532,7 @@ class MainFrame ( wx.Frame ):
         self.params['dataPresent'] = True
 
         self.m_dataTable.AutoSize()
+        self.markNans()
         self.Layout()
 
 
@@ -587,28 +589,32 @@ class MainFrame ( wx.Frame ):
                     
                     self.m_textCtrl11.Clear()
                     self.m_textCtrl21.Clear()
-                        
+
                     self.fillInGrid()
+                    self.m_dataTable.AutoSize()
+                    self.markNans() 
+                    self.Layout()
+                    self.m_dataTable.Enable()
+
+                    if self.controller.nullValuesInFile(self.data):
+                        self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
+                        if self.dlg.ShowModal() == wx.ID_OK:
+                            self.dlg.Destroy()
                 
                     self.descriptiveStatsBtn.Enable()
                     self.newColumnBtn.Enable()
                     self.resetDataBtn.Enable()
                     self.deleteColumnsBtn.Enable()
                     self.exportDataBtn.Enable()
-                    self.m_dataTable.Enable()
+                    
                     self.m_menuItem4.Enable()
                     self.histogramBtn.Enable()
                     self.scatterPlotBtn.Enable()
                     self.pieChartBtn.Enable()
                     self.boxPlotBtn.Enable()
                     self.barChartBtn.Enable()
-                    self.significanceTestBtn.Enable()   
-                    
-                    if self.controller.nullValuesInFile(self.data):
-                       raise ValueError("There are null values in the file")
+                    self.significanceTestBtn.Enable() 
 
-                    self.m_dataTable.AutoSize()
-                    self.Layout()
                         
                     self.params['dataPresent'] = True
                     self.firstFileAdded()
@@ -673,10 +679,16 @@ class MainFrame ( wx.Frame ):
                     if self.controller.OpenAdditionalFile(self.data, self.filename)==False:
                         raise ValueError("Number of rows do not match")
 
-                    if self.controller.nullValuesInFile(self.data):
-                       raise ValueError("There are null values in the file")
-
                     self.fillInGrid()
+                    self.m_dataTable.AutoSize()
+                    self.markNans()
+                    self.Layout()
+
+                    if self.controller.nullValuesInFile(self.data):
+                        self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
+                        if self.dlg.ShowModal() == wx.ID_OK:
+                            self.dlg.Destroy()
+
                     self.descriptiveStatsBtn.Enable()
                     self.newColumnBtn.Enable()
                     self.resetDataBtn.Enable()
@@ -687,10 +699,7 @@ class MainFrame ( wx.Frame ):
                 
                     self.m_textCtrl11.SetValue(str(len(self.data.columns)))
                     self.m_textCtrl21.SetValue(str(len(self.data.index)))
-                    self.m_menuItem2.Enable(False)
-
-                    self.m_dataTable.AutoSize()
-                    self.Layout()
+                    self.m_menuItem2.Enable(False)              
         
         except:
             
@@ -746,23 +755,32 @@ class MainFrame ( wx.Frame ):
         self.adaptSizeOfGrid()        
         
         for i in range (len(colLabels)):
-            
             self.m_dataTable.SetColLabelValue(i, colLabels[i])
         
         for row in range (numRows):
-            
             for col in range (numCols):
 
-                    if type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):
-                             
+                    if type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):        
                         self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
-
-                    else:
-                        
+                    else:                      
                         self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
         self.controller.sortVariables()
+    
 
+    def markNans(self):
+        # print "## Going to mark nans"
+        numRows = self.controller.getNumberOfRows()
+        numCols = self.controller.getNumberOfColumns()
+        for row in range(numRows):
+            for col in range(numCols):
+                content = self.m_dataTable.GetCellValue(row,col)
+                if  content  == 'nan' or content == 'null': # This checks for nan
+                    # print "## Nan detected in cell:",row,"  ",col 
+                    self.m_dataTable.SetCellValue(row,col,"null")
+                    self.m_dataTable.SetCellBackgroundColour(row,col,wx.TheColourDatabase.Find('LIGHT GREY'))
+                else:
+                    self.m_dataTable.SetCellBackgroundColour(row,col,'WHITE')
 
     
     def exportData(self, event):
@@ -858,6 +876,7 @@ class MainFrame ( wx.Frame ):
                     self.fillInGrid()
                 
                 self.m_dataTable.AutoSize()
+                self.markNans()
                 self.Layout()
   
             else:

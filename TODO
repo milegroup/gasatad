@@ -2,7 +2,7 @@ ALL:
 	Contextual menus
 	Help
 	Improve plots
-	Mark and detect nans
+	Check what happens when adding a new column from one that has nans
 
 WIN:
     Problem when reading xls or xlsx files in windows
