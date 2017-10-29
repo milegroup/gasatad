@@ -1,2 +1,3 @@
 
 Selected columns can be deleted using right-click on the table
+More than two files can be uploaded to the app, as long as the no. of rows matches
