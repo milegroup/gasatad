@@ -1,2 +1,2 @@
-Reading of xls/xlsx files corrected
-Loading files window improved
+
+Selected columns can be deleted using right-click on the table

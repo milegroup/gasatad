@@ -367,6 +367,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.createBarChart, self.barChartBtn)
         self.Bind(wx.EVT_BUTTON, self.doSignificanceTest, self.significanceTestBtn)
         self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.rightClickOnTable,self.m_dataTable)
+        self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.rightClickOnTable,self.m_dataTable)
         
         
         #A controller object is created
@@ -418,18 +419,18 @@ class MainFrame ( wx.Frame ):
         event.Skip()
     
     def onPopupDelete(self,event):
-        print "## Going to delete!!"
         dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
                                    "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
-            
         if dlg.ShowModal() == wx.ID_OK:
             dlg.Destroy()
-            
-            listOfColumns = ['LFHF']
 
-            print "##:",listOfColumns
-            self.controller.deleteColumns(listOfColumns)
+            columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+            columnsSelectedLabels = []
+            for columnIndex in columnsSelectedIndex:
+                columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
+        
+            self.controller.deleteColumns(columnsSelectedLabels)
             
             if self.controller.programState.dataToAnalyse.empty:
                 self.resetData(None)
@@ -438,12 +439,8 @@ class MainFrame ( wx.Frame ):
             
             self.m_dataTable.AutoSize()
             self.Layout()
-
         else:
-        
-            dlg.Destroy() 
-            
-
+            dlg.Destroy()
 
 
     def CheckUpdates(self):
@@ -830,7 +827,6 @@ class MainFrame ( wx.Frame ):
 
 
     def resetOptions(self,event):
-        print "## Reset options"
         for key in self.params['optionsdefault'].keys():
             self.params['options'][key] = self.params['optionsdefault'][key]
         self.m_discardColumn.Check()
