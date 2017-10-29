@@ -50,12 +50,13 @@ class Controller():
         
         for column in dataFrame_2.columns:
             
-            if column in dataFrame_1.columns:
-                
-                nameColumns.append(str(column) + "_2")
-            else:
-                
-                nameColumns.append(column)
+            colIndex=2
+            auxColumn = str(column)
+            while auxColumn in dataFrame_1.columns:
+                auxColumn = str(column) + "_" + str(colIndex)
+                colIndex += 1
+                    
+            nameColumns.append(auxColumn)
             
         self.data = concat([dataFrame_1,dataFrame_2], axis = 1)
         
@@ -89,6 +90,7 @@ class Controller():
             if self.programState.qualitativeData is not None:
                 
                 self.programState.dataToAnalyse = self.ConcatDataFrame(self.programState.quantitativeData, self.programState.qualitativeData)
+                self.programState.quantitativeData = self.programState.dataToAnalyse
                 self.programState.setInformationAdditionalFile(len(data.columns), len(data.index), nameOfFile)
     
             return sameNumberRows

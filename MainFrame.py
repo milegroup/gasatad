@@ -25,6 +25,7 @@ import sys
 from pandas.io.parsers import read_csv
 from pandas.io.excel import read_excel
 import numpy
+import csv
 from Controller import Controller
 from FactorsInterface import FactorsInterface
 from ChartInterface import HistogramInterface, ScatterPlotInterface,\
@@ -71,19 +72,19 @@ class MainFrame ( wx.Frame ):
 
         self.m_fileMenu = wx.Menu()
 
-        self.m_menuItem1 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open new file", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem( self.m_menuItem1 )
+        self.m_menuNewFile = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open new file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuNewFile )
         
-        self.m_menuItem2 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Add file", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem( self.m_menuItem2 )
-        self.m_menuItem2.Enable(False)
+        self.m_menuAddFile = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Add file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuAddFile )
+        self.m_menuAddFile.Enable(False)
 
-        self.m_menuItem4 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem(self.m_menuItem4)
-        self.m_menuItem4.Enable(False)
+        self.m_menuResetData = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem(self.m_menuResetData)
+        self.m_menuResetData.Enable(False)
 
-        self.m_menuItem6 = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_fileMenu.AppendItem( self.m_menuItem6 )
+        self.m_menuQuit = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem( self.m_menuQuit )
 
         # ------------ Options menu
 
@@ -115,8 +116,8 @@ class MainFrame ( wx.Frame ):
 
         self.m_aboutMenu = wx.Menu()
 
-        self.m_menuItem5 = wx.MenuItem( self.m_aboutMenu, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_aboutMenu.AppendItem(self.m_menuItem5)
+        self.m_menuAbout = wx.MenuItem( self.m_aboutMenu, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_aboutMenu.AppendItem(self.m_menuAbout)
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
         self.m_menubar1.Append( self.m_optionsMenu, u"Options")
@@ -133,9 +134,9 @@ class MainFrame ( wx.Frame ):
 
         #  -------------------- Information part of the interface
 
-        informationSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Information" ), wx.VERTICAL )
+        informationSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"" ), wx.VERTICAL )
         
-        self.m_staticText2 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Main file:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText2 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Data information", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText2.Wrap( -1 )
         self.m_staticText2.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
@@ -143,49 +144,51 @@ class MainFrame ( wx.Frame ):
         
         bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText3 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText3.Wrap( -1 )
-        bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        bSizer1.Add( self.m_textCtrl1, 0, wx.ALL, 5 )
-        self.m_textCtrl1.Enable(False)
         
         self.m_staticText4 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText4.Wrap( -1 )
         bSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl2 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        bSizer1.Add( self.m_textCtrl2, 0, wx.ALL, 5 )
-        self.m_textCtrl2.Enable(False)
+        self.infoNRows = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
+        bSizer1.Add( self.infoNRows, 0, wx.ALL, 5 )
+        self.infoNRows.SetLabel("0")
+
+        self.m_staticText3 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText3.Wrap( -1 )
+        bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        
+        self.infoNCols = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ),0 )
+        bSizer1.Add( self.infoNCols, 0, wx.ALL, 5 )
+        self.infoNCols.SetLabel("0")
         
         informationSizer.Add( bSizer1, 1, wx.EXPAND|wx.LEFT, 5 )
         
-        self.m_staticText9 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText9.Wrap( -1 )
-        self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
+        # self.m_staticText9 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.m_staticText9.Wrap( -1 )
+        # self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
-        informationSizer.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        # informationSizer.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
+        # bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.m_staticText31 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText31.Wrap( -1 )
-        bSizer11.Add( self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        # self.m_staticText31 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.m_staticText31.Wrap( -1 )
+        # bSizer11.Add( self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl11 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        bSizer11.Add( self.m_textCtrl11, 0, wx.ALL, 5 )
-        self.m_textCtrl11.Enable(False)
+        # self.infoNCols1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        # bSizer11.Add( self.infoNCols1, 0, wx.ALL, 5 )
+        # self.infoNCols1.Enable(False)
         
-        self.m_staticText41 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText41.Wrap( -1 )
-        bSizer11.Add( self.m_staticText41, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
+        # self.m_staticText41 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.m_staticText41.Wrap( -1 )
+        # bSizer11.Add( self.m_staticText41, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
         
-        self.m_textCtrl21 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        bSizer11.Add( self.m_textCtrl21, 0, wx.ALL, 5 )
-        self.m_textCtrl21.Enable(False)
+        # self.infoNRows1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
+        # bSizer11.Add( self.infoNRows1, 0, wx.ALL, 5 )
+        # self.infoNRows1.Enable(False)
         
-        informationSizer.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
+        # informationSizer.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
        
         leftSizer.Add(informationSizer,flag= wx.ALL, border=5)
 
@@ -349,12 +352,12 @@ class MainFrame ( wx.Frame ):
 
         self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
 
-        self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuItem1)
-        self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuItem2)
-        self.Bind(wx.EVT_MENU, self.resetData, self.m_menuItem4)
+        self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuNewFile)
+        self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
+        self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
-        self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuItem5)
-        self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuItem6)
+        self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
+        self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.createNewColumn, self.newColumnBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
@@ -438,6 +441,7 @@ class MainFrame ( wx.Frame ):
                 self.fillInGrid()
             
             self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
             self.markNans()
             self.Layout()
         else:
@@ -488,23 +492,29 @@ class MainFrame ( wx.Frame ):
         webbrowser.open("https://milegroup.github.io/gasatad/#download")
 
     
+    def updateDataInfo(self):
+        if self.params['dataPresent'] == False:
+            self.infoNRows.SetLabel("0")
+            self.infoNCols.SetLabel("0")
+        else:
+            numRows = self.controller.getNumberOfRows()
+            numCols = self.controller.getNumberOfColumns()
+            self.infoNRows.SetLabel(str(numRows))
+            self.infoNCols.SetLabel(str(numCols))
+
+    
     def OpenCVSFileNoGUI(self, fileName):       
         
         self.data = None
         
         try:
-                self.Datafile = open(fileName, 'r')            
+                self.Datafile = open(fileName, 'rU')            
                 self.data = read_csv(self.Datafile, sep = None, header=0, index_col = 0, engine = 'python')
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                self.controller.OpenFile(self.data, os.path.basename(fileName))                    
-                self.m_menuItem2.Enable(True)
-                
-                self.m_textCtrl1.SetValue(str(len(self.data.columns)))
-                self.m_textCtrl2.SetValue(str(len(self.data.index)))  
-                
-                self.m_textCtrl11.Clear()
-                self.m_textCtrl21.Clear()
+                self.controller.OpenFile(self.data, os.path.basename(fileName))  
+                self.m_menuNewFile.Enable(False)                  
+                self.m_menuAddFile.Enable(True)
                     
         except:
             
@@ -519,7 +529,7 @@ class MainFrame ( wx.Frame ):
         self.deleteColumnsBtn.Enable()
         self.exportDataBtn.Enable()
         self.m_dataTable.Enable()
-        self.m_menuItem4.Enable()
+        self.m_menuResetData.Enable()
         self.histogramBtn.Enable()
         self.scatterPlotBtn.Enable()
         self.pieChartBtn.Enable()
@@ -530,6 +540,7 @@ class MainFrame ( wx.Frame ):
         print "File: "+fileName+" loaded"
 
         self.params['dataPresent'] = True
+        self.updateDataInfo()
 
         self.m_dataTable.AutoSize()
         self.markNans()
@@ -553,7 +564,7 @@ class MainFrame ( wx.Frame ):
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
                 self.params['options']['dirfrom'] = self.directory
-                self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
+                self.Datafile = open(os.path.join(self.directory, self.filename), 'rU')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
 
@@ -582,13 +593,8 @@ class MainFrame ( wx.Frame ):
                 if (self.Datafile is not None):
                     self.controller.OpenFile(self.data, self.filename)
                     
-                    self.m_menuItem2.Enable(True)
-                        
-                    self.m_textCtrl1.SetValue(str(len(self.data.columns)))
-                    self.m_textCtrl2.SetValue(str(len(self.data.index)))  
-                    
-                    self.m_textCtrl11.Clear()
-                    self.m_textCtrl21.Clear()
+                    self.m_menuAddFile.Enable(True)
+                    self.m_menuNewFile.Enable(False)                                            
 
                     self.fillInGrid()
                     self.m_dataTable.AutoSize()
@@ -607,7 +613,7 @@ class MainFrame ( wx.Frame ):
                     self.deleteColumnsBtn.Enable()
                     self.exportDataBtn.Enable()
                     
-                    self.m_menuItem4.Enable()
+                    self.m_menuResetData.Enable()
                     self.histogramBtn.Enable()
                     self.scatterPlotBtn.Enable()
                     self.pieChartBtn.Enable()
@@ -617,7 +623,8 @@ class MainFrame ( wx.Frame ):
 
                         
                     self.params['dataPresent'] = True
-                    self.firstFileAdded()
+                    self.updateDataInfo()
+                    # self.firstFileAdded()
 
         except:
             
@@ -647,7 +654,7 @@ class MainFrame ( wx.Frame ):
                 self.filename = wOpenFile.GetFilename()
                 self.directory = wOpenFile.GetDirectory()
                 self.params['options']['dirfrom'] = self.directory
-                self.Datafile = open(os.path.join(self.directory, self.filename), 'r')
+                self.Datafile = open(os.path.join(self.directory, self.filename), 'rU')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
                 discardCol = None
@@ -697,9 +704,8 @@ class MainFrame ( wx.Frame ):
                     self.significanceTestBtn.Enable()
                     self.m_dataTable.Enable()
                 
-                    self.m_textCtrl11.SetValue(str(len(self.data.columns)))
-                    self.m_textCtrl21.SetValue(str(len(self.data.index)))
-                    self.m_menuItem2.Enable(False)              
+                    self.updateDataInfo()
+                    #self.m_menuAddFile.Enable(False)              
         
         except:
             
@@ -759,11 +765,12 @@ class MainFrame ( wx.Frame ):
         
         for row in range (numRows):
             for col in range (numCols):
-
-                    if type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):        
-                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
-                    else:                      
-                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+                if dataToAnalyse.iloc[row, col] != dataToAnalyse.iloc[row, col]:
+                    self.m_dataTable.SetCellValue(row,col,"nan")
+                elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):        
+                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
+                else:                      
+                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
         self.controller.sortVariables()
     
@@ -820,8 +827,9 @@ class MainFrame ( wx.Frame ):
         self.exportDataBtn.Enable(False)
         self.significanceTestBtn.Enable(False)
         
-        self.m_menuItem2.Enable(False)
-        self.m_menuItem4.Enable(False)
+        self.m_menuNewFile.Enable(True)
+        self.m_menuAddFile.Enable(False)
+        self.m_menuResetData.Enable(False)
         
         #Graphs
         self.histogramBtn.Enable( False )
@@ -831,12 +839,14 @@ class MainFrame ( wx.Frame ):
         self.barChartBtn.Enable( False )
         
         #Clearing the information about the files
-        self.m_textCtrl1.Clear()
-        self.m_textCtrl2.Clear()
-        self.m_textCtrl11.Clear()
-        self.m_textCtrl21.Clear()
+        
+        # self.infoNCols.Clear()
+        # self.infoNRows.Clear()
+        # self.infoNCols1.Clear()
+        # self.infoNRows1.Clear()
 
         self.params['dataPresent'] = False
+        self.updateDataInfo()
 
         self.m_dataTable.SetColLabelSize( 30 )
         self.m_dataTable.SetRowLabelSize( 80 )
