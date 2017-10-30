@@ -856,9 +856,11 @@ class MainFrame ( wx.Frame ):
     def resetData(self, event):
         
 
-        self.fillInGrid()
+        
         
         self.controller.resetDataToAnalyse()
+
+        self.fillInGrid()
         
         
         self.m_dataTable.AppendRows(45)
