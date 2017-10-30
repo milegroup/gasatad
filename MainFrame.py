@@ -475,7 +475,7 @@ class MainFrame ( wx.Frame ):
             self.m_dataTable.AutoSize()
             self.m_dataTable.ClearSelection()
             self.markNans()
-            self.updateDataInfo()
+            
             self.Layout()
         else:
             dlg.Destroy()
@@ -855,9 +855,11 @@ class MainFrame ( wx.Frame ):
     
     def resetData(self, event):
         
+
+        self.fillInGrid()
+        
         self.controller.resetDataToAnalyse()
         
-        self.fillInGrid()
         
         self.m_dataTable.AppendRows(45)
         self.m_dataTable.AppendCols(45)
@@ -889,14 +891,22 @@ class MainFrame ( wx.Frame ):
         # self.infoNCols1.Clear()
         # self.infoNRows1.Clear()
 
+        
+
         self.params['dataPresent'] = False
         self.params['noOfFiles'] = 0
         self.updateDataInfo()
+
+        
+
+        
 
         self.m_dataTable.SetColLabelSize( 30 )
         self.m_dataTable.SetRowLabelSize( 80 )
         #self.m_dataTable.AutoSize()
         self.Layout()
+
+        
 
 
     def resetOptions(self,event):
