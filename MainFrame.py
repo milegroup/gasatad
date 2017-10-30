@@ -407,13 +407,26 @@ class MainFrame ( wx.Frame ):
             popupMenu = wx.Menu()
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
-            self.Bind(wx.EVT_MENU, self.onPopupDelete, id=self.popupDeleteID)
+            self.Bind(wx.EVT_MENU, self.onPopupDeleteCols, id=self.popupDeleteID)
             self.PopupMenu( popupMenu )
-            popupMenu.Destroy() 
+            popupMenu.Destroy()
+
+        rowClicked = event.GetRow()
+        rowsSelected = self.m_dataTable.GetSelectedRows()
+        if rowClicked in rowsSelected:
+            textPopupDelete = "Delete row"
+            if len(rowsSelected)>1:
+                textPopupDelete += "s"
+            popupMenu = wx.Menu()
+            self.popupDeleteID = wx.NewId()
+            popupMenu.Append(self.popupDeleteID,textPopupDelete)
+            self.Bind(wx.EVT_MENU, self.onPopupDeleteRows, id=self.popupDeleteID)
+            self.PopupMenu( popupMenu )
+            popupMenu.Destroy()
 
         event.Skip()
     
-    def onPopupDelete(self,event):
+    def onPopupDeleteCols(self,event):
         dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
                                    "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
@@ -435,6 +448,34 @@ class MainFrame ( wx.Frame ):
             self.m_dataTable.AutoSize()
             self.m_dataTable.ClearSelection()
             self.markNans()
+            self.updateDataInfo()
+            self.Layout()
+        else:
+            dlg.Destroy()
+
+    def onPopupDeleteRows(self,event):
+        dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
+                                   "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
+            
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.Destroy()
+
+            rowsSelectedIndex = self.m_dataTable.GetSelectedRows()
+            rowsSelectedLabels = []
+            for rowIndex in rowsSelectedIndex:
+                rowsSelectedLabels.append(self.m_dataTable.GetRowLabelValue(rowIndex))
+
+            self.controller.deleteRows(rowsSelectedIndex)
+
+            if self.controller.programState.dataToAnalyse.empty:
+                self.resetData(None)
+            else:
+                self.fillInGrid()
+            
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.markNans()
+            self.updateDataInfo()
             self.Layout()
         else:
             dlg.Destroy()
@@ -535,12 +576,14 @@ class MainFrame ( wx.Frame ):
 
         print "File: "+fileName+" loaded"
 
+        self.m_dataTable.AutoSize()
+        self.markNans()
+
         self.params['dataPresent'] = True
         self.params['noOfFiles'] += 1
         self.updateDataInfo()
 
-        self.m_dataTable.AutoSize()
-        self.markNans()
+        
         self.Layout()
 
 

@@ -127,13 +127,21 @@ class Controller():
 
 
     def deleteColumns(self, listOfColumnsName):
-        
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(labels = listOfColumnsName, axis = 1)
-        
         if self.programState.dataToAnalyse.empty:
-            
-            self.resetDataToAnalyse()        
+            self.resetDataToAnalyse()     
 
+
+    def deleteRows(self, listOfRowsIndex):
+        self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
+        self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(listOfRowsIndex, axis=0)
+        newIndexes = range(1,len(self.programState.dataToAnalyse.index)+1)
+        self.programState.dataToAnalyse.reindex(newIndexes,fill_value=0)
+        self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
+
+
+        if self.programState.dataToAnalyse.empty:
+            self.resetDataToAnalyse()        
 
         
     def sortVariables(self):
