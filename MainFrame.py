@@ -142,55 +142,47 @@ class MainFrame ( wx.Frame ):
         
         informationSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
         
-        bSizer1 = wx.BoxSizer( wx.HORIZONTAL )
-        
-        
-        
-        self.m_staticText4 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText4.Wrap( -1 )
-        bSizer1.Add( self.m_staticText4, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        self.infoNRows = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
-        bSizer1.Add( self.infoNRows, 0, wx.ALL, 5 )
-        self.infoNRows.SetLabel("0")
+        informationGridSizer = wx.GridSizer(2, 2, 0, 0)    
 
+        # No. or rows
+        bSizer1a = wx.BoxSizer( wx.HORIZONTAL )    
+        self.m_staticText1 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer1a.Add( self.m_staticText1, 0, wx.LEFT, 5 )
+        self.infoNRows = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
+        bSizer1a.Add( self.infoNRows, 0, wx.LEFT, 5 )
+        self.infoNRows.SetLabel("0")
+        informationGridSizer.Add(bSizer1a)
+
+        # No. of columns
+        bSizer1b = wx.BoxSizer( wx.HORIZONTAL )
         self.m_staticText3 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.m_staticText3.Wrap( -1 )
-        bSizer1.Add( self.m_staticText3, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
+        bSizer1b.Add( self.m_staticText3, 0, wx.LEFT, 5 )
         self.infoNCols = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ),0 )
-        bSizer1.Add( self.infoNCols, 0, wx.ALL, 5 )
+        bSizer1b.Add( self.infoNCols, 0, wx.LEFT, 5 )
         self.infoNCols.SetLabel("0")
-        
-        informationSizer.Add( bSizer1, 1, wx.EXPAND|wx.LEFT, 5 )
-        
-        # self.m_staticText9 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Additional file:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        # self.m_staticText9.Wrap( -1 )
-        # self.m_staticText9.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
-        
-        # informationSizer.Add( self.m_staticText9, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        # bSizer11 = wx.BoxSizer( wx.HORIZONTAL )
-        
-        # self.m_staticText31 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        # self.m_staticText31.Wrap( -1 )
-        # bSizer11.Add( self.m_staticText31, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        # self.infoNCols1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        # bSizer11.Add( self.infoNCols1, 0, wx.ALL, 5 )
-        # self.infoNCols1.Enable(False)
-        
-        # self.m_staticText41 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        # self.m_staticText41.Wrap( -1 )
-        # bSizer11.Add( self.m_staticText41, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALL, 5 )
-        
-        # self.infoNRows1 = wx.TextCtrl( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), wx.TE_READONLY )
-        # bSizer11.Add( self.infoNRows1, 0, wx.ALL, 5 )
-        # self.infoNRows1.Enable(False)
-        
-        # informationSizer.Add( bSizer11, 1, wx.EXPAND|wx.LEFT, 5 )
+        informationGridSizer.Add(bSizer1b)
+
+        # No. of open files
+        bSizer2a = wx.BoxSizer( wx.HORIZONTAL )
+        self.m_staticText4 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"No. of files:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer2a.Add( self.m_staticText4, 0, wx.LEFT, 5 )
+        self.infoNFiles = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
+        bSizer2a.Add( self.infoNFiles, 0, wx.LEFT, 5 )
+        self.infoNFiles.SetLabel("0")
+        informationGridSizer.Add(bSizer2a)
+
+        # No. of null values
+        bSizer2b = wx.BoxSizer( wx.HORIZONTAL )
+        self.m_staticText5 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Null values:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        bSizer2b.Add( self.m_staticText5, 0, wx.LEFT, 5 )
+        self.infoNullValues = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
+        bSizer2b.Add( self.infoNullValues, 0, wx.LEFT, 5 )
+        self.infoNullValues.SetLabel("0")
+        informationGridSizer.Add(bSizer2b)
+
+        informationSizer.Add( informationGridSizer, 1, wx.EXPAND|wx.ALL, 5 )
        
-        leftSizer.Add(informationSizer,flag= wx.ALL, border=5)
+        leftSizer.Add(informationSizer,flag= wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, border=10)
 
         #  -------------------- Buttons of the interface
         
@@ -496,11 +488,15 @@ class MainFrame ( wx.Frame ):
         if self.params['dataPresent'] == False:
             self.infoNRows.SetLabel("0")
             self.infoNCols.SetLabel("0")
+            self.infoNFiles.SetLabel("0")
+            self.infoNullValues.SetLabel("0")
         else:
             numRows = self.controller.getNumberOfRows()
             numCols = self.controller.getNumberOfColumns()
             self.infoNRows.SetLabel(str(numRows))
             self.infoNCols.SetLabel(str(numCols))
+            self.infoNFiles.SetLabel(str(self.params['noOfFiles']))
+            self.infoNullValues.SetLabel(str(self.params['noOfNulls']))
 
     
     def OpenCVSFileNoGUI(self, fileName):       
@@ -518,8 +514,8 @@ class MainFrame ( wx.Frame ):
                     
         except:
             
-            print("Error: ", sys.exc_info()[0])
-            print("There was some problem with the file")
+            print "Error: ", sys.exc_info()[0]
+            print "There was some problem with the file"
             return 
 
         self.fillInGrid()
@@ -540,6 +536,7 @@ class MainFrame ( wx.Frame ):
         print "File: "+fileName+" loaded"
 
         self.params['dataPresent'] = True
+        self.params['noOfFiles'] += 1
         self.updateDataInfo()
 
         self.m_dataTable.AutoSize()
@@ -623,12 +620,13 @@ class MainFrame ( wx.Frame ):
 
                         
                     self.params['dataPresent'] = True
+                    self.params['noOfFiles'] += 1
                     self.updateDataInfo()
                     # self.firstFileAdded()
 
         except:
             
-            print("Error: ", sys.exc_info()[0])
+            # print("Error: ", sys.exc_info()[0])
             type, value, traceback = sys.exc_info()
             
             self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
@@ -684,7 +682,7 @@ class MainFrame ( wx.Frame ):
                 if (self.Datafile is not None):
                 
                     if self.controller.OpenAdditionalFile(self.data)==False:
-                        raise ValueError("Number of rows do not match")
+                        raise ValueError("No. of rows does not match")
 
                     self.fillInGrid()
                     self.m_dataTable.AutoSize()
@@ -703,13 +701,14 @@ class MainFrame ( wx.Frame ):
                     self.exportDataBtn.Enable()
                     self.significanceTestBtn.Enable()
                     self.m_dataTable.Enable()
-                
+
+                    self.params['noOfFiles'] += 1
                     self.updateDataInfo()
                     #self.m_menuAddFile.Enable(False)              
         
         except:
             
-            print("Error: ", sys.exc_info()[0])
+            # print("Error: ", sys.exc_info()[0])
             type, value, traceback = sys.exc_info()
 
             self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
@@ -779,6 +778,7 @@ class MainFrame ( wx.Frame ):
         # print "## Going to mark nans"
         numRows = self.controller.getNumberOfRows()
         numCols = self.controller.getNumberOfColumns()
+        self.params['noOfNulls'] = 0
         for row in range(numRows):
             for col in range(numCols):
                 content = self.m_dataTable.GetCellValue(row,col)
@@ -786,6 +786,7 @@ class MainFrame ( wx.Frame ):
                     # print "## Nan detected in cell:",row,"  ",col 
                     self.m_dataTable.SetCellValue(row,col,"null")
                     self.m_dataTable.SetCellBackgroundColour(row,col,wx.TheColourDatabase.Find('LIGHT GREY'))
+                    self.params['noOfNulls'] += 1
                 else:
                     self.m_dataTable.SetCellBackgroundColour(row,col,'WHITE')
 
@@ -846,6 +847,7 @@ class MainFrame ( wx.Frame ):
         # self.infoNRows1.Clear()
 
         self.params['dataPresent'] = False
+        self.params['noOfFiles'] = 0
         self.updateDataInfo()
 
         self.m_dataTable.SetColLabelSize( 30 )
