@@ -70,7 +70,11 @@ class Controller():
          
         self.programState.quantitativeData = data
         self.programState.dataToAnalyse = data
-        self.recalculateRowsIndexes()
+        try:
+            self.recalculateRowsIndexes()
+        except:
+            # print "Error: ", sys.exc_info()[0] 
+            None
 
         self.programState.setInformationFile(len(data.columns), len(data.index))
 
@@ -327,61 +331,38 @@ class Controller():
                
         plt.show()
 
-    
   
     def createPieChart(self, pieChartOptions):
 
-        dataForChart = {}
-        tags = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].unique()
-        print self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].value_counts()
-        
-        #The dict is initialized
-        for tag in tags:
-            dataForChart[tag] = 0
-
-        for i in range(len(self.programState.dataToAnalyse.index)):
-            dataItem = self.programState.dataToAnalyse.loc[i, pieChartOptions.getFirstVarSelected()]
-            
-            dataForChart[dataItem] = dataForChart[dataItem] + 1
-         
-        #Get number of samples (same as name of rows of the Dataframe)
-        numberSamples = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].count()
-        
-        
         sizes = []
-        
-        for name, value in dataForChart.items():
-            
-            sizes.append((value*100)/numberSamples)
-            
-        #Name for the legend
-        labels = []
-        for i in tags:
-            labels.append(i)
-        
         explode = []
-        for i in tags:
+        labels = []
+
+        dataForPie = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].value_counts()
+        numberSamples = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].count()
+
+        for v in dataForPie:
+            sizes.append(100.0*v/numberSamples)
             explode.append(0.05)
-        
-        #colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
-        #explode = (0, 0.1, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
-        
-        plt.pie(sizes, labels=labels, explode = explode,
-                autopct='%1.1f%%', shadow=True, startangle=90)
+
+
+        # colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+        if pieChartOptions.getLegendPosition() == "by default".encode("utf-8"):
+            for l in dataForPie.index:
+                labels.append(l)
+            plt.pie(sizes, labels=labels, explode = explode, autopct='%1.1f%%', shadow=True, startangle=90)
+        else:
+            for l in range(len(sizes)):
+                labels.append('{} ({:.2f}%)'.format(dataForPie.index[l],sizes[l]))
+            patches, text = plt.pie(sizes, explode = explode, shadow=True, startangle=90)
+            plt.legend(patches, labels, loc = pieChartOptions.getLegendPosition())
         
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
-        
-        plt.title(pieChartOptions.getChartTitle())
-        
-        if pieChartOptions.getLegendPosition() != "by default".encode("utf-8"):
-                
-                plt.legend(loc = pieChartOptions.getLegendPosition())
-        
-        
+        plt.tight_layout()
+        plt.title(pieChartOptions.getChartTitle())                
         plt.show()
-
-
+        
         
     def createBoxPlot(self, boxPlotOptions):
 
