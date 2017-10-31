@@ -70,6 +70,7 @@ class Controller():
          
         self.programState.quantitativeData = data
         self.programState.dataToAnalyse = data
+        self.recalculateRowsIndexes()
 
         self.programState.setInformationFile(len(data.columns), len(data.index))
 
@@ -92,6 +93,7 @@ class Controller():
                 self.programState.dataToAnalyse = self.ConcatDataFrame(self.programState.quantitativeData, self.programState.qualitativeData)
                 self.programState.quantitativeData = self.programState.dataToAnalyse
                 # self.programState.setInformationAdditionalFile(len(data.columns), len(data.index), nameOfFile)
+                self.recalculateRowsIndexes()
     
             return sameNumberRows
         
@@ -128,6 +130,7 @@ class Controller():
 
     def deleteColumns(self, listOfColumnsName):
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(labels = listOfColumnsName, axis = 1)
+        self.recalculateRowsIndexes()
         if self.programState.dataToAnalyse.empty:
             self.resetDataToAnalyse()     
 
@@ -135,13 +138,15 @@ class Controller():
     def deleteRows(self, listOfRowsIndex):
         self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(listOfRowsIndex, axis=0)
+        self.recalculateRowsIndexes()
+        if self.programState.dataToAnalyse.empty:
+            self.resetDataToAnalyse()    
+
+    def recalculateRowsIndexes(self):
         newIndexes = range(1,len(self.programState.dataToAnalyse.index)+1)
-        self.programState.dataToAnalyse.reindex(newIndexes,fill_value=0)
+        self.programState.dataToAnalyse.reindex(newIndexes)
         self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
 
-
-        if self.programState.dataToAnalyse.empty:
-            self.resetDataToAnalyse()        
 
         
     def sortVariables(self):
@@ -328,17 +333,20 @@ class Controller():
 
         dataForChart = {}
         tags = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].unique()
+        print self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].value_counts()
         
         #The dict is initialized
         for tag in tags:
             dataForChart[tag] = 0
 
         for i in range(len(self.programState.dataToAnalyse.index)):
-
-            dataForChart[self.programState.dataToAnalyse.loc[i+1, pieChartOptions.getFirstVarSelected()]] = dataForChart[self.programState.dataToAnalyse.loc[i+1, pieChartOptions.getFirstVarSelected()]] + 1
+            dataItem = self.programState.dataToAnalyse.loc[i, pieChartOptions.getFirstVarSelected()]
+            
+            dataForChart[dataItem] = dataForChart[dataItem] + 1
          
         #Get number of samples (same as name of rows of the Dataframe)
         numberSamples = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].count()
+        
         
         sizes = []
         
