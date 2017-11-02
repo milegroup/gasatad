@@ -335,7 +335,6 @@ class Controller():
     def createPieChart(self, pieChartOptions):
 
         sizes = []
-        explode = []
         labels = []
 
         dataForPie = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].value_counts()
@@ -343,18 +342,24 @@ class Controller():
 
         for v in dataForPie:
             sizes.append(100.0*v/numberSamples)
-            explode.append(0.05)
+        
+        cmap = plt.cm.prism
+        colors = cmap(np.linspace(0.,1.,len(dataForPie)))
 
 
         # colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
         if pieChartOptions.getLegendPosition() == "by default".encode("utf-8"):
             for l in dataForPie.index:
                 labels.append(l)
-            plt.pie(sizes, labels=labels, explode = explode, autopct='%1.1f%%', shadow=True, startangle=90)
+            patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=colors)
+            for patch in patches[0]:
+                patch.set_edgecolor('white')
         else:
             for l in range(len(sizes)):
                 labels.append('{} ({:.2f}%)'.format(dataForPie.index[l],sizes[l]))
-            patches, text = plt.pie(sizes, explode = explode, shadow=True, startangle=90)
+            patches, text = plt.pie(sizes, startangle=90, colors=colors)
+            for patch in patches:
+                patch.set_edgecolor('white')
             plt.legend(patches, labels, loc = pieChartOptions.getLegendPosition())
         
         # Set aspect ratio to be equal so that pie is drawn as a circle.
