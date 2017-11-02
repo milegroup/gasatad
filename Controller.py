@@ -363,7 +363,7 @@ class Controller():
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
         plt.tight_layout()
-        plt.title(pieChartOptions.getChartTitle())                
+        plt.title(pieChartOptions.getChartTitle(),fontsize=18)                
         plt.show()
         
         
@@ -375,29 +375,16 @@ class Controller():
             
             bplot = self.programState.dataToAnalyse.plot.box(y = boxPlotOptions.getSelectedCheckBoxes(),
                                                     rot=45,grid = boxPlotOptions.getShowGrid(),
-                                                    return_type='dict', title = boxPlotOptions.getChartTitle(),
+                                                    return_type='dict',
                                                     patch_artist=True, flierprops=flierprops)
 
             for patch, color in zip(bplot['boxes'], self.colorsPatch):
                 patch.set_facecolor(color)
-            print bplot['fliers'][0]
 
         else: # Some categorical value was selected => subplots
             
             
             plotBoxes = boxPlotOptions.getSelectedCheckBoxes()
-
-            print "##",boxPlotOptions.getSelectedCheckBoxes()
-
-            fig, axes = plt.subplots(nrows=1, ncols=len(plotBoxes))
-
-            for plotBox in plotBoxes:
-                print "## Going to plot",plotBox
-
-
-
-            # Start of old code
-
             result = self.programState.dataToAnalyse
 
             bplots = result.boxplot(column = boxPlotOptions.getSelectedCheckBoxes(), by=str(boxPlotOptions.getSecondVarSelected()),
@@ -406,11 +393,8 @@ class Controller():
             for key in bplots.keys():
                 for patch, color in zip(bplots[key]['boxes'], self.colorsPatch):
                     patch.set_facecolor(color)
-
-            # End of old code
-
             
-        plt.suptitle(boxPlotOptions.getChartTitle())
+        plt.suptitle(boxPlotOptions.getChartTitle(),fontsize=18)
         plt.show()    
     
 
