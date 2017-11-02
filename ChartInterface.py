@@ -973,7 +973,7 @@ class ValidatorForFactors(wx.PyValidator):
         
         if not self.selectedCheckBoxes:
             
-            wx.MessageBox("Please, select unless one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+            wx.MessageBox("Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
             return False
             
         else:
@@ -989,7 +989,7 @@ class ValidatorForFactors(wx.PyValidator):
     
     def noCheckBoxSelectedWarning(self):
         
-        dlg = wx.MessageDialog(self, "Please, select unless one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
 
         if dlg.ShowModal() == wx.ID_OK:
             
