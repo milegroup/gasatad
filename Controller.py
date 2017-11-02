@@ -40,7 +40,7 @@ class Controller():
     floatValues = []
     integerValues = []
 
-    colors = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+    colorsPatch = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
 
 
     def ConcatDataFrame(self, dataFrame_1, dataFrame_2):
@@ -349,13 +349,13 @@ class Controller():
         if pieChartOptions.getLegendPosition() == "by default".encode("utf-8"):
             for l in dataForPie.index:
                 labels.append(l)
-            patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colors)
+            patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colorsPatch)
             for patch in patches[0]:
                 patch.set_edgecolor('white')
         else:
             for l in range(len(sizes)):
                 labels.append('{} ({:.2f}%)'.format(dataForPie.index[l],sizes[l]))
-            patches, text = plt.pie(sizes, startangle=90, colors=self.colors)
+            patches, text = plt.pie(sizes, startangle=90, colors=self.colorsPatch)
             for patch in patches:
                 patch.set_edgecolor('white')
             plt.legend(patches, labels, loc = pieChartOptions.getLegendPosition())
@@ -369,33 +369,46 @@ class Controller():
         
     def createBoxPlot(self, boxPlotOptions):
 
-        flierprops = dict(marker='o')
+        flierprops = dict(marker='o',markerfacecolor='white', markersize=8, linestyle='none')
         # No categorical variable was selected
         if boxPlotOptions.getSecondVarSelected() == 'None':
             
             bplot = self.programState.dataToAnalyse.plot.box(y = boxPlotOptions.getSelectedCheckBoxes(),
                                                     rot=45,grid = boxPlotOptions.getShowGrid(),
                                                     return_type='dict', title = boxPlotOptions.getChartTitle(),
-                                                    patch_artist=True)
+                                                    patch_artist=True, flierprops=flierprops)
 
-            for patch, color in zip(bplot['boxes'], self.colors):
+            for patch, color in zip(bplot['boxes'], self.colorsPatch):
                 patch.set_facecolor(color)
+            print bplot['fliers'][0]
 
         else: # Some categorical value was selected => subplots
             
+            
+            plotBoxes = boxPlotOptions.getSelectedCheckBoxes()
+
+            print "##",boxPlotOptions.getSelectedCheckBoxes()
+
+            fig, axes = plt.subplots(nrows=1, ncols=len(plotBoxes))
+
+            for plotBox in plotBoxes:
+                print "## Going to plot",plotBox
+
+
+
+            # Start of old code
+
             result = self.programState.dataToAnalyse
-                                                    
+
             bplots = result.boxplot(column = boxPlotOptions.getSelectedCheckBoxes(), by=str(boxPlotOptions.getSecondVarSelected()),
-                           rot=45,grid = boxPlotOptions.getShowGrid(), return_type='dict', patch_artist=True)
+                           rot=45,grid = boxPlotOptions.getShowGrid(), return_type='dict', patch_artist=True, flierprops=flierprops)
             
             for key in bplots.keys():
-                for patch, color in zip(bplots[key]['boxes'], self.colors):
+                for patch, color in zip(bplots[key]['boxes'], self.colorsPatch):
                     patch.set_facecolor(color)
 
-            # for bplot in bplots:
-            #     print "##",bplot
-            #     for patch, color in zip(bplot['boxes'], self.colors):
-            #         patch.set_facecolor(color)
+            # End of old code
+
             
         plt.suptitle(boxPlotOptions.getChartTitle())
         plt.show()    
