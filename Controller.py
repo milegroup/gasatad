@@ -403,6 +403,7 @@ class Controller():
 
     def createBarChart(self, barChartOptions, operation):
 
+        # No tag selected
         if barChartOptions.getSecondVarSelected().encode('utf-8') == 'None'.encode('utf-8'):
             
             if operation == 'Mean':
@@ -442,19 +443,28 @@ class Controller():
                 
             plt.show()
             
-        else:
+        else: # Some tag has been selected
         
             dataForChart = {}
             tags = self.programState.dataToAnalyse[barChartOptions.getSecondVarSelected()].unique()
+
+
+            print "## tags:",tags
+
             
             for tag in tags:
-                dataForChart[tag] = []
+                if type(tag) is str:
+                    dataForChart[tag] = []
+                if type(tag) is not str:
+                    print "  ## nan detected"
     
-
             for i in range(len(self.programState.dataToAnalyse.index)):
-                temp = self.programState.dataToAnalyse.loc[i+1, barChartOptions.getFirstVarSelected()]
-        
-                dataForChart[self.programState.dataToAnalyse.loc[i+1, barChartOptions.getSecondVarSelected()]].append(temp)
+                temp = self.programState.dataToAnalyse.loc[i, barChartOptions.getFirstVarSelected()]
+                tag = self.programState.dataToAnalyse.loc[i, barChartOptions.getSecondVarSelected()]
+                if type(tag) is str:
+                    dataForChart[tag].append(temp)
+
+            ## Have to remove tags without data
               
             labels = []
             for i in tags:
@@ -489,7 +499,7 @@ class Controller():
             plt.bar(range(len(dataForChart)), results, align='center')
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
     
-            plt.title(barChartOptions.getChartTitle())
+            plt.title(barChartOptions.getChartTitle(), fontsize = 18)
             plt.xlabel(barChartOptions.getXAxisName())
             plt.ylabel(barChartOptions.getYAxisName())
             
