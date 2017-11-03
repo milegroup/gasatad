@@ -40,7 +40,7 @@ class Controller():
     floatValues = []
     integerValues = []
 
-    colorsPatch = ['yellowgreen', 'gold', 'lightskyblue', 'lightcoral']
+    colorsPatch = ['yellowgreen', 'gold', 'cornflowerblue', 'tomato', 'lightgreen', 'hotpink', 'tan', 'lightgrey', 'yellow', 'lightcoral', 'darkgrey', 'aqua', 'darkkhaki', 'orchid', 'lightskyblue']
 
 
     def ConcatDataFrame(self, dataFrame_1, dataFrame_2):
