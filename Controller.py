@@ -314,8 +314,8 @@ class Controller():
     def createScatterPlot(self, scatterOptions):
         
         plt.scatter(self.programState.dataToAnalyse[scatterOptions.getFirstVarSelected()], 
-                    self.programState.dataToAnalyse[scatterOptions.getSecondVarSelected()])
-        plt.title(scatterOptions.getChartTitle())
+                    self.programState.dataToAnalyse[scatterOptions.getSecondVarSelected()],
+                    s=50)
         plt.xlabel(scatterOptions.getXAxisName())
         plt.ylabel(scatterOptions.getYAxisName())
         
@@ -330,6 +330,8 @@ class Controller():
         elif scatterOptions.getYAxisGrid():
             
             plt.grid(axis = 'y')
+
+        plt.title(scatterOptions.getChartTitle(), fontsize = 18)
                
         plt.show()
 
