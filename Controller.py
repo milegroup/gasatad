@@ -448,23 +448,18 @@ class Controller():
             dataForChart = {}
             tags = self.programState.dataToAnalyse[barChartOptions.getSecondVarSelected()].unique()
 
-
-            print "## tags:",tags
-
             
             for tag in tags:
-                if type(tag) is str:
+                if str(tag) != 'nan':
                     dataForChart[tag] = []
-                if type(tag) is not str:
-                    print "  ## nan detected"
     
             for i in range(len(self.programState.dataToAnalyse.index)):
                 temp = self.programState.dataToAnalyse.loc[i, barChartOptions.getFirstVarSelected()]
                 tag = self.programState.dataToAnalyse.loc[i, barChartOptions.getSecondVarSelected()]
-                if type(tag) is str:
+                if str(tag) != 'nan' and str(temp) != 'nan':
                     dataForChart[tag].append(temp)
 
-            ## Have to remove tags without data
+            dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
               
             labels = []
             for i in tags:
@@ -499,7 +494,6 @@ class Controller():
             plt.bar(range(len(dataForChart)), results, align='center')
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
     
-            plt.title(barChartOptions.getChartTitle(), fontsize = 18)
             plt.xlabel(barChartOptions.getXAxisName())
             plt.ylabel(barChartOptions.getYAxisName())
             
@@ -514,6 +508,8 @@ class Controller():
             elif barChartOptions.getYAxisGrid():
                 
                 plt.grid(axis = 'y')
+            
+            plt.title(barChartOptions.getChartTitle(), fontsize = 18)
             
             plt.show()
     
