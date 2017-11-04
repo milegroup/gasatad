@@ -40,7 +40,7 @@ class Controller():
     floatValues = []
     integerValues = []
 
-    colorsPatch = ['yellowgreen', 'gold', 'cornflowerblue', 'tomato', 'lightgreen', 'hotpink', 'tan', 'lightgrey', 'yellow', 'lightcoral', 'darkgrey', 'aqua', 'darkkhaki', 'orchid', 'lightskyblue']
+    colorsPatch = ['cornflowerblue', 'yellowgreen', 'gold', 'tomato', 'lightgreen', 'hotpink', 'tan', 'lightgrey', 'yellow', 'lightcoral', 'darkgrey', 'aqua', 'darkkhaki', 'orchid', 'lightskyblue']
 
 
     def ConcatDataFrame(self, dataFrame_1, dataFrame_2):
@@ -239,11 +239,17 @@ class Controller():
         if histogramOptions.getSecondVarSelected().encode('utf-8') == 'None'.encode('utf-8'):
             
             dataForChart = self.programState.dataToAnalyse[histogramOptions.getFirstVarSelected()]
+            dataForChart = [ x for x in dataForChart if str(x) != 'nan']
+
             
-            plt.hist(dataForChart, 10, histtype='bar')
+            n,bins,patches = plt.hist(dataForChart, 10, histtype='bar', color=self.colorsPatch[0], rwidth=0.75)
            
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
+            plt.ylim(0,max(n)*1.1)
+            for patch in patches:
+                patch.set_edgecolor('white')
+            
             
             if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):
                 
@@ -263,42 +269,47 @@ class Controller():
         else: # Some tag has been selected
         
             dataForChart = {}
-            tags = self.programState.dataToAnalyse[histogramOptions.getSecondVarSelected()].unique()
+            selectedCategory = histogramOptions.getSecondVarSelected()
+            tags = self.programState.dataToAnalyse[selectedCategory].unique()
             
             for tag in tags:
-                dataForChart[tag] = []
+                if str(tag) != 'nan':
+                    dataForChart[tag] = []
             
             for i in range(len(self.programState.dataToAnalyse.index)):
-    
-                dataForChart[self.programState.dataToAnalyse.loc[i, histogramOptions.getSecondVarSelected()]].append(self.programState.dataToAnalyse.loc[i, histogramOptions.getFirstVarSelected()])
+                temp = self.programState.dataToAnalyse.loc[i, histogramOptions.getFirstVarSelected()]
+                tag = self.programState.dataToAnalyse.loc[i, selectedCategory]
+                if str(tag) != 'nan' and str(temp) != 'nan':
+                    dataForChart[tag].append(temp)
 
-            labels = []
-            for i in tags:
-                labels.append(i)
-                
+            dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}    
             
-            tags = np.asarray(tags)
-            plt.hist(dataForChart.values(), 10, histtype='bar',  label=labels)
+            colorsTmp = None
+            if len(self.colorsPatch)>=len(dataForChart.keys()):
+                colorsTmp = self.colorsPatch[0:len(dataForChart)]
+            n,bins,patchesl = plt.hist(dataForChart.values(), 10, histtype='bar',  label=dataForChart.keys(), color=colorsTmp)
             plt.legend()
             
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
+
+            nflat = [data for nl in n for data in nl]
+            plt.ylim(0,max(nflat)*1.1)
+
+            for patches in patchesl:
+                for patch in patches:
+                    patch.set_edgecolor('white')
             
             if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):
-                
                 plt.grid()
             
             elif histogramOptions.getXAxisGrid():
-                
                 plt.grid(axis = 'x')
              
             elif histogramOptions.getYAxisGrid():
-                
                 plt.grid(axis = 'y')
             
-            
             if histogramOptions.getLegendPosition() != "by default".encode("utf-8"):
-                
                 plt.legend(loc = histogramOptions.getLegendPosition())
             
             plt.title(histogramOptions.getChartTitle(), fontsize = 18)
@@ -441,7 +452,8 @@ class Controller():
         else: # Some tag has been selected
         
             dataForChart = {}
-            tags = self.programState.dataToAnalyse[barChartOptions.getSecondVarSelected()].unique()
+            selectedCategory = barChartOptions.getSecondVarSelected()
+            tags = self.programState.dataToAnalyse[selectedCategory].unique()
 
             
             for tag in tags:
@@ -450,7 +462,7 @@ class Controller():
     
             for i in range(len(self.programState.dataToAnalyse.index)):
                 temp = self.programState.dataToAnalyse.loc[i, barChartOptions.getFirstVarSelected()]
-                tag = self.programState.dataToAnalyse.loc[i, barChartOptions.getSecondVarSelected()]
+                tag = self.programState.dataToAnalyse.loc[i, selectedCategory]
                 if str(tag) != 'nan' and str(temp) != 'nan':
                     dataForChart[tag].append(temp)
 
