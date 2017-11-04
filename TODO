@@ -4,6 +4,7 @@ ALL:
 	Improve plots
 	Check what happens when adding a new column from one that has nans
 	When exporting csvs, it always adds the .csv extension (check this)
+	Posibility of marking columns as cathegorical instead of having numbers
 
 WIN:
     Problem when reading xls or xlsx files in windows
