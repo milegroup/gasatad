@@ -1,3 +1,4 @@
 
 Selected columns can be deleted using right-click on the table
 More than two files can be uploaded to the app, as long as the no. of rows matches
+Data can have missing values: these are ignored in plots and in statistical analysis

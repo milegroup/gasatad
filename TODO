@@ -1,10 +1,10 @@
 ALL:
-	Contextual menus
 	Help
-	Improve plots
 	Check what happens when adding a new column from one that has nans
 	When exporting csvs, it always adds the .csv extension (check this)
 	Posibility of marking columns as cathegorical instead of having numbers
+	Review axis of bar charts
+	Problem in basic statistical analysis and significance tests when there are nans
 
 WIN:
     Problem when reading xls or xlsx files in windows

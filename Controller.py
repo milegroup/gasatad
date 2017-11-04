@@ -287,18 +287,21 @@ class Controller():
             colorsTmp = None
             if len(self.colorsPatch)>=len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
-            n,bins,patchesl = plt.hist(dataForChart.values(), 10, histtype='bar',  label=dataForChart.keys(), color=colorsTmp)
+            n,bins,patches = plt.hist(dataForChart.values(), 10, histtype='bar',  label=dataForChart.keys(), color=colorsTmp)
             plt.legend()
             
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
 
-            nflat = [data for nl in n for data in nl]
-            plt.ylim(0,max(nflat)*1.1)
+            if type(n[0]) is np.ndarray:            
+                n = [data for nl in n for data in nl]
+            plt.ylim(0,max(n)*1.1)
 
-            for patches in patchesl:
-                for patch in patches:
-                    patch.set_edgecolor('white')
+            from matplotlib.patches import Rectangle
+            if type(patches[0]) is not Rectangle:
+                patches = [data for pl in patches for data in pl]
+            for patch in patches:
+                patch.set_edgecolor('white')
             
             if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):
                 plt.grid()
