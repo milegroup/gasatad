@@ -29,7 +29,7 @@ class HistogramInterface ( wx.Dialog ):
     
     def __init__( self, parent, listOfVariables, listOfTags ):
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Histogram", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -74,15 +74,19 @@ class HistogramInterface ( wx.Dialog ):
         self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "Y Axis", wx.DefaultPosition, wx.DefaultSize, 0 )
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 10)
         
-        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 ) 
+        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT, 10 ) 
+
+        # ---------------------------------------
                 
-        #Place the legend of the histogram
+        # Place the legend of the histogram
         positions = ['Upper Right', 'Upper Left', 'Lower Left', 'Lower Right', 'Right', 'Center Left', 'Center Right',
                      'Lower Center', 'Upper Center', 'Center']
         
-        legendPosSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Select the position of the Legend" ), wx.HORIZONTAL )
+        self.histLegendPosText = wx.StaticBox( self, wx.ID_ANY, u"Legend position" )
+        legendPosSizer = wx.StaticBoxSizer( self.histLegendPosText, wx.HORIZONTAL )
+        self.histLegendPosText.Enable(False)
         
-        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 )
+        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 10 )
         
         fgLegendSizer = wx.FlexGridSizer( 0, 4, 0, 0 )
         fgLegendSizer.SetFlexibleDirection( wx.BOTH )
@@ -90,22 +94,29 @@ class HistogramInterface ( wx.Dialog ):
         
         legendPosSizer.Add( fgLegendSizer, 1, wx.EXPAND, 5 )
         
-        self.m_radioBtn15 = wx.RadioButton( self, wx.ID_ANY, "By Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
-        fgLegendSizer.Add( self.m_radioBtn15, 0, wx.ALL, 5 )
-        
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn15)
+        self.histLegendPosDefault = wx.RadioButton( self, wx.ID_ANY, "By Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        fgLegendSizer.Add( self.histLegendPosDefault, 0, wx.ALL, 5 )
+        self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.histLegendPosDefault)
+        self.histLegendPosDefault.Enable(False)
+
+        self.histLegendPosOther = []
         
         for position in positions:
-            
-            self.m_radioBtn = wx.RadioButton( self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0 )
-            fgLegendSizer.Add( self.m_radioBtn, 0, wx.ALL, 5 )
+            histLegendPosOtherTmp = wx.RadioButton( self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0 )
+            fgLegendSizer.Add( histLegendPosOtherTmp, 0, wx.ALL, 5 )
+            histLegendPosOtherTmp.Enable(False)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, histLegendPosOtherTmp)
+            self.histLegendPosOther.append(histLegendPosOtherTmp)
+
         
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)     
+        # ---------------------------------------
+            
         
         sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X Variables" ), wx.VERTICAL )
         sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tags" ), wx.VERTICAL )
         
         
+
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
         fgSizer3.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -133,7 +144,7 @@ class HistogramInterface ( wx.Dialog ):
         fgSizer6.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )        
         
         #Not use a label (for example in Level: High, Low)
-        self.m_radioBtn16 = wx.RadioButton( self, wx.ID_ANY, "Not use label", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.m_radioBtn16 = wx.RadioButton( self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
         fgSizer6.Add( self.m_radioBtn16, 0, wx.ALL, 5 )
         self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
         
@@ -146,15 +157,17 @@ class HistogramInterface ( wx.Dialog ):
                     
         #As a default the name of the axis are the selected variables
         self.xAxisNameTextCtrl.SetValue(listOfVariables[0])
-        self.yAxisNameTextCtrl.SetValue('Not use label')
+        self.yAxisNameTextCtrl.SetValue('No. of elements')
 
-        sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 5 )
+        sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 0 )
         sbSizer2.Add( fgSizer6, 1, wx.EXPAND, 5 )
         
-        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 5 )
-        fgSizer3.Add( sbSizer2, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.LEFT, 10 )
+        fgSizer3.Add( sbSizer2, 1, wx.EXPAND | wx.LEFT | wx.RIGHT , 10 )
 
-        gbSizer1.Add( fgSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 5 )       
+        gbSizer1.Add( fgSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 0 )      
+
+        # --------------------------------------- 
         
         #Ok and Cancel buttons
         okay = wx.Button( self, wx.ID_OK )
@@ -164,7 +177,7 @@ class HistogramInterface ( wx.Dialog ):
         btns.AddButton(cancel)
         btns.Realize()
         
-        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
+        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.TOP | wx.BOTTOM, 10 )
         
         self.SetSizer( gbSizer1 )
         gbSizer1.Fit(self)
@@ -175,7 +188,7 @@ class HistogramInterface ( wx.Dialog ):
        
         #Variable to save the selected radiobutton
         self.selectedRadioButtonVariables = listOfVariables[0]
-        self.selectedRadioButtonTags = 'Not use label'
+        self.selectedRadioButtonTags = 'None'
         
         self.Fit()
         self.Show(True)
@@ -193,9 +206,20 @@ class HistogramInterface ( wx.Dialog ):
     def updateSelectedTagsRadioButton(self, event):
         
         radioButton = event.GetEventObject()
-        
+        selectedRadioButton = radioButton.GetLabelText()
         self.selectedRadioButtonTags = radioButton.GetLabelText()
-        self.yAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
+
+        if selectedRadioButton == 'None':
+            self.histLegendPosText.Enable(False)
+            self.histLegendPosDefault.Enable(False)
+            for otherRadioButton in self.histLegendPosOther:
+                otherRadioButton.Enable(False)
+            self.histLegendPosDefault.SetValue(True)
+        else:
+            self.histLegendPosText.Enable()
+            self.histLegendPosDefault.Enable()
+            for otherRadioButton in self.histLegendPosOther:
+                otherRadioButton.Enable()
 
 
     def chartVariables(self):
@@ -436,7 +460,7 @@ class PieChartInterface ( wx.Dialog ):
         positions = ['Upper Right', 'Upper Left', 'Lower Left', 'Lower Right', 'Right', 'Center Left', 'Center Right',
                      'Lower Center', 'Upper Center', 'Center']
         
-        legendPosSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Select the position of the Legend" ), wx.HORIZONTAL )
+        legendPosSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Legend position" ), wx.HORIZONTAL )
         
         gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 )
         
@@ -746,7 +770,7 @@ class BarChartInterface ( wx.Dialog ):
     
     def __init__( self, parent, listOfVariables, listOfTags ):
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Bar chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         

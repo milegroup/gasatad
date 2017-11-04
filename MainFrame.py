@@ -28,7 +28,7 @@ import numpy
 import csv
 from Controller import Controller
 from FactorsInterface import FactorsInterface
-from ChartInterface import HistogramInterface, ScatterPlotInterface,\
+from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
 from SignificanceTestInterface import SignificanceTestInterface

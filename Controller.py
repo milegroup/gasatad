@@ -235,12 +235,13 @@ class Controller():
     
     def createHistogram(self, histogramOptions):
 
-        if histogramOptions.getSecondVarSelected().encode('utf-8') == 'Not use label'.encode('utf-8'):
+        # No tag selected
+        if histogramOptions.getSecondVarSelected().encode('utf-8') == 'None'.encode('utf-8'):
             
             dataForChart = self.programState.dataToAnalyse[histogramOptions.getFirstVarSelected()]
             
-            plt.hist(dataForChart, 10, normed=1, histtype='bar')
-            plt.title(histogramOptions.getChartTitle())
+            plt.hist(dataForChart, 10, histtype='bar')
+           
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
             
@@ -255,28 +256,21 @@ class Controller():
             elif histogramOptions.getYAxisGrid():
                 
                 plt.grid(axis = 'y')
-
-            
-            if histogramOptions.getLegendPosition() != "by default".encode("utf-8"):
-                
-                plt.legend(loc = histogramOptions.getLegendPosition())
-            
-            
+                       
+            plt.title(histogramOptions.getChartTitle(), fontsize = 18)
             plt.show()
             
-        else:
+        else: # Some tag has been selected
         
             dataForChart = {}
             tags = self.programState.dataToAnalyse[histogramOptions.getSecondVarSelected()].unique()
             
             for tag in tags:
                 dataForChart[tag] = []
-    
-            
             
             for i in range(len(self.programState.dataToAnalyse.index)):
     
-                dataForChart[self.programState.dataToAnalyse.loc[i+1, histogramOptions.getSecondVarSelected()]].append(self.programState.dataToAnalyse.loc[i+1, histogramOptions.getFirstVarSelected()])
+                dataForChart[self.programState.dataToAnalyse.loc[i, histogramOptions.getSecondVarSelected()]].append(self.programState.dataToAnalyse.loc[i, histogramOptions.getFirstVarSelected()])
 
             labels = []
             for i in tags:
@@ -284,9 +278,9 @@ class Controller():
                 
             
             tags = np.asarray(tags)
-            plt.hist(dataForChart.values(), 10, normed=1, histtype='bar',  label=labels)
+            plt.hist(dataForChart.values(), 10, histtype='bar',  label=labels)
             plt.legend()
-            plt.title(histogramOptions.getChartTitle())
+            
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
             
@@ -307,6 +301,7 @@ class Controller():
                 
                 plt.legend(loc = histogramOptions.getLegendPosition())
             
+            plt.title(histogramOptions.getChartTitle(), fontsize = 18)
             plt.show()
 
 
