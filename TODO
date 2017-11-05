@@ -6,6 +6,7 @@ ALL:
 	Problem in significance tests when there are nans
 	Rename colums
 	Histogram: no of bins
+	Change descriptive statistics and significance tests (html?)
 
 WIN:
     Problem when reading xls or xlsx files in windows
