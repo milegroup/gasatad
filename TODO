@@ -5,6 +5,7 @@ ALL:
 	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
 	Problem in basic statistical analysis and significance tests when there are nans
+	Rename colums
 
 WIN:
     Problem when reading xls or xlsx files in windows
