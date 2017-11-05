@@ -348,16 +348,22 @@ class BasicStatisticsInterface ( wx.Dialog ):
                 auxIndex1 = []
                
                 for name, value in self.selectedVariablesInColumn.items():
+
+                    tagsColumn = self.dataToAnalyse[name]
+                    auxIndex1 = [x for x in range(len(tagsColumn)) if tagsColumn[x] in value ]
+                    indices.append(auxIndex1)
                     
-                    if value:
-                        auxIndex1 = []
-                        for i in range(len(self.dataToAnalyse.index)):
+                    # if value:
+                    #     auxIndex1 = []
+                    #     for i in range(len(self.dataToAnalyse.index)):
                             
-                            if (self.dataToAnalyse.loc[i+1,name] in value):
+                    #         if (self.dataToAnalyse.loc[i+1,name] in value):
                             
-                                auxIndex1.append(i+1)
+                    #             auxIndex1.append(i+1)
                               
-                        indices.append(auxIndex1)
+                    #     indices.append(auxIndex1)
+
+                        
                     #del auxIndex1[:]
                 
                 

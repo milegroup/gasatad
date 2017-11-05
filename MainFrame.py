@@ -189,37 +189,37 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.newColumnBtn = wx.Button( self, wx.ID_ANY, u"Add New Column", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.newColumnBtn = wx.Button( self, wx.ID_ANY, u"Add new column", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.newColumnBtn.Enable( False )
         # self.newColumnBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.newColumnBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset Data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset data", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.resetDataBtn.Enable( False )
         #self.resetDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.deleteColumnsBtn = wx.Button( self, wx.ID_ANY, u"Delete Columns", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.deleteColumnsBtn = wx.Button( self, wx.ID_ANY, u"Delete columns", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.deleteColumnsBtn.Enable( False )
         #self.deleteColumnsBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.deleteColumnsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export Data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.exportDataBtn.Enable( False )
         #self.exportDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Descriptive Statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Descriptive statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.descriptiveStatsBtn.Enable( False )
         #self.descriptiveStatsBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.descriptiveStatsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.significanceTestBtn = wx.Button( self, wx.ID_ANY, u"Significance Test", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.significanceTestBtn = wx.Button( self, wx.ID_ANY, u"Significance test", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.significanceTestBtn.Enable( False )
         #self.significanceTestBtn.SetMinSize( wx.Size( -1,25 ) )
         
@@ -977,8 +977,12 @@ class MainFrame ( wx.Frame ):
             self.tagsAndValues.clear()
             
             for value in self.controller.characterValues:
-                
-                self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
+
+                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = [x for x in listTags if str(x) != 'nan']
+                self.tagsAndValues[value] = numpy.asarray(listTags)
+
+                # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
             
             dataFrame = self.controller.programState.dataToAnalyse
             variablesList = self.controller.floatValues + self.controller.integerValues

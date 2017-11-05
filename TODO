@@ -3,7 +3,7 @@ ALL:
 	When exporting csvs, it always adds the .csv extension (check this)
 	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
-	Problem in basic statistical analysis and significance tests when there are nans
+	Problem in significance tests when there are nans
 	Rename colums
 	Histogram: no of bins
 
