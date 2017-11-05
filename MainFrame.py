@@ -446,6 +446,7 @@ class MainFrame ( wx.Frame ):
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
                 self.m_dataTable.ClearSelection()
+                self.markTextColumns()
                 self.markNans()
                 self.updateDataInfo()
                 self.Layout()
@@ -472,6 +473,7 @@ class MainFrame ( wx.Frame ):
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
                 self.m_dataTable.ClearSelection()
+                self.markTextColumns()
                 self.markNans()
                 self.updateDataInfo()
                 self.Layout()
@@ -575,6 +577,7 @@ class MainFrame ( wx.Frame ):
         print "File: "+fileName+" loaded"
 
         self.m_dataTable.AutoSize()
+        self.markTextColumns()
         self.markNans()
 
         self.params['dataPresent'] = True
@@ -636,6 +639,7 @@ class MainFrame ( wx.Frame ):
 
                     self.fillInGrid()
                     self.m_dataTable.AutoSize()
+                    self.markTextColumns()
                     self.markNans() 
                     self.Layout()
                     self.m_dataTable.Enable()
@@ -727,6 +731,7 @@ class MainFrame ( wx.Frame ):
 
                     self.fillInGrid()
                     self.m_dataTable.AutoSize()
+                    self.markTextColumns()
                     self.markNans()
                     self.Layout()
 
@@ -813,6 +818,13 @@ class MainFrame ( wx.Frame ):
                     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
         self.controller.sortVariables()
+
+
+    def markTextColumns(self):
+        for col in range(self.controller.getNumberOfColumns()):
+            if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
+                for row in range(self.controller.getNumberOfRows()):
+                    self.m_dataTable.SetCellBackgroundColour(row,col,'lightgoldenrodyellow')
     
 
     def markNans(self):
@@ -826,10 +838,11 @@ class MainFrame ( wx.Frame ):
                 if  content  == 'nan' or content == 'null': # This checks for nan
                     # print "## Nan detected in cell:",row,"  ",col 
                     self.m_dataTable.SetCellValue(row,col,"null")
-                    self.m_dataTable.SetCellBackgroundColour(row,col,wx.TheColourDatabase.Find('LIGHT GREY'))
+                    self.m_dataTable.SetCellBackgroundColour(row,col,'peachpuff')
                     self.params['noOfNulls'] += 1
                 else:
-                    self.m_dataTable.SetCellBackgroundColour(row,col,'WHITE')
+                    if self.m_dataTable.GetColLabelValue(col) not in self.controller.characterValues:
+                        self.m_dataTable.SetCellBackgroundColour(row,col,'white')
 
     
     def exportData(self, event):

@@ -136,7 +136,6 @@ class Controller():
 
     def deleteColumns(self, listOfColumnsName):
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(labels = listOfColumnsName, axis = 1)
-        self.recalculateRowsIndexes()
         if self.programState.dataToAnalyse.empty:
             self.resetDataToAnalyse()     
 
@@ -275,12 +274,13 @@ class Controller():
             for tag in tags:
                 if str(tag) != 'nan':
                     dataForChart[tag] = []
-            
-            for i in range(len(self.programState.dataToAnalyse.index)):
-                temp = self.programState.dataToAnalyse.loc[i, histogramOptions.getFirstVarSelected()]
-                tag = self.programState.dataToAnalyse.loc[i, selectedCategory]
-                if str(tag) != 'nan' and str(temp) != 'nan':
-                    dataForChart[tag].append(temp)
+
+            tagsColumn = self.programState.dataToAnalyse[selectedCategory]
+            valuesColumn = self.programState.dataToAnalyse[histogramOptions.getFirstVarSelected()]
+
+            for i in range(len(valuesColumn)):
+                if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
+                    dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}    
             
@@ -463,11 +463,12 @@ class Controller():
                 if str(tag) != 'nan':
                     dataForChart[tag] = []
     
-            for i in range(len(self.programState.dataToAnalyse.index)):
-                temp = self.programState.dataToAnalyse.loc[i, barChartOptions.getFirstVarSelected()]
-                tag = self.programState.dataToAnalyse.loc[i, selectedCategory]
-                if str(tag) != 'nan' and str(temp) != 'nan':
-                    dataForChart[tag].append(temp)
+            tagsColumn = self.programState.dataToAnalyse[selectedCategory]
+            valuesColumn = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()]
+
+            for i in range(len(valuesColumn)):
+                if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
+                    dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
               
