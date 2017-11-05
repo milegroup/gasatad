@@ -23,7 +23,7 @@ import os
 from MainFrame import MainFrame
 
 MainFrame.params = {}
-MainFrame.params['version'] = 1.0
+MainFrame.params['version'] = 1.1
 MainFrame.params['dataPresent'] = False
 MainFrame.params['noOfFiles'] = 0
 MainFrame.params['noOfNulls'] = 0
