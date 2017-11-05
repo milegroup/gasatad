@@ -212,21 +212,24 @@ class Controller():
         for i in (self.programState.dataToAnalyse.index):
             
             item = self.programState.dataToAnalyse.loc[i, nameRadioButton]
-            
-            for factor in dictKeys:
-                
-                if ( (item >= factorsFromInterface[factor][0]) and (item <= factorsFromInterface[factor][1])):
-                    
-                    arrayToInsert.append(factor)
-                    self.isInRange = True
-                    self.itemAdded = True
 
-                else:
-                    if ((factor == dictKeys[-1]) and (self.isInRange == False) and (self.itemAdded == False)): 
-                        arrayToInsert.append(tagRestValues)
-                self.isInRange = False
-                
-            self.itemAdded = False
+            if str(item) == 'nan':
+                arrayToInsert.append(item)
+            else:
+                for factor in dictKeys:
+                    
+                    if ( (item >= factorsFromInterface[factor][0]) and (item <= factorsFromInterface[factor][1])):
+                        
+                        arrayToInsert.append(factor)
+                        self.isInRange = True
+                        self.itemAdded = True
+
+                    else:
+                        if ((factor == dictKeys[-1]) and (self.isInRange == False) and (self.itemAdded == False)): 
+                            arrayToInsert.append(tagRestValues)
+                    self.isInRange = False
+                    
+                self.itemAdded = False
 
         self.programState.dataToAnalyse.insert(len(self.programState.dataToAnalyse.columns), nameOFFactor, arrayToInsert)
         

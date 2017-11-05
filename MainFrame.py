@@ -27,7 +27,7 @@ from pandas.io.excel import read_excel
 import numpy
 import csv
 from Controller import Controller
-from FactorsInterface import FactorsInterface
+from AddColumnInterface import AddColumnInterface
 from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
@@ -951,17 +951,18 @@ class MainFrame ( wx.Frame ):
             minimum = int(self.controller.programState.dataToAnalyse.min(numeric_only = True).min().round()) -1
             maximum = int(self.controller.programState.dataToAnalyse.max(numeric_only = True).max().round()) +1
             
-            factorFrame = FactorsInterface(self, (self.controller.integerValues + self.controller.floatValues),
+            factorFrame = AddColumnInterface(self, (self.controller.integerValues + self.controller.floatValues),
                                            list(self.controller.programState.dataToAnalyse.columns), minimum, maximum)
             factorFrame.Show(True)
             
             if  factorFrame.ShowModal() == wx.ID_OK:
                 
-                factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor = factorFrame.returnFactors()
-            
+                factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor = factorFrame.returnFactors()            
                 self.controller.addColumn(factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor)
                 
                 self.fillInGrid()
+                self.markTextColumns()
+                self.markNans()
                 self.m_dataTable.AutoSize()
                 self.Layout()         
         else:

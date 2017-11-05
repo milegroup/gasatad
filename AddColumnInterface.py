@@ -21,7 +21,7 @@ import wx
 import wx.lib.agw.floatspin as fs
 import os
 
-class FactorsInterface ( wx.Dialog ):
+class AddColumnInterface ( wx.Dialog ):
     
     spinControlList = []
     textControlList = []
