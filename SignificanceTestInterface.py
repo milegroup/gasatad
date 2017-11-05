@@ -510,14 +510,18 @@ class SignificanceTestInterface ( wx.Dialog ):
                 for name, value in selectedVariablesInColumn.items():
                     
                     if value:
-                        auxIndex1 = []
-                        for i in range(len(self.dataToAnalyse.index)):
+                        tagsColumn = self.dataToAnalyse[name]
+                        auxIndex1 = [x for x in range(len(tagsColumn)) if tagsColumn[x] in value ]
+                        indices.append(auxIndex1)
+
+                        # auxIndex1 = []
+                        # for i in range(len(self.dataToAnalyse.index)):
                             
-                            if (self.dataToAnalyse.loc[i+1,name] in value):
+                        #     if (self.dataToAnalyse.loc[i+1,name] in value):
                             
-                                auxIndex1.append(i+1)
+                        #         auxIndex1.append(i+1)
                               
-                        indices.append(auxIndex1)               
+                        # indices.append(auxIndex1)               
                 
                 if self.intervalNameAndLimits:
                     
@@ -562,6 +566,12 @@ class SignificanceTestInterface ( wx.Dialog ):
         #RP means Right Panel        
         dataSelectedRP = self.dataToAnalyse.loc[listIndex2, self.clickedRadiobuttonRight]
 
+        # print "## dataLP"
+        # print dataSelectedLP
+        # print "## dataRP"
+        # print dataSelectedRP
+
+
         if (len(dataSelectedLP) > 0 and len(dataSelectedRP) > 0):
             
             self.m_textCtrl.BeginAlignment(wx.TEXT_ALIGNMENT_CENTER)
@@ -576,7 +586,7 @@ class SignificanceTestInterface ( wx.Dialog ):
             toRet = ''            
             
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var = False)
-            toRet = toRet + ' T-test on TWO INDEPENDENT samples:\n'
+            toRet = toRet + 'T-test on TWO INDEPENDENT samples:\n'
             toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
             
             temp1, temp2 = ks_2samp(dataSelectedLP, dataSelectedRP)

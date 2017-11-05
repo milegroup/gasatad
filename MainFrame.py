@@ -1008,8 +1008,12 @@ class MainFrame ( wx.Frame ):
             self.tagsAndValues.clear()
             
             for value in self.controller.characterValues:
+
+                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = [x for x in listTags if str(x) != 'nan']
+                self.tagsAndValues[value] = numpy.asarray(listTags)
                 
-                self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
+                # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
             
             
             dataFrame = self.controller.programState.dataToAnalyse
