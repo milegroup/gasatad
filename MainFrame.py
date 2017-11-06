@@ -400,7 +400,9 @@ class MainFrame ( wx.Frame ):
     def rightClickOnTable(self, event):
         columnClicked = event.GetCol()
         columnsSelected = self.m_dataTable.GetSelectedCols()
+
         if columnClicked in columnsSelected:
+
             textPopupDelete = "Delete column"
             if len(columnsSelected)>1:
                 textPopupDelete += "s"
@@ -408,6 +410,12 @@ class MainFrame ( wx.Frame ):
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
             self.Bind(wx.EVT_MENU, self.onPopupDeleteCols, id=self.popupDeleteID)
+
+            if len(columnsSelected)==1:
+                self.popupRenameID = wx.NewId()
+                popupMenu.Append(self.popupRenameID,"Rename column")
+                self.Bind(wx.EVT_MENU, self.onPopupRenameCol, id=self.popupRenameID)
+            
             self.PopupMenu( popupMenu )
             popupMenu.Destroy()
 
@@ -450,6 +458,22 @@ class MainFrame ( wx.Frame ):
                 self.markNans()
                 self.updateDataInfo()
                 self.Layout()
+        else:
+            dlg.Destroy()
+
+    def onPopupRenameCol(self,event):
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        oldLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
+        dlg = wx.TextEntryDialog(self, "Type new label for column '"+oldLabel+"':", 'Rename column', '')
+        if dlg.ShowModal() == wx.ID_OK:
+            newLabel = dlg.GetValue()
+            dlg.Destroy()
+            # print oldLabel,"->",newLabel
+            self.controller.renameColumn(oldLabel,newLabel)
+            self.fillInGrid()
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.Layout()
         else:
             dlg.Destroy()
 

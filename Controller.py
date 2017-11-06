@@ -139,13 +139,17 @@ class Controller():
         if self.programState.dataToAnalyse.empty:
             self.resetDataToAnalyse()     
 
-
     def deleteRows(self, listOfRowsIndex):
         self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(listOfRowsIndex, axis=0)
         self.recalculateRowsIndexes()
         if self.programState.dataToAnalyse.empty:
             self.resetDataToAnalyse()    
+
+
+    def renameColumn(self,oldLabel,newLabel):
+        self.programState.dataToAnalyse.rename(columns={oldLabel:newLabel},inplace=True)
+
 
     def recalculateRowsIndexes(self):
         newIndexes = range(1,len(self.programState.dataToAnalyse.index)+1)
