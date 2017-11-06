@@ -3,7 +3,6 @@ ALL:
 	When exporting csvs, it always adds the .csv extension (check this)
 	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
-	Rename colums
 	Change descriptive statistics and significance tests (html?)
 
 WIN:
