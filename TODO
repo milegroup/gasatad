@@ -6,12 +6,14 @@ ALL:
 	Change descriptive statistics and significance tests (html?)
 
 	Splash screen?
+	Problem when reading xls or xlsx files
 
 WIN:
-    Problem when reading xls or xlsx files in windows
 
 MAC:
 	Try to remove "python" fron the main app bar
 	Improve detection of new versions: now, running GASATaD from source detects new binary versions for MacOS
 
 DEB:
+	Add logo to the .deb package
+	Check privative license when opened with software center
