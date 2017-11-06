@@ -4,7 +4,6 @@ ALL:
 	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
 	Rename colums
-	Histogram: no of bins
 	Change descriptive statistics and significance tests (html?)
 
 WIN:

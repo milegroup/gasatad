@@ -43,21 +43,21 @@ class HistogramInterface ( wx.Dialog ):
         fgSizerchartOptions.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         fgSizerchartOptions.AddGrowableCol(1)
         
-        self.histogramName = wx.StaticText( self, wx.ID_ANY, u"Histogram Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.histogramName = wx.StaticText( self, wx.ID_ANY, u"Histogram title:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.histogramName.Wrap( -1 )
         fgSizerchartOptions.Add( self.histogramName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.histogramNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.histogramNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.xAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.xAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.xAxisNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.xAxisNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.yAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.yAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -67,14 +67,20 @@ class HistogramInterface ( wx.Dialog ):
         gbSizer1.Add( fgSizerchartOptions, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
 
         #Display Grid        
-        displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display Grids" ), wx.HORIZONTAL )
+        displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display settings" ), wx.HORIZONTAL )
 
-        self.xAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "X Axis", wx.DefaultPosition, wx.DefaultSize, 0 )
-        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL, 10)
-        self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "Y Axis", wx.DefaultPosition, wx.DefaultSize, 0 )
-        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 10)
+        displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"Grids:", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 10)
+        self.xAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "x-axis", wx.DefaultPosition, wx.DefaultSize, 0 )
+        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.RIGHT|wx.TOP, 7)
+        self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "y-axis", wx.DefaultPosition, wx.DefaultSize, 0 )
+        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.RIGHT|wx.TOP, 7)
+        displayGridsSizer.AddStretchSpacer()
+        displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"No. of bins:", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 10)
+        self.numOfBins = wx.SpinCtrl(self,wx.ID_ANY, value='10', size=(70,-1))
+        self.numOfBins.SetRange(1,100)
+        displayGridsSizer.Add(self.numOfBins, 0, wx.RIGHT|wx.TOP, 2)
         
-        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT, 10 ) 
+        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 ) 
 
         # ---------------------------------------
                 
@@ -244,7 +250,8 @@ class HistogramInterface ( wx.Dialog ):
         histogramOptions = ChartOptions(self.histogramNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), 
                                       self.yAxisNameTextCtrl.GetValue(), False,self.xAxischeckBox.IsChecked(), 
                                       self.yAxischeckBox.IsChecked(), self.selectedRadioButtonVariables, 
-                                      self.selectedRadioButtonTags, self.position, [])
+                                      self.selectedRadioButtonTags, self.position, [],
+                                      numOfBins=self.numOfBins.GetValue())
         
         return histogramOptions 
 

@@ -178,7 +178,7 @@ class FileInformation():
         
 class ChartOptions():
     
-    def __init__(self, title = '', xAxisName = '', yAxisName = '', showGrid = True, xAxisGrid = False, yAxisGrid = False, firstVarSelected = '', secondVarSelected = '', legendPosition = '', selectedCheckBoxes = [] ):
+    def __init__(self, title = '', xAxisName = '', yAxisName = '', showGrid = True, xAxisGrid = False, yAxisGrid = False, firstVarSelected = '', secondVarSelected = '', legendPosition = '', selectedCheckBoxes = [], numOfBins=10 ):
         
         self.chartTitle = title
         self.xAxisName = xAxisName
@@ -193,78 +193,40 @@ class ChartOptions():
         self.firstVarSelected = firstVarSelected
         self.secondVarSelected = secondVarSelected
         self.selectedCheckBoxes = selectedCheckBoxes
+
+        self.numOfBins = numOfBins
         
-    def getChartTitle(self):
-        
+    def getChartTitle(self):        
         return self.chartTitle
     
-    def getXAxisName(self):
-        
-        return self.xAxisName
-    
-    def getYAxisName(self):
-        
+    def getXAxisName(self):        
+        return self.xAxisName   
+    def getYAxisName(self):       
         return self.yAxisName
     
-    def getShowGrid(self):
-        
+    def getShowGrid(self):        
         return self.showGrid
     
-    def getXAxisGrid(self):
-        
+    def getXAxisGrid(self):        
         return self.xAxisGrid
     
-    def getYAxisGrid(self):
-        
+    def getYAxisGrid(self):        
         return self.yAxisGrid
     
-    def getFirstVarSelected(self):
-        
+    def getFirstVarSelected(self):        
         return self.firstVarSelected
     
-    def getSecondVarSelected(self):
-        
+    def getSecondVarSelected(self):        
         return self.secondVarSelected
     
-    def getLegendPosition(self):
-        
+    def getLegendPosition(self):        
         return self.legendPosition.lower().encode("utf-8")
     
     def getSelectedCheckBoxes(self):
-        
         return self.selectedCheckBoxes
-    
-    def setChartTitle(self, title):
-        
-        self.chartTitle = title
-    
-    def setXAxisName(self, xAxisName):
-        
-        self.xAxisName = xAxisName
-    
-    def setYAxisName(self, yAxisName):
-        
-        self.yAxisName = yAxisName
-    
-    def setShowGrid(self, showGrid):
-        
-        self.showGrid = showGrid
-    
-    def setXAxisGrid(self, xAxisGrid):
-        
-        self.xAxisGrid = xAxisGrid
-    
-    def setYAxisGrid(self, yAxisGrid):
-        
-        self.yAxisGrid = yAxisGrid
-        
-    def setLegendPosition(self, pos):
-        
-        self.legendPosition = pos
-        
-    def setSelectedCheckBoxes(self, listCheckBoxes):
-        
-        self.selectedCheckBoxes = listCheckBoxes    
+
+    def getNumOfBins(self):
+        return self.numOfBins
 
 
 

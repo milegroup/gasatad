@@ -244,7 +244,7 @@ class Controller():
             dataForChart = [ x for x in dataForChart if str(x) != 'nan']
 
             
-            n,bins,patches = plt.hist(dataForChart, 10, histtype='bar', color=self.colorsPatch[0], rwidth=0.75)
+            n,bins,patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75, bins=histogramOptions.getNumOfBins())
            
             plt.xlabel(histogramOptions.getXAxisName())
             plt.ylabel(histogramOptions.getYAxisName())
@@ -253,16 +253,13 @@ class Controller():
                 patch.set_edgecolor('white')
             
             
-            if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):
-                
+            if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):                
                 plt.grid()
             
-            elif histogramOptions.getXAxisGrid():
-                
+            elif histogramOptions.getXAxisGrid():                
                 plt.grid(axis = 'x')
              
-            elif histogramOptions.getYAxisGrid():
-                
+            elif histogramOptions.getYAxisGrid():                
                 plt.grid(axis = 'y')
                        
             plt.title(histogramOptions.getChartTitle(), fontsize = 18)
@@ -290,7 +287,7 @@ class Controller():
             colorsTmp = None
             if len(self.colorsPatch)>=len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
-            n,bins,patches = plt.hist(dataForChart.values(), 10, histtype='bar',  label=dataForChart.keys(), color=colorsTmp)
+            n,bins,patches = plt.hist(dataForChart.values(), histtype='bar',  label=dataForChart.keys(), color=colorsTmp, bins=histogramOptions.getNumOfBins())
             plt.legend()
             
             plt.xlabel(histogramOptions.getXAxisName())
