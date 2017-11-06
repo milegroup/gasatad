@@ -5,6 +5,8 @@ ALL:
 	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
 
+	Splash screen?
+
 WIN:
     Problem when reading xls or xlsx files in windows
 
