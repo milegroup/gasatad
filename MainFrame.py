@@ -50,6 +50,14 @@ class MainFrame ( wx.Frame ):
      
     def __init__( self, parent ):
 
+        # splash = MySplashScreen()
+        # splash.Show()
+
+        bmp = wx.Image("icons/SplashScreen1.2.png").ConvertToBitmap()
+        splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
+
+        wx.Yield()
+
         self.configInit()
 
         # print "Invoked from directory:",self.params['options']['dirfrom']
