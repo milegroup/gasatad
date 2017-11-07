@@ -4,8 +4,6 @@ ALL:
 	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
-
-	Splash screen?
 	Problem when reading xls or xlsx files
 
 WIN:
