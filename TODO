@@ -5,6 +5,7 @@ ALL:
 	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
+	Testfile1Nans, significance HP morning vs HP afternoon: nans?
 
 WIN:
 
