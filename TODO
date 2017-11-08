@@ -8,11 +8,11 @@ ALL:
 	Testfile1Nans, significance HP morning vs HP afternoon: nans?
 
 WIN:
+	Colors of cells
 
 MAC:
 	Try to remove "python" fron the main app bar
 	Improve detection of new versions: now, running GASATaD from source detects new binary versions for MacOS
+	Colors of cells
 
 DEB:
-	Add logo to the .deb package
-	Check privative license when opened with software center
