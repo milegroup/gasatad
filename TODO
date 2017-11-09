@@ -5,7 +5,6 @@ ALL:
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
 	When there are many categories in discreet data, allow user to group them
-	Testfile1Nans, significance HP morning vs HP afternoon: nans?
 
 WIN:
 	Colors of cells
