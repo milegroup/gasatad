@@ -7,11 +7,9 @@ ALL:
 	When there are many categories in discreet data, allow user to group them
 
 WIN:
-	Colors of cells
 
 MAC:
 	Try to remove "python" fron the main app bar
 	Improve detection of new versions: now, running GASATaD from source detects new binary versions for MacOS
-	Colors of cells
 
 DEB:

@@ -883,7 +883,8 @@ class MainFrame ( wx.Frame ):
         for col in range(self.controller.getNumberOfColumns()):
             if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
                 for row in range(self.controller.getNumberOfRows()):
-                    self.m_dataTable.SetCellBackgroundColour(row,col,'lightgoldenrodyellow')
+                    self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
+                    # self.m_dataTable.SetCellBackgroundColour(row,col,'lightgoldenrodyellow')
     
 
     def markNans(self):
@@ -897,7 +898,8 @@ class MainFrame ( wx.Frame ):
                 if  content  == 'nan' or content == 'null': # This checks for nan
                     # print "## Nan detected in cell:",row,"  ",col 
                     self.m_dataTable.SetCellValue(row,col,"null")
-                    self.m_dataTable.SetCellBackgroundColour(row,col,'peachpuff')
+                    # self.m_dataTable.SetCellBackgroundColour(row,col,'peachpuff')
+                    self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(255,218,185))
                     self.params['noOfNulls'] += 1
                 else:
                     if self.m_dataTable.GetColLabelValue(col) not in self.controller.characterValues:
