@@ -1,10 +1,10 @@
 ALL:
 	Help
 	When exporting csvs, it always adds the .csv extension (check this)
-	Posibility of marking columns as cathegorical instead of having numbers
 	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
+	When there are many categories in discreet data, allow user to group them
 	Testfile1Nans, significance HP morning vs HP afternoon: nans?
 
 WIN:

@@ -490,7 +490,7 @@ class PieChartInterface ( wx.Dialog ):
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)
                 
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Descriptive Variables" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Discrete variables" ), wx.VERTICAL )
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
@@ -632,7 +632,7 @@ class BoxPlotInterface ( wx.Dialog ):
         gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 )
         
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Descriptive Variables" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Discrete variables" ), wx.VERTICAL )
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )

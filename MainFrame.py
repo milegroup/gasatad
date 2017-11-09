@@ -420,9 +420,21 @@ class MainFrame ( wx.Frame ):
             self.Bind(wx.EVT_MENU, self.onPopupDeleteCols, id=self.popupDeleteID)
 
             if len(columnsSelected)==1:
+
+                # Renaming menu entry
                 self.popupRenameID = wx.NewId()
                 popupMenu.Append(self.popupRenameID,"Rename column")
                 self.Bind(wx.EVT_MENU, self.onPopupRenameCol, id=self.popupRenameID)
+                
+                # Discretizing menu entry
+                columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+                # print "## Selected column:",columnSelectedLabel
+                # print "## Character columns:",self.controller.characterValues
+                if columnSelectedLabel not in self.controller.characterValues:
+                    self.popupDiscretizeID = wx.NewId()
+                    popupMenu.Append(self.popupDiscretizeID,"Discretize column")
+                    self.Bind(wx.EVT_MENU, self.onPopupDiscretizeCol, id=self.popupDiscretizeID)
+
             
             self.PopupMenu( popupMenu )
             popupMenu.Destroy()
@@ -484,6 +496,21 @@ class MainFrame ( wx.Frame ):
             self.Layout()
         else:
             dlg.Destroy()
+
+    def onPopupDiscretizeCol(self,event):
+        columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+        # print "## Going to discretize: ",columnSelectedLabel
+        self.controller.programState.dataToAnalyse[columnSelectedLabel] = self.controller.programState.dataToAnalyse[columnSelectedLabel].astype(str)
+        # print self.controller.programState.dataToAnalyse.dtypes
+        self.controller.characterValues.append(columnSelectedLabel)
+        self.fillInGrid()
+        self.m_dataTable.AutoSize()
+        self.m_dataTable.ClearSelection()
+        self.markTextColumns()
+        self.markNans()
+        # self.updateDataInfo()
+        self.Layout()
+
 
     def onPopupDeleteRows(self,event):
         dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",

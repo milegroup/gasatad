@@ -36,7 +36,7 @@ class AddColumnInterface ( wx.Dialog ):
     def __init__( self, parent, listOfVariables, namesColumns, minimum, maximum ):
         
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Add New Column", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Add column", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
