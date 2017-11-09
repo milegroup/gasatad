@@ -1121,11 +1121,15 @@ class MainFrame ( wx.Frame ):
             if  scatterFrame.ShowModal() == wx.ID_OK:
         
                     scatterOptions = scatterFrame.getScatterPlotOptions()
-                    
-                    self.controller.createScatterPlot(scatterOptions)
+                    if len(scatterOptions['selectedCheckBoxes'])==0:
+                        wx.MessageBox("No variables were selected to be plotted in the y-axis", "ERROR")
+                    elif len(scatterOptions['selectedCheckBoxes'])>6:
+                        wx.MessageBox("No more than 6 variables can be plotted in the y-axis", "ERROR")
+                    else:
+                        self.controller.createScatterPlot(scatterOptions)
         else:
             
-            wx.MessageBox("There are no numerical values", "Attention!")        
+            wx.MessageBox("There are no numerical values", "Attention")        
                 
     
     def createPieChart(self, event):  

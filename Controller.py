@@ -41,6 +41,7 @@ class Controller():
     integerValues = []
 
     colorsPatch = ['cornflowerblue', 'yellowgreen', 'gold', 'tomato', 'lightgreen', 'hotpink', 'tan', 'lightgrey', 'yellow', 'lightcoral', 'darkgrey', 'aqua', 'darkkhaki', 'orchid', 'lightskyblue']
+    colorsLine = ['red','blue','green','yellow','black','grey']
 
 
     def ConcatDataFrame(self, dataFrame_1, dataFrame_2):
@@ -242,37 +243,37 @@ class Controller():
     def createHistogram(self, histogramOptions):
 
         # No tag selected
-        if histogramOptions.getSecondVarSelected().encode('utf-8') == 'None'.encode('utf-8'):
+        if histogramOptions['secondVarSelected'].encode('utf-8') == 'None'.encode('utf-8'):
             
-            dataForChart = self.programState.dataToAnalyse[histogramOptions.getFirstVarSelected()]
+            dataForChart = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
             dataForChart = [ x for x in dataForChart if str(x) != 'nan']
 
             
-            n,bins,patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75, bins=histogramOptions.getNumOfBins())
+            n,bins,patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75, bins=histogramOptions['numOfBins'])
            
-            plt.xlabel(histogramOptions.getXAxisName())
-            plt.ylabel(histogramOptions.getYAxisName())
+            plt.xlabel(histogramOptions['xAxisName'])
+            plt.ylabel(histogramOptions['yAxisName'])
             plt.ylim(0,max(n)*1.1)
             for patch in patches:
                 patch.set_edgecolor('white')
             
             
-            if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):                
+            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):                
                 plt.grid()
             
-            elif histogramOptions.getXAxisGrid():                
+            elif histogramOptions['xAxisGrid']:                
                 plt.grid(axis = 'x')
              
-            elif histogramOptions.getYAxisGrid():                
+            elif histogramOptions['yAxisGrid']:                
                 plt.grid(axis = 'y')
                        
-            plt.title(histogramOptions.getChartTitle(), fontsize = 18)
+            plt.title(histogramOptions['title'], fontsize = 18)
             plt.show()
             
         else: # Some tag has been selected
         
             dataForChart = {}
-            selectedCategory = histogramOptions.getSecondVarSelected()
+            selectedCategory = histogramOptions['secondVarSelected']
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
             
             for tag in tags:
@@ -280,7 +281,7 @@ class Controller():
                     dataForChart[tag] = []
 
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
-            valuesColumn = self.programState.dataToAnalyse[histogramOptions.getFirstVarSelected()]
+            valuesColumn = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
 
             for i in range(len(valuesColumn)):
                 if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
@@ -291,11 +292,11 @@ class Controller():
             colorsTmp = None
             if len(self.colorsPatch)>=len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
-            n,bins,patches = plt.hist(dataForChart.values(), histtype='bar',  label=dataForChart.keys(), color=colorsTmp, bins=histogramOptions.getNumOfBins())
+            n,bins,patches = plt.hist(dataForChart.values(), histtype='bar',  label=dataForChart.keys(), color=colorsTmp, bins=histogramOptions['numOfBins'])
             plt.legend()
             
-            plt.xlabel(histogramOptions.getXAxisName())
-            plt.ylabel(histogramOptions.getYAxisName())
+            plt.xlabel(histogramOptions['xAxisName'])
+            plt.ylabel(histogramOptions['yAxisName'])
 
             if type(n[0]) is np.ndarray:            
                 n = [data for nl in n for data in nl]
@@ -307,46 +308,65 @@ class Controller():
             for patch in patches:
                 patch.set_edgecolor('white')
             
-            if (histogramOptions.getXAxisGrid() & histogramOptions.getYAxisGrid()):
+            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):                
                 plt.grid()
             
-            elif histogramOptions.getXAxisGrid():
+            elif histogramOptions['xAxisGrid']:                
                 plt.grid(axis = 'x')
              
-            elif histogramOptions.getYAxisGrid():
+            elif histogramOptions['yAxisGrid']:                
                 plt.grid(axis = 'y')
             
-            if histogramOptions.getLegendPosition() != "by default".encode("utf-8"):
-                plt.legend(loc = histogramOptions.getLegendPosition())
+            if histogramOptions['legendPosition'] != "by default".encode("utf-8"):
+                plt.legend(loc = histogramOptions['legendPosition'])
             
-            plt.title(histogramOptions.getChartTitle(), fontsize = 18)
+            plt.title(histogramOptions['title'], fontsize = 18)
             plt.show()
 
-
-
     def createScatterPlot(self, scatterOptions):
-        
-        plt.scatter(self.programState.dataToAnalyse[scatterOptions.getFirstVarSelected()], 
-                    self.programState.dataToAnalyse[scatterOptions.getSecondVarSelected()],
-                    s=50)
-        plt.xlabel(scatterOptions.getXAxisName())
-        plt.ylabel(scatterOptions.getYAxisName())
-        
-        if (scatterOptions.getXAxisGrid() & scatterOptions.getYAxisGrid()):
+
+        if len(scatterOptions['selectedCheckBoxes'])==1:
+            xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
+            ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][0]]
+            plt.scatter(xdata, ydata, s=50)
+            xf = 0.05*(max(xdata)-min(xdata))
+            yf = 0.05*(max(ydata)-min(ydata))
+            plt.xlim(min(xdata)-xf,max(xdata)+xf)
+            plt.ylim(min(ydata)-yf,max(ydata)+yf)
             
+        else:
+            for i in range(len(scatterOptions['selectedCheckBoxes'])):
+                xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
+                ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][i]]
+                if i==0:
+                    miny = min(ydata)
+                    maxy = max(ydata)
+                else:
+                    if min(ydata) < miny:
+                        miny = min(ydata)
+                    if max(ydata) > maxy:
+                        maxy = max(ydata)
+
+                plt.scatter(xdata, ydata, s=50, c=self.colorsLine[i])
+            xf = 0.05*(max(xdata)-min(xdata))
+            plt.xlim(min(xdata)-xf,max(xdata)+xf)
+            yf = 0.05*(maxy-miny)
+            plt.ylim(miny-yf,maxy+yf)
+
+        plt.xlabel(scatterOptions['xAxisName'])
+        plt.ylabel(scatterOptions['yAxisName'])
+        
+        if (scatterOptions['xAxisGrid'] & scatterOptions['yAxisGrid']):
             plt.grid()
-        
-        elif scatterOptions.getXAxisGrid():
-            
+        elif scatterOptions['xAxisGrid']:
             plt.grid(axis = 'x')
-         
-        elif scatterOptions.getYAxisGrid():
-            
+        elif scatterOptions['yAxisGrid']:
             plt.grid(axis = 'y')
 
-        plt.title(scatterOptions.getChartTitle(), fontsize = 18)
-               
+        plt.title(scatterOptions['title'], fontsize = 18)
         plt.show()
+
+
 
   
     def createPieChart(self, pieChartOptions):

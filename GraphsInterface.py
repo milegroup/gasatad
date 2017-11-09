@@ -50,14 +50,14 @@ class HistogramInterface ( wx.Dialog ):
         self.histogramNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.histogramNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.xAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.xAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.xAxisNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.xAxisNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.yAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.yAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -69,11 +69,11 @@ class HistogramInterface ( wx.Dialog ):
         #Display Grid        
         displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display settings" ), wx.HORIZONTAL )
 
-        displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"Grids:", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 10)
+        displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"Grid:", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 10)
         self.xAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "x-axis", wx.DefaultPosition, wx.DefaultSize, 0 )
-        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.RIGHT|wx.TOP, 7)
+        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.RIGHT|wx.TOP, 8)
         self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "y-axis", wx.DefaultPosition, wx.DefaultSize, 0 )
-        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.RIGHT|wx.TOP, 7)
+        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.RIGHT|wx.TOP, 8)
         displayGridsSizer.AddStretchSpacer()
         displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"No. of bins:", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.ALL, 10)
         self.numOfBins = wx.SpinCtrl(self,wx.ID_ANY, value='10', size=(70,-1))
@@ -85,8 +85,7 @@ class HistogramInterface ( wx.Dialog ):
         # ---------------------------------------
                 
         # Place the legend of the histogram
-        positions = ['Upper Right', 'Upper Left', 'Lower Left', 'Lower Right', 'Right', 'Center Left', 'Center Right',
-                     'Lower Center', 'Upper Center', 'Center']
+        positions = ['Upper right', 'Upper left', 'Lower left', 'Lower right', 'Right', 'Center left', 'Center right', 'Lower center', 'Upper center', 'Center']
         
         self.histLegendPosText = wx.StaticBox( self, wx.ID_ANY, u"Legend position" )
         legendPosSizer = wx.StaticBoxSizer( self.histLegendPosText, wx.HORIZONTAL )
@@ -100,7 +99,7 @@ class HistogramInterface ( wx.Dialog ):
         
         legendPosSizer.Add( fgLegendSizer, 1, wx.EXPAND, 5 )
         
-        self.histLegendPosDefault = wx.RadioButton( self, wx.ID_ANY, "By Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.histLegendPosDefault = wx.RadioButton( self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
         fgLegendSizer.Add( self.histLegendPosDefault, 0, wx.ALL, 5 )
         self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.histLegendPosDefault)
         self.histLegendPosDefault.Enable(False)
@@ -118,8 +117,8 @@ class HistogramInterface ( wx.Dialog ):
         # ---------------------------------------
             
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X Variables" ), wx.VERTICAL )
-        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tags" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X variable" ), wx.VERTICAL )
+        sbScatterPlotYVar = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tag" ), wx.VERTICAL )
         
         
 
@@ -166,10 +165,10 @@ class HistogramInterface ( wx.Dialog ):
         self.yAxisNameTextCtrl.SetValue('No. of elements')
 
         sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 0 )
-        sbSizer2.Add( fgSizer6, 1, wx.EXPAND, 5 )
+        sbScatterPlotYVar.Add( fgSizer6, 1, wx.EXPAND, 5 )
         
         fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.LEFT, 10 )
-        fgSizer3.Add( sbSizer2, 1, wx.EXPAND | wx.LEFT | wx.RIGHT , 10 )
+        fgSizer3.Add( sbScatterPlotYVar, 1, wx.EXPAND | wx.LEFT | wx.RIGHT , 10 )
 
         gbSizer1.Add( fgSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 0 )      
 
@@ -246,24 +245,34 @@ class HistogramInterface ( wx.Dialog ):
     
     
     def getHistogramOptions(self):
-        
-        histogramOptions = ChartOptions(self.histogramNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), 
-                                      self.yAxisNameTextCtrl.GetValue(), False,self.xAxischeckBox.IsChecked(), 
-                                      self.yAxischeckBox.IsChecked(), self.selectedRadioButtonVariables, 
-                                      self.selectedRadioButtonTags, self.position, [],
-                                      numOfBins=self.numOfBins.GetValue())
+
+        histogramOptions = dict(
+            title = self.histogramNameTextCtrl.GetValue(),
+            xAxisName = self.xAxisNameTextCtrl.GetValue(),
+            yAxisName = self.yAxisNameTextCtrl.GetValue(),
+            showGrid = False,
+            xAxisGrid = self.xAxischeckBox.IsChecked(),
+            yAxisGrid = self.yAxischeckBox.IsChecked(),
+            firstVarSelected =self.selectedRadioButtonVariables, 
+            secondVarSelected = self.selectedRadioButtonTags,
+            legendPosition = self.position.lower(),
+            selectedCheckBoxes = [],
+            numOfBins=self.numOfBins.GetValue()
+        )
         
         return histogramOptions 
 
-
+   
 
 
     
 class ScatterPlotInterface ( wx.Dialog ):
     
     def __init__( self, parent, listOfVariables):
+
+        self.selectedCheckBoxes = []
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Variables for the Scatter Plot", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Scatter plot", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -278,14 +287,14 @@ class ScatterPlotInterface ( wx.Dialog ):
         fgSizerchartOptions.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         fgSizerchartOptions.AddGrowableCol(1)
         
-        self.scatterName = wx.StaticText( self, wx.ID_ANY, u"Scatter Plot Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.scatterName = wx.StaticText( self, wx.ID_ANY, u"Scatter plot title:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.scatterName.Wrap( -1 )
         fgSizerchartOptions.Add( self.scatterName, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.scatterNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.scatterNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.xAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.xAxisName, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -293,7 +302,7 @@ class ScatterPlotInterface ( wx.Dialog ):
         fgSizerchartOptions.Add( self.xAxisNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
         
-        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.yAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.yAxisName, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -313,8 +322,8 @@ class ScatterPlotInterface ( wx.Dialog ):
         gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 ) 
 
         #Variables
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X Variables" ), wx.VERTICAL )
-        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Y Variables" ), wx.VERTICAL )
+        sbScatterPlotXVar = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X variable" ), wx.VERTICAL )
+        sbScatterPlotYVar = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Y variables" ), wx.VERTICAL )
         
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
@@ -340,33 +349,33 @@ class ScatterPlotInterface ( wx.Dialog ):
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
         
  
-        fgSizer6 = wx.FlexGridSizer( 0, 2, 0, 0 )
-        fgSizer6.SetFlexibleDirection( wx.BOTH )
-        fgSizer6.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )        
+        fgScatterPlotYVar = wx.FlexGridSizer( 0, 2, 0, 0 )
+        fgScatterPlotYVar.SetFlexibleDirection( wx.BOTH )
+        fgScatterPlotYVar.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )        
         
         for i in listOfVariables:
             
             #First element
             if i == listOfVariables[0]:
             
-                self.m_radioBtn16 = wx.RadioButton( self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
-                fgSizer6.Add( self.m_radioBtn16, 0, wx.ALL, 5 )
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+                self.m_checkBox16 = wx.CheckBox( self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+                fgScatterPlotYVar.Add( self.m_checkBox16, 0, wx.ALL, 5 )
+                self.Bind(wx.wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
             
             else:
-                self.m_radioBtn16 = wx.RadioButton( self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
-                fgSizer6.Add( self.m_radioBtn16, 0, wx.ALL, 5 )
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+                self.m_checkBox16 = wx.CheckBox( self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
+                fgScatterPlotYVar.Add( self.m_checkBox16, 0, wx.ALL, 5 )
+                self.Bind(wx.wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
 
         #The name of the axis by default
         self.xAxisNameTextCtrl.SetValue(listOfVariables[0])
-        self.yAxisNameTextCtrl.SetValue(listOfVariables[0])
+        self.yAxisNameTextCtrl.SetValue('')
         
-        sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 5 )
-        sbSizer2.Add( fgSizer6, 1, wx.EXPAND, 5 )
+        sbScatterPlotXVar.Add( fgSizer5, 1, wx.EXPAND, 5 )
+        sbScatterPlotYVar.Add( fgScatterPlotYVar, 1, wx.EXPAND, 5 )
         
-        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 5 )
-        fgSizer3.Add( sbSizer2, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbScatterPlotXVar, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbScatterPlotYVar, 1, wx.EXPAND | wx.ALL, 5 )
 
         gbSizer1.Add( fgSizer3, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 5 )       
     
@@ -387,41 +396,44 @@ class ScatterPlotInterface ( wx.Dialog ):
        
         #Radiobutton selected a the beginning
         self.selectedRadioButtonVariables = listOfVariables[0]
-        self.selectedRadioButtonTags = listOfVariables[0]
+        self.selectedCheckBoxes = []
         
         self.Fit()
         self.Show(True)        
       
         
     def updateSelectedVariablesRadioButton(self, event):
-        
         radioButton = event.GetEventObject()
-        
         self.selectedRadioButtonVariables = radioButton.GetLabelText()
         self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
             
     
-    def updateSelectedTagsRadioButton(self, event):
+    def updateSelectedTagsCheckBox(self, event):
+        checkBox = event.GetEventObject()
         
-        radioButton = event.GetEventObject()
+        if checkBox.IsChecked():
+            self.selectedCheckBoxes.append(checkBox.GetLabel().encode("utf-8"))
+        else:
+            self.selectedCheckBoxes.remove(checkBox.GetLabel().encode("utf-8"))
         
-        self.selectedRadioButtonTags = radioButton.GetLabelText()
-        self.yAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
-        
-    def chartVariables(self):
-        
-        return self.selectedRadioButtonVariables, self.selectedRadioButtonTags
-    
-    def getScatterPlotDescription(self):
-        
-        return self.scatterNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), self.yAxisNameTextCtrl.GetValue()
-    
+        if len(self.selectedCheckBoxes)==1:
+            self.yAxisNameTextCtrl.SetValue(self.selectedCheckBoxes[0])
+        else:
+            self.yAxisNameTextCtrl.SetValue('')
+            
+
     def getScatterPlotOptions(self):
-        
-        scatterOptions = ChartOptions(self.scatterNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), 
-                                      self.yAxisNameTextCtrl.GetValue(), False, self.xAxischeckBox.IsChecked(), 
-                                      self.yAxischeckBox.IsChecked(), self.selectedRadioButtonVariables, 
-                                      self.selectedRadioButtonTags, '', [])
+
+        scatterOptions = dict(
+            title = self.scatterNameTextCtrl.GetValue(),
+            xAxisName = self.xAxisNameTextCtrl.GetValue(),
+            yAxisName = self.yAxisNameTextCtrl.GetValue(),
+            showGrid = False,
+            xAxisGrid = self.xAxischeckBox.IsChecked(),
+            yAxisGrid = self.yAxischeckBox.IsChecked(),
+            firstVarSelected = self.selectedRadioButtonVariables,
+            legendPosition = '',
+            selectedCheckBoxes = self.selectedCheckBoxes)
         
         return scatterOptions
     
@@ -644,7 +656,7 @@ class BoxPlotInterface ( wx.Dialog ):
         
         
         
-        #Here the RadioButtons are created
+        #Here the checkboxes are created
         for i in listOfVariables:
             
             self.m_checkBox = wx.CheckBox( self, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
@@ -828,7 +840,7 @@ class BarChartInterface ( wx.Dialog ):
 
         #Variables, tags and operations Options
         sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X Variables" ), wx.VERTICAL )
-        sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tags" ), wx.VERTICAL )
+        sbScatterPlotYVar = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tags" ), wx.VERTICAL )
         sbSizer3 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Operations" ), wx.VERTICAL )
         
         
@@ -901,11 +913,11 @@ class BarChartInterface ( wx.Dialog ):
                 
         
         sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 5 )
-        sbSizer2.Add( fgSizer6, 1, wx.EXPAND, 5 )
+        sbScatterPlotYVar.Add( fgSizer6, 1, wx.EXPAND, 5 )
         sbSizer3.Add( fgSizer7, 1, wx.EXPAND, 5 )
         
         fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 5 )
-        fgSizer3.Add( sbSizer2, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbScatterPlotYVar, 1, wx.EXPAND | wx.ALL, 5 )
 
         gbSizer1.Add( fgSizer3, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 5 )
         gbSizer1.Add( sbSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )        
