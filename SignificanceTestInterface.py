@@ -585,7 +585,10 @@ class SignificanceTestInterface ( wx.Dialog ):
             #The string to return is created
             toRet = ''            
             
-            temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var = False)
+            # print "## d1:\n",dataSelectedLP
+            # print "## d2:\n",dataSelectedRP
+
+            temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var = False, nan_policy='omit')
             toRet = toRet + 'T-test on TWO INDEPENDENT samples:\n'
             toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
             
