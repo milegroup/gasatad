@@ -2,3 +2,4 @@ No. of bins in histogram plots
 Renaming of columns
 Splash screen
 Discretization of columns
+Scatter plots with several variables
