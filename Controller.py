@@ -293,7 +293,6 @@ class Controller():
             if len(self.colorsPatch)>=len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
             n,bins,patches = plt.hist(dataForChart.values(), histtype='bar',  label=dataForChart.keys(), color=colorsTmp, bins=histogramOptions['numOfBins'])
-            plt.legend()
             
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
@@ -317,7 +316,9 @@ class Controller():
             elif histogramOptions['yAxisGrid']:                
                 plt.grid(axis = 'y')
             
-            if histogramOptions['legendPosition'] != "by default".encode("utf-8"):
+            if histogramOptions['legendPosition'] == "by default".encode("utf-8"):
+                plt.legend()
+            else:
                 plt.legend(loc = histogramOptions['legendPosition'])
             
             plt.title(histogramOptions['title'], fontsize = 18)
@@ -347,11 +348,16 @@ class Controller():
                     if max(ydata) > maxy:
                         maxy = max(ydata)
 
-                plt.scatter(xdata, ydata, s=50, c=self.colorsLine[i])
+                plt.scatter(xdata, ydata, s=50, c=self.colorsLine[i], label=scatterOptions['selectedCheckBoxes'][i])
             xf = 0.05*(max(xdata)-min(xdata))
             plt.xlim(min(xdata)-xf,max(xdata)+xf)
             yf = 0.05*(maxy-miny)
             plt.ylim(miny-yf,maxy+yf)
+
+        if scatterOptions['legendPosition'] == "by default".encode("utf-8"):
+            plt.legend(scatterpoints=1)
+        else:
+            plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
 
         plt.xlabel(scatterOptions['xAxisName'])
         plt.ylabel(scatterOptions['yAxisName'])
