@@ -411,7 +411,7 @@ class ScatterPlotInterface ( wx.Dialog ):
         # --------------------------------------- 
         # Ok and Cancel buttons   
     
-        okay = wx.Button( self, wx.ID_OK )
+        okay = wx.Button( self, wx.ID_OK, validator = ValidatorForScatter(self))
         cancel = wx.Button( self, wx.ID_CANCEL )
         btns = wx.StdDialogButtonSizer()
         btns.AddButton(okay)
@@ -485,7 +485,35 @@ class ScatterPlotInterface ( wx.Dialog ):
         return scatterOptions
     
     
+
+
+class ValidatorForScatter(wx.PyValidator):
     
+    def __init__(self, object):
+        wx.PyValidator.__init__(self)
+        self.object = object
+
+    def Clone(self):
+        return ValidatorForScatter(self.object)
+    
+    def Validate(self, win):
+        
+        if not self.object.selectedCheckBoxes:            
+            wx.MessageBox("No variables were selected to be plotted in the y-axis", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
+            return False
+        elif len(self.object.selectedCheckBoxes)>6:
+            wx.MessageBox("No more than 6 variables can be plotted in the y-axis", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
+            return False
+        else:
+            return True
+        
+    def TransferToWindow(self):
+        return True
+    
+    def TransferFromWindow(self):
+        return True
+    
+
     
 class PieChartInterface ( wx.Dialog ):
     

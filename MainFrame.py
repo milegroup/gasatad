@@ -1119,14 +1119,8 @@ class MainFrame ( wx.Frame ):
             scatterFrame = ScatterPlotInterface(self, self.controller.floatValues + self.controller.integerValues)
             
             if  scatterFrame.ShowModal() == wx.ID_OK:
-        
                     scatterOptions = scatterFrame.getScatterPlotOptions()
-                    if len(scatterOptions['selectedCheckBoxes'])==0:
-                        wx.MessageBox("No variables were selected to be plotted in the y-axis", "ERROR")
-                    elif len(scatterOptions['selectedCheckBoxes'])>6:
-                        wx.MessageBox("No more than 6 variables can be plotted in the y-axis", "ERROR")
-                    else:
-                        self.controller.createScatterPlot(scatterOptions)
+                    self.controller.createScatterPlot(scatterOptions)
         else:
             
             wx.MessageBox("There are no numerical values", "Attention")        
