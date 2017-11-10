@@ -332,32 +332,54 @@ class Controller():
             plt.scatter(xdata, ydata, s=50)
             xf = 0.05*(max(xdata)-min(xdata))
             yf = 0.05*(max(ydata)-min(ydata))
-            plt.xlim(min(xdata)-xf,max(xdata)+xf)
+            xmin = min(xdata)-xf
+            xmax = max(xdata)+xf
+            plt.xlim(xmin,xmax)
             plt.ylim(min(ydata)-yf,max(ydata)+yf)
+
+            if scatterOptions['linearFit']:
+                m,b = np.polyfit(xdata,ydata,1)
+                xplotdata = np.array([xmin,xmax])
+                plt.plot(xplotdata, m*xplotdata + b, linewidth=2)
+                
+
             
         else:
             for i in range(len(scatterOptions['selectedCheckBoxes'])):
                 xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
                 ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][i]]
                 if i==0:
-                    miny = min(ydata)
-                    maxy = max(ydata)
+                    ymin = min(ydata)
+                    ymax = max(ydata)
                 else:
-                    if min(ydata) < miny:
-                        miny = min(ydata)
-                    if max(ydata) > maxy:
-                        maxy = max(ydata)
+                    if min(ydata) < ymin:
+                        ymin = min(ydata)
+                    if max(ydata) > ymax:
+                        ymax = max(ydata)
 
-                plt.scatter(xdata, ydata, s=50, c=self.colorsLine[i], label=scatterOptions['selectedCheckBoxes'][i])
+                plt.scatter(xdata, ydata, s=50, color=self.colorsLine[i], label=scatterOptions['selectedCheckBoxes'][i])
             xf = 0.05*(max(xdata)-min(xdata))
-            plt.xlim(min(xdata)-xf,max(xdata)+xf)
-            yf = 0.05*(maxy-miny)
-            plt.ylim(miny-yf,maxy+yf)
+            yf = 0.05*(ymax-ymin)
+            xmin = min(xdata)-xf
+            xmax = max(xdata)+xf
+            plt.xlim(xmin,xmax)
+            plt.ylim(ymin-yf,ymax+yf)
 
             if scatterOptions['legendPosition'] == "by default".encode("utf-8"):
                 plt.legend(scatterpoints=1)
             else:
                 plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
+
+            if scatterOptions['linearFit']:
+                xplotdata = np.array([xmin,xmax])
+                for i in range(len(scatterOptions['selectedCheckBoxes'])):
+                    xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
+                    ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][i]]
+                    m,b = np.polyfit(xdata,ydata,1)
+                    plt.plot(xplotdata, m*xplotdata + b, linewidth=2, color=self.colorsLine[i])
+
+
+
 
         plt.xlabel(scatterOptions['xAxisName'])
         plt.ylabel(scatterOptions['yAxisName'])

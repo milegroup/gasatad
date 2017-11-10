@@ -316,8 +316,8 @@ class ScatterPlotInterface ( wx.Dialog ):
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
         displayGridsSizer.AddStretchSpacer()
 
-        self.LRcheckBox = wx.CheckBox( self, wx.ID_ANY, "Linear regression", wx.DefaultPosition, wx.DefaultSize)
-        displayGridsSizer.Add(self.LRcheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
+        self.LFcheckBox = wx.CheckBox( self, wx.ID_ANY, "Plot linear fit", wx.DefaultPosition, wx.DefaultSize)
+        displayGridsSizer.Add(self.LFcheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
         
         gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ),  wx.EXPAND | wx.LEFT|wx.RIGHT, 10  ) 
 
@@ -484,7 +484,8 @@ class ScatterPlotInterface ( wx.Dialog ):
             yAxisGrid = self.yAxischeckBox.IsChecked(),
             firstVarSelected = self.selectedRadioButtonVariables,
             legendPosition = self.position.lower(),
-            selectedCheckBoxes = self.selectedCheckBoxes)
+            selectedCheckBoxes = self.selectedCheckBoxes,
+            linearFit = self.LFcheckBox.IsChecked())
         
         return scatterOptions
     
