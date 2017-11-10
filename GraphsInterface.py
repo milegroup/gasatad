@@ -314,6 +314,10 @@ class ScatterPlotInterface ( wx.Dialog ):
         displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
         self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0 )
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
+        displayGridsSizer.AddStretchSpacer()
+
+        self.LRcheckBox = wx.CheckBox( self, wx.ID_ANY, "Linear regression", wx.DefaultPosition, wx.DefaultSize)
+        displayGridsSizer.Add(self.LRcheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
         
         gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ),  wx.EXPAND | wx.LEFT|wx.RIGHT, 10  ) 
 

@@ -354,10 +354,10 @@ class Controller():
             yf = 0.05*(maxy-miny)
             plt.ylim(miny-yf,maxy+yf)
 
-        if scatterOptions['legendPosition'] == "by default".encode("utf-8"):
-            plt.legend(scatterpoints=1)
-        else:
-            plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
+            if scatterOptions['legendPosition'] == "by default".encode("utf-8"):
+                plt.legend(scatterpoints=1)
+            else:
+                plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
 
         plt.xlabel(scatterOptions['xAxisName'])
         plt.ylabel(scatterOptions['yAxisName'])
