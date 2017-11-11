@@ -557,6 +557,22 @@ class PieChartInterface ( wx.Dialog ):
         
 
         gbSizer1.Add( fgSizerchartOptions, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
+
+        # -------------------------------
+
+        # Display Grid 
+               
+        displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display settings" ), wx.HORIZONTAL )
+
+        self.offsetCheckBox = wx.CheckBox( self, wx.ID_ANY, "Offset slices", wx.DefaultPosition, wx.DefaultSize, 0 )
+        displayGridsSizer.Add(self.offsetCheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
+        displayGridsSizer.AddStretchSpacer()
+        displayGridsSizer.Add(wx.StaticText( self, wx.ID_ANY, u"No. of slices (0=all):", wx.DefaultPosition, wx.DefaultSize, 0 ), 0, wx.CENTER, 5)
+        self.numOfSlices = wx.SpinCtrl(self,wx.ID_ANY, value='0', size=(70,-1))
+        self.numOfSlices.SetRange(0,20)
+        displayGridsSizer.Add(self.numOfSlices, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL , 4)
+        
+        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 ) 
         
         # -------------------------------
                 
@@ -584,7 +600,7 @@ class PieChartInterface ( wx.Dialog ):
         
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)
 
-        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 )
+        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT | wx.TOP, 10 )
 
         # -------------------------------
 
@@ -664,7 +680,9 @@ class PieChartInterface ( wx.Dialog ):
         pieChartOptions = dict(
             title=self.pieChartNameTextCtrl.GetValue(),
             firstVarSelected = self.selectedRadioButtonTags, 
-            legendPosition= self.legendPosition.lower()
+            legendPosition= self.legendPosition.lower(),
+            offset = self.offsetCheckBox.IsChecked(),
+            numOfSlices = self.numOfSlices.GetValue()
         )
         return pieChartOptions
     

@@ -398,11 +398,25 @@ class Controller():
 
     def createPieChart(self, pieChartOptions):
 
+        print "##",pieChartOptions['numOfSlices']
+
         sizes = []
         labels = []
+        
 
-        dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts()
-        numberSamples = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].count()
+        dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts() # Number of elements for slice
+
+        numberSamples = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].count() # Total of elements
+
+        print dataForPie
+        print numberSamples
+
+        explode = None
+        if pieChartOptions['offset']:
+            explode = []
+            for l in dataForPie.index:
+                explode.append(0.05)
+                    
 
         for v in dataForPie:
             sizes.append(100.0*v/numberSamples)
@@ -410,14 +424,14 @@ class Controller():
         if pieChartOptions['legendPosition'] == "default".encode("utf-8"):
             for l in dataForPie.index:
                 labels.append(l)
-            patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colorsPatch)
+            patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colorsPatch, explode=explode)
             for patch in patches[0]:
                 patch.set_edgecolor('white')
         else:
 
             for l in dataForPie.index:
                 labels.append(l)
-            patches = plt.pie(sizes, autopct = '%1.1f%%', startangle=90, colors=self.colorsPatch)
+            patches = plt.pie(sizes, autopct = '%1.1f%%', startangle=90, colors=self.colorsPatch, explode=explode)
             for patch in patches[0]:
                 patch.set_edgecolor('white')
             plt.legend(patches[0], labels, loc = pieChartOptions['legendPosition'])
@@ -428,8 +442,8 @@ class Controller():
         plt.title(pieChartOptions['title'],fontsize=18)                
         plt.show()
         
-       
-        
+
+
     def createBoxPlot(self, boxPlotOptions):
 
         flierprops = dict(marker='o',markerfacecolor='white', markersize=8, linestyle='none')
