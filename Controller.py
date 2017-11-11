@@ -316,7 +316,7 @@ class Controller():
             elif histogramOptions['yAxisGrid']:                
                 plt.grid(axis = 'y')
             
-            if histogramOptions['legendPosition'] == "by default".encode("utf-8"):
+            if histogramOptions['legendPosition'] == "default".encode("utf-8"):
                 plt.legend()
             else:
                 plt.legend(loc = histogramOptions['legendPosition'])
@@ -365,7 +365,7 @@ class Controller():
             plt.xlim(xmin,xmax)
             plt.ylim(ymin-yf,ymax+yf)
 
-            if scatterOptions['legendPosition'] == "by default".encode("utf-8"):
+            if scatterOptions['legendPosition'] == "default".encode("utf-8"):
                 plt.legend(scatterpoints=1)
             else:
                 plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
@@ -396,39 +396,39 @@ class Controller():
 
 
 
-  
     def createPieChart(self, pieChartOptions):
 
         sizes = []
         labels = []
 
-        dataForPie = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].value_counts()
-        numberSamples = self.programState.dataToAnalyse[pieChartOptions.getFirstVarSelected()].count()
+        dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts()
+        numberSamples = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].count()
 
         for v in dataForPie:
             sizes.append(100.0*v/numberSamples)
-        
 
-        if pieChartOptions.getLegendPosition() == "by default".encode("utf-8"):
+        if pieChartOptions['legendPosition'] == "default".encode("utf-8"):
             for l in dataForPie.index:
                 labels.append(l)
             patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colorsPatch)
             for patch in patches[0]:
                 patch.set_edgecolor('white')
         else:
-            for l in range(len(sizes)):
-                labels.append('{} ({:.2f}%)'.format(dataForPie.index[l],sizes[l]))
-            patches, text = plt.pie(sizes, startangle=90, colors=self.colorsPatch)
-            for patch in patches:
+
+            for l in dataForPie.index:
+                labels.append(l)
+            patches = plt.pie(sizes, autopct = '%1.1f%%', startangle=90, colors=self.colorsPatch)
+            for patch in patches[0]:
                 patch.set_edgecolor('white')
-            plt.legend(patches, labels, loc = pieChartOptions.getLegendPosition())
+            plt.legend(patches[0], labels, loc = pieChartOptions['legendPosition'])
         
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
         plt.tight_layout()
-        plt.title(pieChartOptions.getChartTitle(),fontsize=18)                
+        plt.title(pieChartOptions['title'],fontsize=18)                
         plt.show()
         
+       
         
     def createBoxPlot(self, boxPlotOptions):
 

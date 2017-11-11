@@ -25,7 +25,7 @@ from Model import ChartOptions
 
 class HistogramInterface ( wx.Dialog ): 
         
-    position = 'by default'
+    legendPosition = 'default'
     
     def __init__( self, parent, listOfVariables, listOfTags ):
         
@@ -84,7 +84,8 @@ class HistogramInterface ( wx.Dialog ):
         
         gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 ) 
 
-        # ---------------------------------------    
+        # ---------------------------------------   
+         
         # Legend
         
         positions = ['Upper right', 'Upper left', 'Lower left', 'Lower right', 'Right', 'Center left', 'Center right', 'Lower center', 'Upper center', 'Center']
@@ -92,8 +93,6 @@ class HistogramInterface ( wx.Dialog ):
         self.histLegendPosText = wx.StaticBox( self, wx.ID_ANY, u"Legend position" )
         legendPosSizer = wx.StaticBoxSizer( self.histLegendPosText, wx.HORIZONTAL )
         self.histLegendPosText.Enable(False)
-        
-        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT|wx.TOP, 10 )
         
         fgLegendSizer = wx.FlexGridSizer( 0, 4, 0, 0 )
         fgLegendSizer.SetFlexibleDirection( wx.BOTH )
@@ -114,6 +113,8 @@ class HistogramInterface ( wx.Dialog ):
             histLegendPosOtherTmp.Enable(False)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, histLegendPosOtherTmp)
             self.histLegendPosOther.append(histLegendPosOtherTmp)
+
+        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT|wx.TOP, 10 )
 
         
         # ---------------------------------------
@@ -232,7 +233,7 @@ class HistogramInterface ( wx.Dialog ):
     
     def updateLegendPosition(self, event):
         radioButton = event.GetEventObject()
-        self.position = radioButton.GetLabelText()
+        self.legendPosition = radioButton.GetLabelText()
     
     
     def getHistogramOptions(self):
@@ -246,7 +247,7 @@ class HistogramInterface ( wx.Dialog ):
             yAxisGrid = self.yAxischeckBox.IsChecked(),
             firstVarSelected =self.selectedRadioButtonVariables, 
             secondVarSelected = self.selectedRadioButtonTags,
-            legendPosition = self.position.lower(),
+            legendPosition = self.legendPosition.lower(),
             selectedCheckBoxes = [],
             numOfBins=self.numOfBins.GetValue()
         )
@@ -262,7 +263,7 @@ class ScatterPlotInterface ( wx.Dialog ):
     def __init__( self, parent, listOfVariables):
 
         self.selectedCheckBoxes = []
-        self.position = 'by default'
+        self.position = 'default'
         
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Scatter plot", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
@@ -519,16 +520,17 @@ class ValidatorForScatter(wx.PyValidator):
         return True
     
 
+
     
 class PieChartInterface ( wx.Dialog ):
     
     
-    position = 'by default'
+    legendPosition = 'default'
     
     def __init__( self, parent, listOfTags ):
         
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Pie chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
@@ -536,32 +538,33 @@ class PieChartInterface ( wx.Dialog ):
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        
-        #Pie Chart Options
+        # -------------------------------
+
+        # Pie Chart Options
+
         fgSizerchartOptions = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizerchartOptions.SetFlexibleDirection( wx.BOTH )
         fgSizerchartOptions.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         fgSizerchartOptions.AddGrowableCol(1)
         
         
-        self.histogramName = wx.StaticText( self, wx.ID_ANY, u"Pie Chart Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.histogramName.Wrap( -1 )
-        fgSizerchartOptions.Add( self.histogramName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
+        self.pieChartName = wx.StaticText( self, wx.ID_ANY, u"Pie chart title:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.pieChartName.Wrap( -1 )
+        fgSizerchartOptions.Add( self.pieChartName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        self.histogramNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        fgSizerchartOptions.Add( self.histogramNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
+        self.pieChartNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
+        fgSizerchartOptions.Add( self.pieChartNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
 
         gbSizer1.Add( fgSizerchartOptions, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
         
+        # -------------------------------
                 
-        #To place the legend, all positions
-        positions = ['Upper Right', 'Upper Left', 'Lower Left', 'Lower Right', 'Right', 'Center Left', 'Center Right',
-                     'Lower Center', 'Upper Center', 'Center']
+        # Legend position
+
+        positions = ['Upper right', 'Upper left', 'Lower left', 'Lower right', 'Right', 'Center left', 'Center right', 'Lower center', 'Upper center', 'Center']
         
         legendPosSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Legend position" ), wx.HORIZONTAL )
-        
-        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 )
         
         fgLegendSizer = wx.FlexGridSizer( 0, 4, 0, 0 )
         fgLegendSizer.SetFlexibleDirection( wx.BOTH )
@@ -569,7 +572,7 @@ class PieChartInterface ( wx.Dialog ):
         
         legendPosSizer.Add( fgLegendSizer, 1, wx.EXPAND, 5 )
         
-        self.m_radioBtn15 = wx.RadioButton( self, wx.ID_ANY, "By Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+        self.m_radioBtn15 = wx.RadioButton( self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
         fgLegendSizer.Add( self.m_radioBtn15, 0, wx.ALL, 5 )
         
         self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn15)
@@ -580,9 +583,15 @@ class PieChartInterface ( wx.Dialog ):
             fgLegendSizer.Add( self.m_radioBtn, 0, wx.ALL, 5 )
         
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)
+
+        gbSizer1.Add( legendPosSizer, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 )
+
+        # -------------------------------
+
+        # Discrete variable
                 
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Discrete variables" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Discrete variable" ), wx.VERTICAL )
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
@@ -609,13 +618,15 @@ class PieChartInterface ( wx.Dialog ):
         
         sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 5 )
         
-        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 0 )
 
         
-        gbSizer1.Add( fgSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 5 )       
-    
+        gbSizer1.Add( fgSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT | wx.TOP, 10 )       
 
-        #Buttons OK and Cancel
+        # -------------------------------
+
+        # Buttons OK and Cancel
+
         okay = wx.Button( self, wx.ID_OK )
         cancel = wx.Button( self, wx.ID_CANCEL )
         btns = wx.StdDialogButtonSizer()
@@ -623,7 +634,7 @@ class PieChartInterface ( wx.Dialog ):
         btns.AddButton(cancel)
         btns.Realize()
         
-        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )     
+        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.TOP | wx.BOTTOM, 10 )     
     
         
         self.SetSizer( gbSizer1 )
@@ -632,7 +643,7 @@ class PieChartInterface ( wx.Dialog ):
         self.Fit()
         self.Centre( wx.BOTH )
         
-        #RadioButton selected by default
+        # RadioButton selected by default
         self.selectedRadioButtonTags = listOfTags[0]
         
         
@@ -642,31 +653,20 @@ class PieChartInterface ( wx.Dialog ):
       
         
     def updateSelectedVariablesRadioButton(self, event):
-        
         radioButton = event.GetEventObject()
-        
         self.selectedRadioButtonTags = radioButton.GetLabelText()
 
-        
-    def chartVariables(self):
-        
-        return self.selectedRadioButtonVariables, self.selectedRadioButtonTags
-
-    
-    
     def updateLegendPosition(self, event):
-        
         radioButton = event.GetEventObject()
-        
-        self.position = radioButton.GetLabelText()
-    
+        self.legendPosition = radioButton.GetLabelText()
     
     def getPieChartOptions(self):
-        
-        histogramOptions = ChartOptions(self.histogramNameTextCtrl.GetValue(), '', '', False, False, False, self.selectedRadioButtonTags, 
-                                        None, self.position, [])
-        
-        return histogramOptions
+        pieChartOptions = dict(
+            title=self.pieChartNameTextCtrl.GetValue(),
+            firstVarSelected = self.selectedRadioButtonTags, 
+            legendPosition= self.legendPosition.lower()
+        )
+        return pieChartOptions
     
     
     
