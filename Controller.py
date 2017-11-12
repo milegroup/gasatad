@@ -454,36 +454,45 @@ class Controller():
         plt.show()
         
 
-
     def createBoxPlot(self, boxPlotOptions):
 
         flierprops = dict(marker='o',markerfacecolor='white', markersize=8, linestyle='none')
         # No categorical variable was selected
-        if boxPlotOptions.getSecondVarSelected() == 'None':
+        if boxPlotOptions['secondVarSelected'] == 'None':
             
-            bplot = self.programState.dataToAnalyse.plot.box(y = boxPlotOptions.getSelectedCheckBoxes(),
-                                                    rot=45,grid = boxPlotOptions.getShowGrid(),
-                                                    return_type='dict',
-                                                    patch_artist=True, flierprops=flierprops)
+            bplot = self.programState.dataToAnalyse.plot.box(
+                y = boxPlotOptions['selectedCheckBoxes'],
+                rot=45,
+                grid = boxPlotOptions['showGrid'],
+                return_type='dict',
+                patch_artist=True,
+                flierprops=flierprops
+            )
 
             for patch, color in zip(bplot['boxes'], self.colorsPatch):
                 patch.set_facecolor(color)
 
         else: # Some categorical value was selected => subplots
             
-            
-            plotBoxes = boxPlotOptions.getSelectedCheckBoxes()
+            plotBoxes = boxPlotOptions['selectedCheckBoxes']
             result = self.programState.dataToAnalyse
 
-            bplots = result.boxplot(column = boxPlotOptions.getSelectedCheckBoxes(), by=str(boxPlotOptions.getSecondVarSelected()),
-                           rot=45,grid = boxPlotOptions.getShowGrid(), return_type='dict', patch_artist=True, flierprops=flierprops)
+            bplots = result.boxplot(
+                column = boxPlotOptions['selectedCheckBoxes'],
+                by=str(boxPlotOptions['secondVarSelected']),
+                rot=45,
+                grid = boxPlotOptions['showGrid'],
+                return_type='dict',
+                patch_artist=True,
+                flierprops=flierprops
+            )
             
             for key in bplots.keys():
                 for patch, color in zip(bplots[key]['boxes'], self.colorsPatch):
                     patch.set_facecolor(color)
             
-        plt.suptitle(boxPlotOptions.getChartTitle(),fontsize=18)
-        plt.show()    
+        plt.suptitle(boxPlotOptions['title'], fontsize=18)
+        plt.show()   
     
 
 

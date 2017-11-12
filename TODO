@@ -6,6 +6,7 @@ ALL:
 	Problem when reading xls or xlsx files
 	Check resolution of logo
 	When network is slow, it takes a while to open
+	Check resizing of plot windows
 
 WIN:
 
