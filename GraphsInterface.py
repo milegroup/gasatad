@@ -29,10 +29,8 @@ class HistogramInterface ( wx.Dialog ):
     
     def __init__( self, parent, listOfVariables, listOfTags ):
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Histogram", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Histogram", size=wx.DefaultSize, pos = wx.DefaultPosition)
+                
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -267,9 +265,8 @@ class ScatterPlotInterface ( wx.Dialog ):
         self.selectedCheckBoxes = []
         self.position = 'default'
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Scatter plot", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Scatter plot",size = wx.DefaultSize, pos = wx.DefaultPosition)
         
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
@@ -532,10 +529,8 @@ class PieChartInterface ( wx.Dialog ):
     def __init__( self, parent, listOfTags ):
         
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Pie chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Pie chart", size = wx.DefaultSize, pos = wx.DefaultPosition)
+                
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -698,10 +693,8 @@ class BoxPlotInterface ( wx.Dialog ):
         
         self.selectedCheckBoxes = []
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Box plot", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Box plot", size = wx.DefaultSize, pos = wx.DefaultPosition)
+                
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -867,10 +860,8 @@ class BarChartInterface ( wx.Dialog ):
     
     def __init__( self, parent, listOfVariables, listOfTags ):
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Bar chart", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Bar chart",  size = wx.DefaultSize, pos = wx.DefaultPosition)
+                
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
