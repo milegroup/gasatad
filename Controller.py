@@ -19,7 +19,6 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
 import pandas
-from pandas import concat
 import numpy as np
 
 import sys
@@ -61,7 +60,7 @@ class Controller():
                     
             nameColumns.append(auxColumn)
             
-        self.data = concat([dataFrame_1,dataFrame_2], axis = 1)
+        self.data = pandas.concat([dataFrame_1,dataFrame_2], axis = 1)
         
         self.data.columns = nameColumns
         
@@ -398,18 +397,30 @@ class Controller():
 
     def createPieChart(self, pieChartOptions):
 
-        print "##",pieChartOptions['numOfSlices']
+        def changeDataForPie(dataOrig, numOfData):
+            # Adds the least frequent values in 'Other values'
+            dataNew = dataOrig.sort_values(ascending = False)
+            top = dataNew.iloc[range(numOfData)]
+            bottom = dataNew.iloc[range(numOfData,len(dataNew))]
+
+            bottom.iat[0]=bottom.sum()
+            bottom = bottom.iloc[[0]]
+
+            dataConcat = pandas.concat([top,bottom])
+            dataConcat = dataConcat.rename({dataConcat.index[-1]:'Other values'})
+
+            return dataConcat
+
 
         sizes = []
         labels = []
-        
-
-        dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts() # Number of elements for slice
-
+        dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts() # Number of elements for each slice
         numberSamples = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].count() # Total of elements
 
         print dataForPie
-        print numberSamples
+
+        if( pieChartOptions['numOfSlices'] != 0) and (pieChartOptions['numOfSlices'] < len(dataForPie)-1):
+            dataForPie = changeDataForPie(dataForPie, pieChartOptions['numOfSlices'])
 
         explode = None
         if pieChartOptions['offset']:

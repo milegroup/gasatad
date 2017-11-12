@@ -4,7 +4,8 @@ ALL:
 	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
-	When there are many categories in discreet data, allow user to group them
+	Check resolution of logo
+	When network is slow, it takes a while to open
 
 WIN:
 
