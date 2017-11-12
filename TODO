@@ -3,7 +3,6 @@ ALL:
 	When exporting csvs, it always adds the .csv extension (check this)
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
-	Check resolution of logo
 	When network is slow, it takes a while to open
 
 WIN:
