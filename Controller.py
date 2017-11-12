@@ -499,6 +499,7 @@ class Controller():
     def createBarChart(self, barChartOptions):
 
         operation = barChartOptions['operation']
+
         # No tag selected
         if barChartOptions['secondVarSelected'].encode('utf-8') == 'None'.encode('utf-8'):
             
@@ -508,14 +509,17 @@ class Controller():
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].median()
             elif operation == 'Variance':
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].var()
-            else:
+            elif operation == "Std deviation":
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].std()
 
             names = [str(barChartOptions['firstVarSelected'])]
             y_pos = np.arange(len(names))
             
-            plt.bar(y_pos, dataForChart, align='center', alpha=0.5)
-            plt.xticks(y_pos, names)
+            plt.bar(y_pos, dataForChart, align='center', edgecolor='white', color=self.colorsPatch[0])
+
+            plt.xticks(y_pos, '')
+            plt.xlim(-0.5,0.5)
+            plt.ylim(0,dataForChart*1.1)
             
             plt.title(barChartOptions['title'], fontsize = 18)
             plt.xlabel(barChartOptions['xAxisName'])
@@ -571,15 +575,20 @@ class Controller():
                     temp2 = pandas.Series(data)
                     results.append(temp2.var())
 
-            else:
+            elif operation == "Std deviation":
                 for data in dataForChart.values():
                     temp2 = pandas.Series(data)
                     results.append(temp2.std())
 
                 
             tags = np.asarray(tags)
-            plt.bar(range(len(dataForChart)), results, align='center')
+            if (len(dataForChart)<=len(self.colorsPatch)):
+                plt.bar(range(len(dataForChart)), results, align='center', edgecolor='white', color=self.colorsPatch[0:len(dataForChart)])
+            else:
+                plt.bar(range(len(dataForChart)), results, align='center', edgecolor='white')
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
+            plt.xlim(-0.5,len(dataForChart)-0.5)
+            plt.ylim(0,1.1*max(results))
     
             plt.xlabel(barChartOptions['xAxisName'])
             plt.ylabel(barChartOptions['yAxisName'])

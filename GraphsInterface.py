@@ -32,7 +32,10 @@ class HistogramInterface ( wx.Dialog ):
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        #Histogram options
+        # -------------------------------
+
+        # Histogram options
+
         fgSizerchartOptions = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizerchartOptions.SetFlexibleDirection( wx.BOTH )
         fgSizerchartOptions.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
@@ -601,7 +604,7 @@ class PieChartInterface ( wx.Dialog ):
         # Discrete variable
                 
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Discrete variable" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tag" ), wx.VERTICAL )
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
         fgSizer3.SetFlexibleDirection( wx.BOTH )
@@ -766,7 +769,7 @@ class BoxPlotInterface ( wx.Dialog ):
         fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 0 )
 
         
-        gbSizer1.Add( fgSizer3, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT, 10 )
+        gbSizer1.Add( fgSizer3, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 10 )
 
         # -----------------------
         
@@ -801,7 +804,7 @@ class BoxPlotInterface ( wx.Dialog ):
         
         # Ok and Cancel buttons
 
-        okay = wx.Button( self, wx.ID_OK, validator = ValidatorForFactors(self.selectedCheckBoxes) )
+        okay = wx.Button( self, wx.ID_OK, validator = ValidatorForBoxplot(self.selectedCheckBoxes) )
         cancel = wx.Button( self, wx.ID_CANCEL )
         btns = wx.StdDialogButtonSizer()
         btns.AddButton(okay)
@@ -848,6 +851,36 @@ class BoxPlotInterface ( wx.Dialog ):
         )
         return boxPlotOptions
     
+class ValidatorForBoxplot(wx.PyValidator):
+    
+    def __init__(self, selectedCheckBoxes):
+        wx.PyValidator.__init__(self)
+        self.selectedCheckBoxes = selectedCheckBoxes
+
+    def Clone(self):
+        return ValidatorForBoxplot(self.selectedCheckBoxes)
+    
+    def Validate(self, win):
+        if not self.selectedCheckBoxes:
+            wx.MessageBox("Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+            return False
+        else:
+            return True
+        
+    def TransferToWindow(self):
+        return True
+    
+    def TransferFromWindow(self):
+        return True
+    
+    def noCheckBoxSelectedWarning(self):
+        
+        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.Destroy()
+        else:
+            dlg.Destroy()
+
     
 
                         
@@ -861,28 +894,30 @@ class BarChartInterface ( wx.Dialog ):
         gbSizer1.SetFlexibleDirection( wx.BOTH )
         gbSizer1.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
+        # -----------------------------
 
-        #BarChart options
+        # BarChart options
+
         fgSizerchartOptions = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizerchartOptions.SetFlexibleDirection( wx.BOTH )
         fgSizerchartOptions.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         fgSizerchartOptions.AddGrowableCol(1)
         
-        self.histogramName = wx.StaticText( self, wx.ID_ANY, u"Chart Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.histogramName = wx.StaticText( self, wx.ID_ANY, u"Title:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.histogramName.Wrap( -1 )
         fgSizerchartOptions.Add( self.histogramName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.histogramNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.histogramNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.xAxisName = wx.StaticText( self, wx.ID_ANY, u"X-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.xAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.xAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.xAxisNameTextCtrl = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
         fgSizerchartOptions.Add( self.xAxisNameTextCtrl, 0, wx.ALIGN_CENTER_VERTICAL|wx.EXPAND|wx.ALL, 5 )
         
-        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y Axis Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.yAxisName = wx.StaticText( self, wx.ID_ANY, u"Y-axis label:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.yAxisName.Wrap( -1 )
         fgSizerchartOptions.Add( self.yAxisName, 0, wx.ALIGN_CENTER|wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -891,21 +926,27 @@ class BarChartInterface ( wx.Dialog ):
         
         gbSizer1.Add( fgSizerchartOptions, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
 
-        #Display Grid        
-        displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display Grids" ), wx.HORIZONTAL )
+        # -------------------------------
 
-        self.xAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "X Axis", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # Display Grid        
+
+        displayGridsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Display settings" ), wx.HORIZONTAL )
+
+        self.xAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "X-axis grid", wx.DefaultPosition, wx.DefaultSize, 0 )
         displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL, 10)
-        self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "Y Axis", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.yAxischeckBox = wx.CheckBox( self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0 )
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 10)
 
         
-        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 20 ) 
+        gbSizer1.Add( displayGridsSizer, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.LEFT|wx.RIGHT, 10 ) 
 
-        #Variables, tags and operations Options
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X Variables" ), wx.VERTICAL )
-        sbScatterPlotYVar = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tags" ), wx.VERTICAL )
-        sbSizer3 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Operations" ), wx.VERTICAL )
+        # -------------------------------
+
+        # Variables, tags and operations Options
+
+        sbBarChartVarsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"X variable" ), wx.VERTICAL )
+        sbBarChartTagsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Tag" ), wx.VERTICAL )
+        sbBarChartOpsSizer = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Operation" ), wx.VERTICAL )
         
         
         fgSizer3 = wx.FlexGridSizer( 1, 0, 0, 0 )
@@ -949,13 +990,16 @@ class BarChartInterface ( wx.Dialog ):
        
                 
         #As a default the name of the axis are the selected variables
-        self.xAxisNameTextCtrl.SetValue(listOfVariables[0])
-        self.yAxisNameTextCtrl.SetValue('None')
+        self.xAxisNameTextCtrl.SetValue('')
+
         
         
-        listOperations = ['Mean', 'Median', 'Std Deviation', 'Variance']
+        
+        listOperations = ['Mean', 'Median', 'Std deviation', 'Variance']
         #By default, Mean selected
         self.selectedOperation = str(listOperations[0])
+
+        self.yAxisNameTextCtrl.SetValue(self.selectedOperation.lower()+" ("+listOfVariables[0]+")")
         
         
         fgSizer7 = wx.FlexGridSizer( 1,0 , 0, 0 )
@@ -976,17 +1020,21 @@ class BarChartInterface ( wx.Dialog ):
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.m_radioBtn16)
                 
         
-        sbSizer1.Add( fgSizer5, 1, wx.EXPAND, 5 )
-        sbScatterPlotYVar.Add( fgSizer6, 1, wx.EXPAND, 5 )
-        sbSizer3.Add( fgSizer7, 1, wx.EXPAND, 5 )
+        sbBarChartVarsSizer.Add( fgSizer5, 1, wx.EXPAND, 5 )
+        sbBarChartTagsSizer.Add( fgSizer6, 1, wx.EXPAND, 5 )
+        sbBarChartOpsSizer.Add( fgSizer7, 1, wx.EXPAND, 5 )
         
-        fgSizer3.Add( sbSizer1, 1, wx.EXPAND | wx.ALL, 5 )
-        fgSizer3.Add( sbScatterPlotYVar, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbBarChartVarsSizer, 1, wx.EXPAND | wx.ALL, 5 )
+        fgSizer3.Add( sbBarChartTagsSizer, 1, wx.EXPAND | wx.ALL, 5 )
 
         gbSizer1.Add( fgSizer3, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_RIGHT|wx.EXPAND|wx.ALL, 5 )
-        gbSizer1.Add( sbSizer3, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.ALL, 5 )        
+
+        gbSizer1.Add( sbBarChartOpsSizer, wx.GBPosition( 3, 0 ), wx.GBSpan( 1, 1 ), wx.LEFT|wx.RIGHT, 10 )
+
+        # -------------------------------     
         
-        #Ok and Cancel buttons
+        # Ok and Cancel buttons
+
         okay = wx.Button( self, wx.ID_OK )
         cancel = wx.Button( self, wx.ID_CANCEL )
         btns = wx.StdDialogButtonSizer()
@@ -994,7 +1042,7 @@ class BarChartInterface ( wx.Dialog ):
         btns.AddButton(cancel)
         btns.Realize()
         
-        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )
+        gbSizer1.Add( btns, wx.GBPosition( 4, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.TOP | wx.BOTTOM, 10 )
         
         self.SetSizer( gbSizer1 )
         gbSizer1.Fit(self)
@@ -1014,16 +1062,20 @@ class BarChartInterface ( wx.Dialog ):
     def updateSelectedVariablesRadioButton(self, event):
         radioButton = event.GetEventObject()
         self.selectedRadioButtonVariables = radioButton.GetLabelText()
-        self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
+        self.yAxisNameTextCtrl.SetValue(self.selectedOperation.lower()+" ("+self.selectedRadioButtonVariables+")")
     
     def updateSelectedTagsRadioButton(self, event):
         radioButton = event.GetEventObject()
         self.selectedRadioButtonTags = radioButton.GetLabelText()
-        self.yAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
+        if self.selectedRadioButtonTags == 'None':
+            self.xAxisNameTextCtrl.SetValue('')
+        else:
+            self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
 
     def updateSelectedOperationRadioButton(self, event):
         radioButton = event.GetEventObject()
         self.selectedOperation = radioButton.GetLabelText()
+        self.yAxisNameTextCtrl.SetValue(self.selectedOperation.lower()+" ("+self.selectedRadioButtonVariables+")")
 
     def getBarChartOptions(self):
         barchartOptions = dict(
@@ -1040,41 +1092,3 @@ class BarChartInterface ( wx.Dialog ):
         return barchartOptions 
 
 
-class ValidatorForFactors(wx.PyValidator):
-    
-    def __init__(self, selectedCheckBoxes):
-        
-        wx.PyValidator.__init__(self)
-        self.selectedCheckBoxes = selectedCheckBoxes
-
-    def Clone(self):
-        return ValidatorForFactors(self.selectedCheckBoxes)
-    
-    def Validate(self, win):
-        
-        if not self.selectedCheckBoxes:
-            
-            wx.MessageBox("Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
-            return False
-            
-        else:
-            return True
-        
-    def TransferToWindow(self):
-        
-        return True
-    
-    def TransferFromWindow(self):
-        return True
-    
-    
-    def noCheckBoxSelectedWarning(self):
-        
-        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
-
-        if dlg.ShowModal() == wx.ID_OK:
-            
-            dlg.Destroy()
-        else:
-            
-            dlg.Destroy()

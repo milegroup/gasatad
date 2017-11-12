@@ -1,7 +1,6 @@
 ALL:
 	Help
 	When exporting csvs, it always adds the .csv extension (check this)
-	Review axis of bar charts and patches and margins
 	Change descriptive statistics and significance tests (html?)
 	Problem when reading xls or xlsx files
 	Check resolution of logo

@@ -4,3 +4,4 @@ Splash screen
 Discretization of columns
 Scatter plots with several variables and linear fit
 Max. no. of categories in pie charts
+Bar charts improved
