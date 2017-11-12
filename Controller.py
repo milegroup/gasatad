@@ -496,61 +496,51 @@ class Controller():
     
 
 
-    def createBarChart(self, barChartOptions, operation):
+    def createBarChart(self, barChartOptions):
 
+        operation = barChartOptions['operation']
         # No tag selected
-        if barChartOptions.getSecondVarSelected().encode('utf-8') == 'None'.encode('utf-8'):
+        if barChartOptions['secondVarSelected'].encode('utf-8') == 'None'.encode('utf-8'):
             
             if operation == 'Mean':
-                dataForChart = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()].mean()
-                
+                dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].mean()
             elif operation == 'Median':
-                dataForChart = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()].median()
-
+                dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].median()
             elif operation == 'Variance':
-                dataForChart = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()].var()
-
+                dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].var()
             else:
-                dataForChart = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()].std()
+                dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].std()
 
-    
-            names = [str(barChartOptions.getFirstVarSelected())]
+            names = [str(barChartOptions['firstVarSelected'])]
             y_pos = np.arange(len(names))
             
             plt.bar(y_pos, dataForChart, align='center', alpha=0.5)
             plt.xticks(y_pos, names)
             
-            plt.title(barChartOptions.getChartTitle())
-            plt.xlabel(barChartOptions.getXAxisName())
-            plt.ylabel(barChartOptions.getYAxisName())
+            plt.title(barChartOptions['title'], fontsize = 18)
+            plt.xlabel(barChartOptions['xAxisName'])
+            plt.ylabel(barChartOptions['yAxisName'])
             
-            if (barChartOptions.getXAxisGrid() & barChartOptions.getYAxisGrid()):
-                
+            if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
                 plt.grid()
-            
-            elif barChartOptions.getXAxisGrid():
-                
+            elif barChartOptions['xAxisGrid']:
                 plt.grid(axis = 'x')
-             
-            elif barChartOptions.getYAxisGrid():
-                
+            elif barChartOptions['yAxisGrid']:
                 plt.grid(axis = 'y')
-                
             plt.show()
             
         else: # Some tag has been selected
         
             dataForChart = {}
-            selectedCategory = barChartOptions.getSecondVarSelected()
+            selectedCategory = barChartOptions['secondVarSelected']
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
 
-            
             for tag in tags:
                 if str(tag) != 'nan':
                     dataForChart[tag] = []
     
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
-            valuesColumn = self.programState.dataToAnalyse[barChartOptions.getFirstVarSelected()]
+            valuesColumn = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']]
 
             for i in range(len(valuesColumn)):
                 if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
@@ -591,27 +581,19 @@ class Controller():
             plt.bar(range(len(dataForChart)), results, align='center')
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
     
-            plt.xlabel(barChartOptions.getXAxisName())
-            plt.ylabel(barChartOptions.getYAxisName())
+            plt.xlabel(barChartOptions['xAxisName'])
+            plt.ylabel(barChartOptions['yAxisName'])
             
-            if (barChartOptions.getXAxisGrid() & barChartOptions.getYAxisGrid()):
-                
+            if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
                 plt.grid()
-            
-            elif barChartOptions.getXAxisGrid():
-                
+            elif barChartOptions['xAxisGrid']:
                 plt.grid(axis = 'x')
-             
-            elif barChartOptions.getYAxisGrid():
-                
+            elif barChartOptions['yAxisGrid']:
                 plt.grid(axis = 'y')
-            
-            plt.title(barChartOptions.getChartTitle(), fontsize = 18)
-            
+
+            plt.title(barChartOptions['title'], fontsize = 18)
             plt.show()
-    
     
 
     def nullValuesInFile(self, data): 
-         
         return pandas.isnull(data).values.any()

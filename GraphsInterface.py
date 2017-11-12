@@ -18,10 +18,7 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 import wx
-import wx.xrc
-
-from Model import ChartOptions
-
+# import wx.xrc
 
 class HistogramInterface ( wx.Dialog ): 
         
@@ -855,9 +852,7 @@ class BoxPlotInterface ( wx.Dialog ):
 
                         
 class BarChartInterface ( wx.Dialog ): 
-    
-    position = 'by default'
-    
+        
     def __init__( self, parent, listOfVariables, listOfTags ):
         
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Bar chart",  size = wx.DefaultSize, pos = wx.DefaultPosition)
@@ -1017,58 +1012,32 @@ class BarChartInterface ( wx.Dialog ):
       
 
     def updateSelectedVariablesRadioButton(self, event):
-        
         radioButton = event.GetEventObject()
-        
         self.selectedRadioButtonVariables = radioButton.GetLabelText()
         self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
-            
     
     def updateSelectedTagsRadioButton(self, event):
-        
         radioButton = event.GetEventObject()
-        
         self.selectedRadioButtonTags = radioButton.GetLabelText()
         self.yAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
 
     def updateSelectedOperationRadioButton(self, event):
-        
         radioButton = event.GetEventObject()
         self.selectedOperation = radioButton.GetLabelText()
-        
 
-        
-    def chartVariables(self):
-        
-        return self.selectedRadioButtonVariables, self.selectedRadioButtonTags
-    
-    
-    def getBarChartDescription(self):
-        
-        return self.histogramNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), self.yAxisNameTextCtrl.GetValue()
-    
-    
-    def updateLegendPosition(self, event):
-        
-        radioButton = event.GetEventObject()
-        
-        self.position = radioButton.GetLabelText()
-    
-    
     def getBarChartOptions(self):
+        barchartOptions = dict(
+            title = self.histogramNameTextCtrl.GetValue(),
+            xAxisName = self.xAxisNameTextCtrl.GetValue(), 
+            yAxisName = self.yAxisNameTextCtrl.GetValue(),
+            xAxisGrid = self.xAxischeckBox.IsChecked(), 
+            yAxisGrid = self.yAxischeckBox.IsChecked(),
+            firstVarSelected = self.selectedRadioButtonVariables, 
+            secondVarSelected = self.selectedRadioButtonTags,
+            operation = self.selectedOperation
+        )
         
-        histogramOptions = ChartOptions(self.histogramNameTextCtrl.GetValue(), self.xAxisNameTextCtrl.GetValue(), 
-                                      self.yAxisNameTextCtrl.GetValue(), False,self.xAxischeckBox.IsChecked(), 
-                                      self.yAxischeckBox.IsChecked(), self.selectedRadioButtonVariables, 
-                                      self.selectedRadioButtonTags, self.position, [])
-        
-        return histogramOptions 
-
-    def getSelectedOperation(self):
-        
-        return self.selectedOperation
-
-
+        return barchartOptions 
 
 
 class ValidatorForFactors(wx.PyValidator):

@@ -1170,9 +1170,7 @@ class MainFrame ( wx.Frame ):
             if  barChartFrame.ShowModal() == wx.ID_OK:
         
                     barChartOptions = barChartFrame.getBarChartOptions()
-                    operation = barChartFrame.getSelectedOperation()
-                    
-                    self.controller.createBarChart(barChartOptions, operation) 
+                    self.controller.createBarChart(barChartOptions) 
         
         else:
             
