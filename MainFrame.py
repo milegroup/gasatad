@@ -221,7 +221,7 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Descriptive statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Basic statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.descriptiveStatsBtn.Enable( False )
         #self.descriptiveStatsBtn.SetMinSize( wx.Size( -1,25 ) )
         
@@ -1033,7 +1033,6 @@ class MainFrame ( wx.Frame ):
 
     def createBasicStatisticsInterface(self, event):
         
-
         if (len(self.controller.integerValues + self.controller.floatValues) != 0):
             self.tagsAndValues.clear()
             
@@ -1050,8 +1049,7 @@ class MainFrame ( wx.Frame ):
             minimum = int(self.controller.programState.dataToAnalyse.min(numeric_only = True).min().round()) -1
             maximum = int(self.controller.programState.dataToAnalyse.max(numeric_only = True).max().round()) +1
             
-            basicStatsInterface = BasicStatisticsInterface(self, variablesList, self.tagsAndValues, self.controller.integerValues,
-                                                           minimum, maximum, dataFrame)
+            basicStatsInterface = BasicStatisticsInterface(self, variablesList, self.tagsAndValues, self.controller.integerValues, dataFrame)
             
             
             if basicStatsInterface.ShowModal() == wx.ID_CLOSE:
@@ -1059,7 +1057,7 @@ class MainFrame ( wx.Frame ):
 
         else:
             
-            wx.MessageBox("There are no numerical values", "Attention!")
+            wx.MessageBox("There are no numerical values in the data", "ERROR", wx.OK|wx.ICON_EXCLAMATION)
 
 
 

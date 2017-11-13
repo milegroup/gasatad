@@ -30,12 +30,9 @@ set_option('expand_frame_repr', False)
 
 class BasicStatisticsInterface ( wx.Dialog ):
     
-    def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, minimum, maximum, dataFrame ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size =(1200, 600), style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
+    def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, dataFrame ):
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Basic statistics", pos = wx.DefaultPosition, size =(1200, 600))
         
-        
-        self.min = minimum
-        self.max = maximum
         self.dataToAnalyse = dataFrame
         
         #Inicialización de las listas necesarias para obtener las opciones elegidas por el usuario
@@ -74,14 +71,15 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         self.scrollSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        rightSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"VARIABLES" ), wx.VERTICAL )
-        self.scrollSizer.Add( rightSizer, 1, wx.EXPAND | wx.ALL, 10 )
+        dataSelectionSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data selection" ), wx.VERTICAL )
+        
+        self.scrollSizer.Add( dataSelectionSizer, 1, wx.EXPAND | wx.ALL, 10 )
         
         fgSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer.SetFlexibleDirection( wx.BOTH )
         fgSizer.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        rightSizer.Add(fgSizer, 1, wx.ALL | wx.EXPAND, 5)
+        dataSelectionSizer.Add(fgSizer, 1, wx.ALL | wx.EXPAND, 5)
         
         #Definition of the Sizer where the checkBoxes will be created
         checkSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -131,7 +129,9 @@ class BasicStatisticsInterface ( wx.Dialog ):
             fgSizer.Add( auxSizer2, 0,  wx.ALL| wx.EXPAND, 5)
             
             for i in integerValues:
-            
+                minumum = int(min(self.dataToAnalyse[i]))
+                maximum = int(max(self.dataToAnalyse[i]))
+
                 self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_checkBox.SetFont( wx.Font( 10, wx.DEFAULT, wx.NORMAL, wx.BOLD, False, wx.EmptyString ) )
                 self.Bind(wx.EVT_CHECKBOX, self.changeStatusSpinCtrl, self.m_checkBox)
@@ -142,8 +142,10 @@ class BasicStatisticsInterface ( wx.Dialog ):
                 self.m_staticText11 = wx.StaticText( self.scrolledPanel, wx.ID_ANY, u"From:", wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_staticText11.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
+
+                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minumum, maximum, minumum,1, str(i) + "-LimitInf")
             
-                self.m_spinCtrl11 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitInf")
+                # self.m_spinCtrl11 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minumum, maximum, minumum, str(i) + "-LimitInf")
                 auxSizer2.Add( self.m_spinCtrl11, 0, wx.ALL, 5 )
                 self.m_spinCtrl11.Enable(False)
             
@@ -151,7 +153,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
                 self.m_staticText21.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl21 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitSup")
+                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 100,-1 ), wx.SP_ARROW_KEYS| wx.ALIGN_RIGHT, minumum, maximum, maximum, 1, str(i) + "-LimitSup")
                 auxSizer2.Add( self.m_spinCtrl21, 0, wx.ALL, 5 )
                 self.m_spinCtrl21.Enable(False) 
                 
@@ -170,13 +172,12 @@ class BasicStatisticsInterface ( wx.Dialog ):
         panelSizer = wx.BoxSizer(wx.VERTICAL)
         panelSizer.Add(self.scrolledPanel, 1, wx.EXPAND)
         
-        close = wx.Button( self.panel, wx.ID_CANCEL, label = "Close" )
-        showResults = wx.Button( self.panel, wx.ID_ANY, label = "Show Results" )
+        close = wx.Button( self.panel, wx.ID_CANCEL, label = "Cancel" )
+        showResults = wx.Button( self.panel, wx.ID_ANY, label = "Show results" )
         self.Bind(wx.EVT_BUTTON, self.calculateData, showResults)
         sizerBtns = wx.BoxSizer(wx.HORIZONTAL)
         sizerBtns.Add( showResults, 1, wx.EXPAND | wx.ALL, 5 )
         sizerBtns.Add( close, 1, wx.EXPAND | wx.ALL, 5 )
-
         panelSizer.Add(sizerBtns, 0 , wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
        
         self.panel.SetSizer(panelSizer)
@@ -287,15 +288,11 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         
         if not self.selectedCheckBoxes:
-            
             self.noCheckBoxSelectedWarning()
-            
             return DataFrame()
         
         elif self.wrongInterval:
-            
             self.wrongIntervalWarning()
-            
             return DataFrame()
             
         else:
@@ -323,10 +320,10 @@ class BasicStatisticsInterface ( wx.Dialog ):
                         
                         for i in range(len(self.dataToAnalyse.index)):
                             
-                            if ( (self.dataToAnalyse.loc[i+1,nameVariable] >= paarList[0])
-                                 and (self.dataToAnalyse.loc[i+1,nameVariable] <= paarList[1])):
+                            if ( (self.dataToAnalyse.loc[i,nameVariable] >= paarList[0])
+                                 and (self.dataToAnalyse.loc[i,nameVariable] <= paarList[1])):
                             
-                                auxIndex.append(i+1)
+                                auxIndex.append(i)
                                 
                         indices.append(auxIndex)
                         #del auxIndex[:]
@@ -402,79 +399,60 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         self.m_textCtrl1.Clear()
         
-        self.m_textCtrl1.BeginAlignment(wx.TEXT_ALIGNMENT_CENTER)
-        self.m_textCtrl1.BeginBold()
-        self.m_textCtrl1.BeginFontSize(15)
-        self.m_textCtrl1.WriteText('BASIC STATISTICS\n\n')
-        self.m_textCtrl1.EndAlignment()
-        self.m_textCtrl1.EndBold()
-        self.m_textCtrl1.EndFontSize()
+        
         
         self.toShow = ''
         
         data = self.getSelectedData()
                 
         if not data.empty:
+
+            self.m_textCtrl1.BeginAlignment(wx.TEXT_ALIGNMENT_CENTER)
+            self.m_textCtrl1.BeginBold()
+            self.m_textCtrl1.BeginFontSize(15)
+            self.m_textCtrl1.WriteText('BASIC STATISTICS\n\n')
+            self.m_textCtrl1.EndAlignment()
+            self.m_textCtrl1.EndBold()
+            self.m_textCtrl1.EndFontSize()
+
             self.toShow = self.toShow + 'Maximum:\n' + data.max().round(3).to_string() + '\n'
-            
-            self.toShow = self.toShow + '\nMinimum:\n' + data.min().round(3).to_string() + '\n'
-            
-            self.toShow = self.toShow + '\nMean:\n' + data.mean().round(3).to_string() + '\n'
-            
-            self.toShow = self.toShow + '\nMedian:\n' + data.median().round(3).to_string() + '\n'
-            
+            self.toShow = self.toShow + '\nMinimum:\n' + data.min().round(3).to_string() + '\n'            
+            self.toShow = self.toShow + '\nMean:\n' + data.mean().round(3).to_string() + '\n'            
+            self.toShow = self.toShow + '\nMedian:\n' + data.median().round(3).to_string() + '\n'            
             self.toShow = self.toShow + '\nStd Deviation:\n' + data.std().round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nVariance:\n' + data.var().round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nCovariance:\n' + data.cov().round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nQuantile 25%:\n' + data.quantile(q = 0.25).round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nQuantile 50%:\n' + data.quantile(q = 0.5).round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nQuantile 75%:\n' + data.quantile(q = 0.75).round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nCorrelation (Pearson):\n' + data.corr(method = 'pearson').round(3).to_string() + '\n'
-            
             #self.toShow = self.toShow + '\nCorrelation (Kendall):\n' + data.corr(method = 'kendall').round(3).to_string() + '\n'
-            
             #self.toShow = self.toShow + '\nCorrelation (Spearman):\n' + data.corr(method = 'spearman').round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nKurtosis:\n' + data.kurtosis().round(3).to_string() + '\n'
-            
             self.toShow = self.toShow + '\nSkew:\n' + data.skew().round(3).to_string() + '\n'
-            
             
             self.m_textCtrl1.AppendText(self.toShow)
             self.m_textCtrl1.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, 'Ubuntu Mono'))
         
-        else:
-            
-            wx.MessageBox("There is no data that match the selected filters", "Attention!",
-                                   wx.OK | wx.ICON_EXCLAMATION)
+        # else:
+        #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
 
 
     def noCheckBoxSelectedWarning(self):
         
-        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, "Please, select at least one variable", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
 
         if dlg.ShowModal() == wx.ID_OK:
-            
             dlg.Destroy()
         else:
-            
             dlg.Destroy()
             
     
     def wrongIntervalWarning(self):
         
-        dlg = wx.MessageDialog(self, "The value of the FROM item have to be lower or equal than the TO item", "Attention!",
-                               wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, "Bad defined interval", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
 
         if dlg.ShowModal() == wx.ID_OK:
-            
             dlg.Destroy()
         else:
-            
             dlg.Destroy()        
