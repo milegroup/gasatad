@@ -261,31 +261,24 @@ class BasicStatisticsInterface ( wx.Dialog ):
     def getSelectedData(self):
         
         self.intervalNameAndLimitsLeft.clear()
-        #Se busca qué variables se han activado para luego extraer los valores de los SpinCtrl que 
-        # indican el límite superior e inferior del intervalo
+        # Obtain values from spinctrl to check them
+
         for checkBox in self.activatedCheckBoxes:
-        
             i = 0
             
             while checkBox != self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
-    
                 i = i+1
             
             if checkBox == self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
-                
                 limitInf = self.listOfSpinCtrl[i].GetValue()
                 limitSup = self.listOfSpinCtrl[i + 1].GetValue()
-                    
                 self.intervalNameAndLimitsLeft[checkBox] = [limitInf, limitSup]
-        
         
         self.wrongInterval = False
         
         for nameVariable, paarList in self.intervalNameAndLimitsLeft.iteritems():
-            
             if paarList[0] > paarList[1]:
                 self.wrongInterval = True 
-        
         
         if not self.selectedCheckBoxes:
             self.noCheckBoxSelectedWarning()
@@ -295,17 +288,17 @@ class BasicStatisticsInterface ( wx.Dialog ):
             self.wrongIntervalWarning()
             return DataFrame()
             
-        else:
-            #self.getSelectedValuesComboBox()
+        else: # Everything is Ok
             tempList = []
             
-            #Lista de listas
+            # Lista de listas
             indices = []
             indicesToReturn = []
     
             for i in self.selectedVariablesInColumn.values():
-                
                 tempList.extend(i) 
+
+            # tempList contains the marked discrete variables
             
             if not tempList:
                 
@@ -317,14 +310,10 @@ class BasicStatisticsInterface ( wx.Dialog ):
                         
                         auxIndex = []
                         #if -1 not in paarList:
-                        
                         for i in range(len(self.dataToAnalyse.index)):
-                            
                             if ( (self.dataToAnalyse.loc[i,nameVariable] >= paarList[0])
                                  and (self.dataToAnalyse.loc[i,nameVariable] <= paarList[1])):
-                            
                                 auxIndex.append(i)
-                                
                         indices.append(auxIndex)
                         #del auxIndex[:]
                 
@@ -333,15 +322,13 @@ class BasicStatisticsInterface ( wx.Dialog ):
     
                 for i in range(len(indices)):
                     auxIndices2.extend(indices[i])
-    
                 
                 for i in range(len(indices[0])):
-                    
-                    if auxIndices2.count(indices[0][i]) == len(indices):# Si es igual a esto quiere decir que cumple todas las condiciones 
-                                                                    #seleccionadas en la interfaz gráfica 
+                    if auxIndices2.count(indices[0][i]) == len(indices):# Si es igual a esto quiere decir que cumple todas las condiciones seleccionadas en la interfaz gráfica 
                         indicesToReturn.append(indices[0][i])
             
-            else:
+            else: # tempList (marked discrete variables) is not empty
+
                 auxIndex1 = []
                
                 for name, value in self.selectedVariablesInColumn.items():
@@ -370,8 +357,8 @@ class BasicStatisticsInterface ( wx.Dialog ):
                         
                         for i in range(len(self.dataToAnalyse.index)):
                             
-                            if ( (self.dataToAnalyse.loc[i+1,nameVariable] >= paarList[0])
-                                 and (self.dataToAnalyse.loc[i+1,nameVariable] <= paarList[1])):
+                            if ( (self.dataToAnalyse.loc[i,nameVariable] >= paarList[0])
+                                 and (self.dataToAnalyse.loc[i,nameVariable] <= paarList[1])):
                             
                                 auxIndex.append(i+1)
                                 

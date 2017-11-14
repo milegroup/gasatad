@@ -605,7 +605,7 @@ class MainFrame ( wx.Frame ):
         
         try:
                 self.Datafile = open(fileName, 'rU')            
-                self.data = read_csv(self.Datafile, sep = None, header=0, index_col = 0, engine = 'python')
+                self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 self.controller.OpenFile(self.data)  
@@ -667,10 +667,9 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'rU')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
-
-                discardCol = None
+                discardCol = False
                 if self.params['options']['discardfirstcolumn']=='True':
-                    discardCol=0
+                    discardCol=True
 
                 sepChar = ''
                 if self.params['options']['sepchar']=="Comma":
@@ -681,17 +680,18 @@ class MainFrame ( wx.Frame ):
                     sepChar='\t'
 
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, index_col = discardCol, engine = 'python')
-                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-                
+                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, engine = 'python')    
                 if self.fileExtension == "xlsx" or self.fileExtension == "xls":
-                    self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
-                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
+                    self.data = read_excel(self.Datafile,sheetname=0, header = 0)
+
+                if discardCol:
+                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
+                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 wOpenFile.Destroy()
 
                 if (self.Datafile is not None):
-                    self.controller.OpenFile(self.data)
+                    self.controller.OpenFile(self.data )
                     
                     self.m_menuAddFile.Enable(True)
                     self.m_menuNewFile.Enable(False)                                            
@@ -759,12 +759,11 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(os.path.join(self.directory, self.filename), 'rU')
                 self.fileExtension = self.filename.rpartition(".")[-1]
 
-                discardCol = None
-                sepChar = ''
-
+                discardCol = False
                 if self.params['options']['discardfirstcolumn']=='True':
-                    discardCol=0
+                    discardCol=True
 
+                sepChar = ''
                 if self.params['options']['sepchar']=="Comma":
                     sepChar=','
                 elif self.params['options']['sepchar']=="Semicolon":
@@ -773,12 +772,13 @@ class MainFrame ( wx.Frame ):
                     sepChar='\t'
 
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, index_col = discardCol, engine = 'python')
-                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-                
+                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, engine = 'python')
                 if self.fileExtension == "xlsx":
-                    self.data = read_excel(self.Datafile,sheetname=0, header = 0, index_col = discardCol)
-                    self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
+                    self.data = read_excel(self.Datafile, sheetname=0, header = 0)
+
+                if discardCol:
+                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
+                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
 
                 if (len(self.data.columns)==0):
                     raise ValueError("There was a problem reading the columns of the file")

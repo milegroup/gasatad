@@ -75,7 +75,7 @@ class Controller():
         try:
             self.recalculateRowsIndexes()
         except:
-            # print "Error: ", sys.exc_info()[0] 
+            print "Error: ", sys.exc_info()
             None
 
         self.programState.setInformationFile(len(data.columns), len(data.index))
@@ -152,9 +152,9 @@ class Controller():
 
 
     def recalculateRowsIndexes(self):
-        newIndexes = range(1,len(self.programState.dataToAnalyse.index)+1)
+        newIndexes = range(0,len(self.programState.dataToAnalyse.index))
         self.programState.dataToAnalyse.reindex(newIndexes)
-        self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
+        #self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
 
 
         

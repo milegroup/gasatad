@@ -485,8 +485,8 @@ class SignificanceTestInterface ( wx.Dialog ):
                         
                         for i in range(len(self.dataToAnalyse.index)):
                             
-                            if ( (self.dataToAnalyse.loc[i+1,nameVariable] >= paarList[0])
-                                 and (self.dataToAnalyse.loc[i+1,nameVariable] <= paarList[1])):
+                            if ( (self.dataToAnalyse.loc[i,nameVariable] >= paarList[0])
+                                 and (self.dataToAnalyse.loc[i,nameVariable] <= paarList[1])):
                             
                                 auxIndex.append(i+1)
                                 
@@ -531,8 +531,8 @@ class SignificanceTestInterface ( wx.Dialog ):
                         
                         for i in range(len(self.dataToAnalyse.index)):
                             
-                            if ( (self.dataToAnalyse.loc[i+1,nameVariable] >= paarList[0])
-                                 and (self.dataToAnalyse.loc[i+1,nameVariable] <= paarList[1])):
+                            if ( (self.dataToAnalyse.loc[i,nameVariable] >= paarList[0])
+                                 and (self.dataToAnalyse.loc[i,nameVariable] <= paarList[1])):
                             
                                 auxIndex.append(i+1)
                                 
