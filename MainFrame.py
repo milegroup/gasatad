@@ -895,7 +895,7 @@ class MainFrame ( wx.Frame ):
         for row in range(numRows):
             for col in range(numCols):
                 content = self.m_dataTable.GetCellValue(row,col)
-                if  content  == 'nan' or content == 'null': # This checks for nan
+                if  content  == 'nan' or content == 'null' or content.lower() == "no data": # This checks for nan
                     # print "## Nan detected in cell:",row,"  ",col 
                     self.m_dataTable.SetCellValue(row,col,"null")
                     # self.m_dataTable.SetCellBackgroundColour(row,col,'peachpuff')

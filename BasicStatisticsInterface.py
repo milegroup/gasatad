@@ -31,7 +31,10 @@ set_option('expand_frame_repr', False)
 class BasicStatisticsInterface ( wx.Dialog ):
     
     def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, dataFrame ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Basic statistics", pos = wx.DefaultPosition, size =(1200, 600))
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Basic statistics", size=(1024, 600), pos = wx.DefaultPosition)
+
+        self.SetMinSize((640, 480))
+
         
         self.dataToAnalyse = dataFrame
         
@@ -73,7 +76,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
 
         dataSelectionSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data selection" ), wx.VERTICAL )
         
-        self.scrollSizer.Add( dataSelectionSizer, 1, wx.EXPAND | wx.ALL, 10 )
+        self.scrollSizer.Add( dataSelectionSizer, 0, wx.EXPAND | wx.ALL, 10 )
         
         fgSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer.SetFlexibleDirection( wx.BOTH )

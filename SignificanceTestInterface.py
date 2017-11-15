@@ -25,10 +25,10 @@ import wx.richtext as rt
 class SignificanceTestInterface ( wx.Dialog ):
     
     def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, minimum, maximum, dataFrame ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = wx.EmptyString, pos = wx.DefaultPosition, size =wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE|wx.TAB_TRAVERSAL )
-        
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
-        
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Significance test", size =(1200, 600), pos = wx.DefaultPosition)
+
+        self.SetMinSize((640, 480))
+                
         
         self.dataToAnalyse = dataFrame
         self.min = minimum
@@ -76,7 +76,7 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         #LEFT SIZER
         rightSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"VARIABLES" ), wx.VERTICAL )
-        self.scrollSizer.Add( rightSizer, 1, wx.ALL, 10 )
+        self.scrollSizer.Add( rightSizer, 0, wx.ALL, 10 )
         
         fgSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer.SetFlexibleDirection( wx.BOTH )
@@ -170,7 +170,7 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         #RIGHT SIZER
         leftSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"VARIABLES" ), wx.VERTICAL )
-        self.scrollSizer.Add( leftSizer, 1, wx.ALL, 10 )
+        self.scrollSizer.Add( leftSizer, 0, wx.ALL, 10 )
         
         fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgSizer2.SetFlexibleDirection( wx.BOTH )
@@ -263,8 +263,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.listOfSpinCtrlRight.append(self.m_spinCtrl21)    
         
         #TEXT CONTROL
-        self.m_textCtrl = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, (400, 500),
-                                        wx.VSCROLL | wx.HSCROLL | wx.TE_MULTILINE | wx.TE_READONLY | wx.NO_BORDER)
+        self.m_textCtrl = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL | wx.HSCROLL | wx.TE_MULTILINE | wx.TE_READONLY | wx.NO_BORDER)
         self.m_textCtrl.SetMargins((20,20))
         
         self.scrollSizer.Add( self.m_textCtrl, 1,  wx.ALL | wx.EXPAND , 20 )
@@ -288,22 +287,13 @@ class SignificanceTestInterface ( wx.Dialog ):
         panelSizer.Add(btns)
         #btn = wx.Button(self.panel, label="Add Widget")
         
-        #panelSizer.Fit(self.panel)
+
         self.panel.SetSizerAndFit(panelSizer)
         panelSizer.Layout()
-        self.panel.Fit()
         self.panel.Layout()
         
-        mainSizer = wx.BoxSizer(wx.VERTICAL)
-        
-        mainSizer.Add(self.panel, 1, wx.EXPAND)
-        self.SetSizerAndFit(mainSizer)
-        mainSizer.Fit(self)
-        self.Fit()
         self.Layout()
         
-        
-        #self.panel.SetSizer(panelSizer)
         self.Centre( wx.BOTH )
 
 
