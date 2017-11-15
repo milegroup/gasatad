@@ -164,18 +164,18 @@ class BasicStatisticsInterface ( wx.Dialog ):
                 self.listOfSpinCtrl.append(self.m_spinCtrl21)
         
         
-        self.m_textCtrl1 = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
+        self.textResultsWindow = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize,
                                         wx.VSCROLL | wx.HSCROLL | wx.TE_MULTILINE | wx.TE_READONLY | wx.NO_BORDER)
-        self.m_textCtrl1.SetMargins((20,20))
+        self.textResultsWindow.SetMargins((20,20))
         
-        self.scrollSizer.Add( self.m_textCtrl1, 1, wx.EXPAND | wx.ALL, 10 )
+        self.scrollSizer.Add( self.textResultsWindow, 1, wx.EXPAND | wx.ALL, 10 )
         
         self.scrolledPanel.SetSizer(self.scrollSizer)
        
         panelSizer = wx.BoxSizer(wx.VERTICAL)
         panelSizer.Add(self.scrolledPanel, 1, wx.EXPAND)
         
-        close = wx.Button( self.panel, wx.ID_CANCEL, label = "Cancel" )
+        close = wx.Button( self.panel, wx.ID_CANCEL, label = "Close" )
         showResults = wx.Button( self.panel, wx.ID_ANY, label = "Show results" )
         self.Bind(wx.EVT_BUTTON, self.calculateData, showResults)
         sizerBtns = wx.BoxSizer(wx.HORIZONTAL)
@@ -387,9 +387,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
     
     def calculateData(self, event):
         
-        self.m_textCtrl1.Clear()
-        
-        
+        self.textResultsWindow.Clear()
         
         self.toShow = ''
         
@@ -397,35 +395,78 @@ class BasicStatisticsInterface ( wx.Dialog ):
                 
         if not data.empty:
 
-            self.m_textCtrl1.BeginAlignment(wx.TEXT_ALIGNMENT_CENTER)
-            self.m_textCtrl1.BeginBold()
-            self.m_textCtrl1.BeginFontSize(15)
-            self.m_textCtrl1.WriteText('BASIC STATISTICS\n\n')
-            self.m_textCtrl1.EndAlignment()
-            self.m_textCtrl1.EndBold()
-            self.m_textCtrl1.EndFontSize()
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginFontSize(12)
+            self.textResultsWindow.WriteText('BASIC STATISTICS')
+            self.textResultsWindow.EndFontSize()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.Newline()
 
-            self.toShow = self.toShow + 'Maximum:\n' + data.max().round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nMinimum:\n' + data.min().round(3).to_string() + '\n'            
-            self.toShow = self.toShow + '\nMean:\n' + data.mean().round(3).to_string() + '\n'            
-            self.toShow = self.toShow + '\nMedian:\n' + data.median().round(3).to_string() + '\n'            
-            self.toShow = self.toShow + '\nStd Deviation:\n' + data.std().round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nVariance:\n' + data.var().round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nCovariance:\n' + data.cov().round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nQuantile 25%:\n' + data.quantile(q = 0.25).round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nQuantile 50%:\n' + data.quantile(q = 0.5).round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nQuantile 75%:\n' + data.quantile(q = 0.75).round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nCorrelation (Pearson):\n' + data.corr(method = 'pearson').round(3).to_string() + '\n'
-            #self.toShow = self.toShow + '\nCorrelation (Kendall):\n' + data.corr(method = 'kendall').round(3).to_string() + '\n'
-            #self.toShow = self.toShow + '\nCorrelation (Spearman):\n' + data.corr(method = 'spearman').round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nKurtosis:\n' + data.kurtosis().round(3).to_string() + '\n'
-            self.toShow = self.toShow + '\nSkew:\n' + data.skew().round(3).to_string() + '\n'
-            
-            self.m_textCtrl1.AppendText(self.toShow)
-            self.m_textCtrl1.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, 'Ubuntu Mono'))
+            self.writeParam("No. of values")
+            self.writeNum(data.count())
+
+            self.writeParam("Minimum")
+            self.writeNum(data.min())
+
+            self.writeParam("Maximum")
+            self.writeNum(data.max())
+
+            self.writeParam("Mean")
+            self.writeNum(data.mean())
+
+            self.writeParam("Median")
+            self.writeNum(data.median())
+
+            self.writeParam("Std Deviation")
+            self.writeNum(data.std())
+
+            self.writeParam("Variance")
+            self.writeNum(data.var())
+
+            self.writeParam("Covariance")
+            self.writeNum(data.cov())
+
+            self.writeParam("Quantile 25%")
+            self.writeNum(data.quantile(q = 0.25))
+
+            self.writeParam("Quantile 50%")
+            self.writeNum(data.quantile(q = 0.5))
+
+            self.writeParam("Quantile 75%")
+            self.writeNum(data.quantile(q = 0.75))
+
+            self.writeParam("Correlation (Pearson)")
+            self.writeNum(data.corr(method = 'pearson'))
+
+            self.writeParam("Kurtosis")
+            self.writeNum(data.kurtosis())
+
+            self.writeParam("Skew")
+            self.writeNum(data.skew())
+
+            font = self.textResultsWindow.GetFont() 
+            font = wx.Font(font.GetPointSize(), wx.MODERN, 
+                       font.GetStyle(), 
+                       font.GetWeight(), font.GetUnderlined()) 
+            self.textResultsWindow.SetFont(font) 
+
+            # self.textResultsWindow.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Consolas'))
         
         # else:
         #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
+
+    def writeParam(self,text):
+        self.textResultsWindow.BeginBold()
+        self.textResultsWindow.BeginItalic()
+        self.textResultsWindow.WriteText("\n"+text+"\n")
+        self.textResultsWindow.EndItalic()
+        self.textResultsWindow.EndBold()
+
+    def writeNum(self,data,nodec = 3):
+        self.textResultsWindow.WriteText(data.round(nodec).to_string()+"\n")
+
+    def writeNumInt(self,data):
+        self.textResultsWindow.WriteText(data.to_string()+"\n")
 
 
     def noCheckBoxSelectedWarning(self):
