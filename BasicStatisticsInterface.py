@@ -463,7 +463,6 @@ class BasicStatisticsInterface ( wx.Dialog ):
         self.textResultsWindow.EndBold()
 
     def writeNum(self,data,nodec = 3):
-        print type(data)
         if type(data) == DataFrame:
             self.textResultsWindow.WriteText(data.round(nodec).to_string(col_space=10)+"\n")
         else:
