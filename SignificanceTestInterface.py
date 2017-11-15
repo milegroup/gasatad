@@ -25,7 +25,7 @@ import wx.richtext as rt
 class SignificanceTestInterface ( wx.Dialog ):
     
     def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, minimum, maximum, dataFrame ):
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Significance test", size =(1200, 600), pos = wx.DefaultPosition)
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Significance test", size =(1400, 600), pos = wx.DefaultPosition)
 
         self.SetMinSize((640, 480))
                 
@@ -75,7 +75,7 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         
         #LEFT SIZER
-        rightSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"VARIABLES" ), wx.VERTICAL )
+        rightSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data set #1" ), wx.VERTICAL )
         self.scrollSizer.Add( rightSizer, 0, wx.ALL, 10 )
         
         fgSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -169,7 +169,7 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         
         #RIGHT SIZER
-        leftSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"VARIABLES" ), wx.VERTICAL )
+        leftSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data set #2" ), wx.VERTICAL )
         self.scrollSizer.Add( leftSizer, 0, wx.ALL, 10 )
         
         fgSizer2 = wx.FlexGridSizer( 0, 2, 0, 0 )
@@ -276,19 +276,24 @@ class SignificanceTestInterface ( wx.Dialog ):
         panelSizer.Add(self.scrolledPanel, 1, wx.EXPAND)
         
         
+        close = wx.Button( self.panel, wx.ID_CANCEL, label="Close" )
+        showResults = wx.Button( self.panel, wx.ID_OK, label = "Show Results" )
+        self.Bind(wx.EVT_BUTTON, self.calculateData, showResults)
+
+        sizerBtns = wx.BoxSizer(wx.HORIZONTAL)
+        sizerBtns.Add( showResults, 1, wx.EXPAND | wx.ALL, 5 )
+        sizerBtns.Add( close, 1, wx.EXPAND | wx.ALL, 5 )
+        panelSizer.Add(sizerBtns, 0 , wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
-        okay = wx.Button( self.panel, wx.ID_OK, label = "Show Results" )
-        self.Bind(wx.EVT_BUTTON, self.calculateData, okay)
-        cancel = wx.Button( self.panel, wx.ID_CANCEL )
-        btns = wx.StdDialogButtonSizer()
-        btns.AddButton(okay)
-        btns.AddButton(cancel)
-        btns.Realize()
-        panelSizer.Add(btns)
+        # btns = wx.StdDialogButtonSizer()
+        # btns.AddButton(showResults)
+        # btns.AddButton(close)
+        # btns.Realize()
+        # panelSizer.Add(btns, 0 , wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5)
         #btn = wx.Button(self.panel, label="Add Widget")
         
 
-        self.panel.SetSizerAndFit(panelSizer)
+        self.panel.SetSizer(panelSizer)
         panelSizer.Layout()
         self.panel.Layout()
         
@@ -562,45 +567,69 @@ class SignificanceTestInterface ( wx.Dialog ):
         # print dataSelectedLP
         # print "## dataRP"
         # print dataSelectedRP
+        # print dataSelectedRP.count()
 
 
-        if (len(dataSelectedLP) > 0 and len(dataSelectedRP) > 0):
+        if (dataSelectedLP.count() > 0 and dataSelectedRP.count() > 0):
             
             self.textResultsWindow.BeginBold()
             self.textResultsWindow.BeginFontSize(12)
-            self.textResultsWindow.WriteText('SIGNIFICANCE TESTS')
+            self.textResultsWindow.WriteText('SIGNIFICANCE TEST')
             self.textResultsWindow.EndFontSize()
             self.textResultsWindow.EndBold()
             self.textResultsWindow.Newline()
 
             self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginFontSize(10)
-            self.textResultsWindow.WriteText(str(self.clickedRadiobuttonLeft) + ' Vs ' + str(self.clickedRadiobuttonRight))
+            self.textResultsWindow.BeginItalic()
+            self.textResultsWindow.BeginFontSize(11)
+            self.textResultsWindow.WriteText(str(self.clickedRadiobuttonLeft) + ' vs. ' + str(self.clickedRadiobuttonRight))
             self.textResultsWindow.EndFontSize()
+            self.textResultsWindow.EndItalic()
             self.textResultsWindow.EndBold()
             self.textResultsWindow.Newline()
             
-            
-            
-            #The string to return is created
-            toRet = ''            
-            
-            # print "## d1:\n",dataSelectedLP
-            # print "## d2:\n",dataSelectedRP
+                        
+            print "## d1:\n",dataSelectedLP
+            print "## d2:\n",dataSelectedRP
+
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginItalic()
+            self.textResultsWindow.WriteText("\nNo. of values\n")
+            self.textResultsWindow.EndItalic()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.WriteText('  '+str(self.clickedRadiobuttonLeft)+': '+str(dataSelectedLP.count())+'\n')
+            self.textResultsWindow.WriteText('  '+str(self.clickedRadiobuttonRight)+': '+str(dataSelectedRP.count())+'\n\n')
 
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var = False, nan_policy='omit')
-            toRet = toRet + 'T-test on TWO INDEPENDENT samples:\n'
-            toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginItalic()
+            self.textResultsWindow.WriteText("\nWelch's t-test on independent samples\n")
+            self.textResultsWindow.EndItalic()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
             
             temp1, temp2 = ks_2samp(dataSelectedLP, dataSelectedRP)
-            toRet = toRet + 'Kolmogorov-Smirnov on TWO samples:\n'
-            toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginItalic()
+            self.textResultsWindow.WriteText('\nKolmogorov-Smirnov test\n')
+            self.textResultsWindow.EndItalic()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
             
             temp1, temp2 = ranksums(dataSelectedLP, dataSelectedRP)
-            toRet = toRet + 'Wilcoxon rank-sum test:\n'
-            toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginItalic()
+            self.textResultsWindow.WriteText('\nWilcoxon rank-sum test\n')
+            self.textResultsWindow.EndItalic()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
 
-            self.textResultsWindow.AppendText(toRet)
+            font = self.textResultsWindow.GetFont() 
+            font = wx.Font(font.GetPointSize(), wx.MODERN,
+                font.GetStyle(), font.GetWeight(),
+                font.GetUnderlined()) 
+            self.textResultsWindow.SetFont(font) 
+
             
         else:
             

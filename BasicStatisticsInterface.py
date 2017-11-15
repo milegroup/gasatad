@@ -74,7 +74,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         self.scrollSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        dataSelectionSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data selection" ), wx.VERTICAL )
+        dataSelectionSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, u"Data set" ), wx.VERTICAL )
         
         self.scrollSizer.Add( dataSelectionSizer, 0, wx.EXPAND | wx.ALL, 10 )
         
