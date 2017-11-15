@@ -388,9 +388,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
     def calculateData(self, event):
         
         self.textResultsWindow.Clear()
-        
-        self.toShow = ''
-        
+                
         data = self.getSelectedData()
                 
         if not data.empty:

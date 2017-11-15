@@ -263,10 +263,10 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.listOfSpinCtrlRight.append(self.m_spinCtrl21)    
         
         #TEXT CONTROL
-        self.m_textCtrl = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL | wx.HSCROLL | wx.TE_MULTILINE | wx.TE_READONLY | wx.NO_BORDER)
-        self.m_textCtrl.SetMargins((20,20))
+        self.textResultsWindow = rt.RichTextCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, wx.VSCROLL | wx.HSCROLL | wx.TE_MULTILINE | wx.TE_READONLY | wx.NO_BORDER)
+        self.textResultsWindow.SetMargins((20,20))
         
-        self.scrollSizer.Add( self.m_textCtrl, 1,  wx.ALL | wx.EXPAND , 20 )
+        self.scrollSizer.Add( self.textResultsWindow, 1,  wx.ALL | wx.EXPAND , 20 )
         
         
         self.scrolledPanel.SetSizerAndFit(self.scrollSizer)
@@ -545,7 +545,9 @@ class SignificanceTestInterface ( wx.Dialog ):
             return indicesToReturn
         
         
-    def resultsSignificanceTests(self):
+    def calculateData(self, event):           
+        
+        self.textResultsWindow.Clear()
         
         listIndex1 = self.getSelectedData(self.activatedCheckBoxesLeft, self.listOfSpinCtrlLeft, self.selectedVariablesInColumnLeft)
         listIndex2 = self.getSelectedData(self.activatedCheckBoxesRight, self.listOfSpinCtrlRight, self.selectedVariablesInColumnRight)
@@ -564,13 +566,21 @@ class SignificanceTestInterface ( wx.Dialog ):
 
         if (len(dataSelectedLP) > 0 and len(dataSelectedRP) > 0):
             
-            self.m_textCtrl.BeginAlignment(wx.TEXT_ALIGNMENT_CENTER)
-            self.m_textCtrl.BeginBold()
-            self.m_textCtrl.BeginFontSize(15)
-            self.m_textCtrl.WriteText('RESULTS FOR ' + str(self.clickedRadiobuttonLeft) + ' Vs ' + str(self.clickedRadiobuttonRight) + '\n\n')
-            self.m_textCtrl.EndAlignment()
-            self.m_textCtrl.EndBold()
-            self.m_textCtrl.EndFontSize()
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginFontSize(12)
+            self.textResultsWindow.WriteText('SIGNIFICANCE TESTS')
+            self.textResultsWindow.EndFontSize()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.Newline()
+
+            self.textResultsWindow.BeginBold()
+            self.textResultsWindow.BeginFontSize(10)
+            self.textResultsWindow.WriteText(str(self.clickedRadiobuttonLeft) + ' Vs ' + str(self.clickedRadiobuttonRight))
+            self.textResultsWindow.EndFontSize()
+            self.textResultsWindow.EndBold()
+            self.textResultsWindow.Newline()
+            
+            
             
             #The string to return is created
             toRet = ''            
@@ -589,22 +599,15 @@ class SignificanceTestInterface ( wx.Dialog ):
             temp1, temp2 = ranksums(dataSelectedLP, dataSelectedRP)
             toRet = toRet + 'Wilcoxon rank-sum test:\n'
             toRet = toRet + 'Statistic: {0}  p-value: {1}\n\n'.format(temp1, temp2)
+
+            self.textResultsWindow.AppendText(toRet)
             
-            return toRet
         else:
             
             wx.MessageBox("There is no data that match the selected filters in one of the variables", "Attention!",
                                    wx.OK | wx.ICON_EXCLAMATION)
-            toRet = ''
-            return toRet
 
 
-
-    def calculateData(self, event):           
-        
-        self.m_textCtrl.Clear()
-        toShow = self.resultsSignificanceTests()
-        self.m_textCtrl.AppendText(toShow)
 
     
     def wrongIntervalWarning(self):
