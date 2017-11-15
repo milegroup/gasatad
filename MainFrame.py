@@ -605,7 +605,8 @@ class MainFrame ( wx.Frame ):
         
         try:
                 self.Datafile = open(fileName, 'rU')            
-                self.data = read_csv(self.Datafile, sep = None, index_col = 0, engine = 'python')
+                self.data = read_csv(self.Datafile, sep = None, engine = 'python')
+                self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 self.controller.OpenFile(self.data)  
