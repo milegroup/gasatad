@@ -196,31 +196,31 @@ class BasicStatisticsInterface ( wx.Dialog ):
 
         if checkBox.IsChecked():
             
-            self.activatedCheckBoxes.append(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxes.append(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrl[i].GetName().split("-")[0]:
     
                 i = i+1
              
              
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrl[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrl[i].Enable()
                 self.listOfSpinCtrl[i + 1].Enable()
                         
         else:
             
-            self.activatedCheckBoxes.remove(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxes.remove(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrl[i].GetName().split("-")[0]:
     
                 i = i+1
             
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrl[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrl[i].Enable(False)
                 self.listOfSpinCtrl[i + 1].Enable(False)
@@ -236,11 +236,11 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         if checkBox.IsChecked():
             
-            self.selectedCheckBoxes.append(checkBox.GetLabel().encode("utf-8"))
+            self.selectedCheckBoxes.append(checkBox.GetLabel())
                         
         else:
             
-            self.selectedCheckBoxes.remove(checkBox.GetLabel().encode("utf-8"))
+            self.selectedCheckBoxes.remove(checkBox.GetLabel())
 
 
     
@@ -248,8 +248,8 @@ class BasicStatisticsInterface ( wx.Dialog ):
         
         checkBox = event.GetEventObject()
         
-        label = checkBox.GetLabel().encode("utf-8")
-        nameCheckBox = checkBox.GetName().encode("utf-8")       
+        label = checkBox.GetLabel()
+        nameCheckBox = checkBox.GetName()       
                 
         if checkBox.IsChecked():
             
@@ -269,10 +269,10 @@ class BasicStatisticsInterface ( wx.Dialog ):
         for checkBox in self.activatedCheckBoxes:
             i = 0
             
-            while checkBox != self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox != self.listOfSpinCtrl[i].GetName().split("-")[0]:
                 i = i+1
             
-            if checkBox == self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox == self.listOfSpinCtrl[i].GetName().split("-")[0]:
                 limitInf = self.listOfSpinCtrl[i].GetValue()
                 limitSup = self.listOfSpinCtrl[i + 1].GetValue()
                 self.intervalNameAndLimitsLeft[checkBox] = [limitInf, limitSup]
@@ -383,7 +383,6 @@ class BasicStatisticsInterface ( wx.Dialog ):
                                                                     #seleccionadas en la interfaz gráfica 
                         indicesToReturn.append(indices[0][i])
             
-             
             return self.dataToAnalyse.loc[indicesToReturn, self.selectedCheckBoxes]
     
     

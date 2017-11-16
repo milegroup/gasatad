@@ -24,7 +24,7 @@ import wx.richtext as rt
 
 class SignificanceTestInterface ( wx.Dialog ):
     
-    def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, minimum, maximum, dataFrame ):
+    def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, dataFrame ):
         
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Significance test", size =(1400, 600), pos = wx.DefaultPosition)
 
@@ -32,10 +32,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 
         
         self.dataToAnalyse = dataFrame
-        self.min = minimum
-        self.max = maximum
-        
-        
+
         #All needed lists
         self.selectedVariablesInColumnLeft = dict.fromkeys(tagsAndValues.keys())
         self.selectedVariablesInColumnRight = dict.fromkeys(tagsAndValues.keys())
@@ -141,6 +138,8 @@ class SignificanceTestInterface ( wx.Dialog ):
             fgSizer.Add( auxSizer2, 0,  wx.ALL| wx.EXPAND, 5)
             
             for i in integerValues:
+                minimum = int(min(self.dataToAnalyse[i]))
+                maximum = int(max(self.dataToAnalyse[i]))
             
                 self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_checkBox.SetFont( wx.Font( 10, wx.DEFAULT, wx.NORMAL, wx.BOLD, False, wx.EmptyString ) )
@@ -153,7 +152,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText11.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl11 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitInf")
+                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, str(i) + "-LimitInf")
                 auxSizer2.Add( self.m_spinCtrl11, 0, wx.ALL, 5 )
                 self.m_spinCtrl11.Enable(False)
             
@@ -161,7 +160,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText21.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl21 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitSup")
+                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, str(i) + "-LimitSup")
                 auxSizer2.Add( self.m_spinCtrl21, 0, wx.ALL, 5 )
                 self.m_spinCtrl21.Enable(False) 
                 
@@ -236,6 +235,8 @@ class SignificanceTestInterface ( wx.Dialog ):
             #self.ListOfAuxSizers.append(auxSizer2)
             
             for i in integerValues:
+                minimum = int(min(self.dataToAnalyse[i]))
+                maximum = int(max(self.dataToAnalyse[i]))
             
                 self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_checkBox.SetFont( wx.Font( 10, wx.DEFAULT, wx.NORMAL, wx.BOLD, False, wx.EmptyString ) )
@@ -248,7 +249,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText11.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl11 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitInf")
+                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, str(i) + "-LimitInf")
                 auxSizer2.Add( self.m_spinCtrl11, 0, wx.ALL, 5 )
                 self.m_spinCtrl11.Enable(False)                
                 
@@ -256,7 +257,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText21.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl21 = wx.SpinCtrl( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS, minimum, maximum, 0, str(i) + "-LimitSup")
+                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, str(i) + "-LimitSup")
                 auxSizer2.Add( self.m_spinCtrl21, 0, wx.ALL, 5 )
                 self.m_spinCtrl21.Enable(False)
                 
@@ -310,31 +311,31 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         if checkBox.IsChecked():
             
-            self.activatedCheckBoxesLeft.append(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxesLeft.append(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrlLeft[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrlLeft[i].GetName().split("-")[0]:
     
                 i = i+1
              
              
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrlLeft[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrlLeft[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrlLeft[i].Enable()
                 self.listOfSpinCtrlLeft[i + 1].Enable()
                         
         else:
             
-            self.activatedCheckBoxesLeft.remove(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxesLeft.remove(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrlLeft[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrlLeft[i].GetName().split("-")[0]:
     
                 i = i+1
             
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrlLeft[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrlLeft[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrlLeft[i].Enable(False)
                 self.listOfSpinCtrlLeft[i + 1].Enable(False)
@@ -347,31 +348,31 @@ class SignificanceTestInterface ( wx.Dialog ):
         
         if checkBox.IsChecked():
             
-            self.activatedCheckBoxesRight.append(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxesRight.append(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrlRight[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrlRight[i].GetName().split("-")[0]:
     
                 i = i+1
              
              
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrlRight[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrlRight[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrlRight[i].Enable()
                 self.listOfSpinCtrlRight[i + 1].Enable()
                         
         else:
             
-            self.activatedCheckBoxesRight.remove(checkBox.GetLabel().encode("utf-8"))
+            self.activatedCheckBoxesRight.remove(checkBox.GetLabel())
             
             i = 0
             
-            while checkBox.GetLabel().encode("utf-8") != self.listOfSpinCtrlRight[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox.GetLabel() != self.listOfSpinCtrlRight[i].GetName().split("-")[0]:
     
                 i = i+1
             
-            if checkBox.GetLabel().encode("utf-8") == self.listOfSpinCtrlRight[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox.GetLabel() == self.listOfSpinCtrlRight[i].GetName().split("-")[0]:
                 
                 self.listOfSpinCtrlRight[i].Enable(False)
                 self.listOfSpinCtrlRight[i + 1].Enable(False)
@@ -381,14 +382,14 @@ class SignificanceTestInterface ( wx.Dialog ):
     def changeSelectedRadioButtonLeft(self, event):   
         
         radioButton = event.GetEventObject()
-        self.clickedRadiobuttonLeft = radioButton.GetLabel().encode("utf-8")
+        self.clickedRadiobuttonLeft = radioButton.GetLabel()
         
             
     
     def changeSelectedRadioButtonRight(self, event):   
         
         radioButton = event.GetEventObject()
-        self.clickedRadiobuttonRight = radioButton.GetLabel().encode("utf-8")
+        self.clickedRadiobuttonRight = radioButton.GetLabel()
         
     
 
@@ -396,8 +397,8 @@ class SignificanceTestInterface ( wx.Dialog ):
 
         checkBox = event.GetEventObject()
     
-        label = checkBox.GetLabel().encode("utf-8")
-        nameCheckBox = checkBox.GetName().encode("utf-8")       
+        label = checkBox.GetLabel()
+        nameCheckBox = checkBox.GetName()       
                 
         if checkBox.IsChecked():
             
@@ -412,8 +413,8 @@ class SignificanceTestInterface ( wx.Dialog ):
 
         checkBox = event.GetEventObject()
     
-        label = checkBox.GetLabel().encode("utf-8")
-        nameCheckBox = checkBox.GetName().encode("utf-8")       
+        label = checkBox.GetLabel()
+        nameCheckBox = checkBox.GetName()       
                 
         if checkBox.IsChecked():
             
@@ -433,11 +434,11 @@ class SignificanceTestInterface ( wx.Dialog ):
         
             i = 0
             
-            while checkBox != listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox != listOfSpinCtrl[i].GetName().split("-")[0]:
     
                 i = i+1
             
-            if checkBox == listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox == listOfSpinCtrl[i].GetName().split("-")[0]:
                 
                 limitInf = listOfSpinCtrl[i].GetValue()
                 limitSup = listOfSpinCtrl[i + 1].GetValue()
@@ -583,7 +584,7 @@ class SignificanceTestInterface ( wx.Dialog ):
             self.textResultsWindow.BeginBold()
             self.textResultsWindow.BeginItalic()
             self.textResultsWindow.BeginFontSize(11)
-            self.textResultsWindow.WriteText(str(self.clickedRadiobuttonLeft) + ' vs. ' + str(self.clickedRadiobuttonRight))
+            self.textResultsWindow.WriteText(self.clickedRadiobuttonLeft + ' vs. ' + self.clickedRadiobuttonRight)
             self.textResultsWindow.EndFontSize()
             self.textResultsWindow.EndItalic()
             self.textResultsWindow.EndBold()
@@ -598,8 +599,8 @@ class SignificanceTestInterface ( wx.Dialog ):
             self.textResultsWindow.WriteText("\nNo. of values\n")
             self.textResultsWindow.EndItalic()
             self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText('  '+str(self.clickedRadiobuttonLeft)+': '+str(dataSelectedLP.count())+'\n')
-            self.textResultsWindow.WriteText('  '+str(self.clickedRadiobuttonRight)+': '+str(dataSelectedRP.count())+'\n\n')
+            self.textResultsWindow.WriteText('  '+self.clickedRadiobuttonLeft+': '+str(dataSelectedLP.count())+'\n')
+            self.textResultsWindow.WriteText('  '+self.clickedRadiobuttonRight+': '+str(dataSelectedRP.count())+'\n\n')
 
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var = False, nan_policy='omit')
             self.textResultsWindow.BeginBold()
@@ -675,11 +676,11 @@ class ValidatorForFactors(wx.PyValidator):
         
             i = 0
             
-            while checkBox != self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            while checkBox != self.listOfSpinCtrl[i].GetName().split("-")[0]:
     
                 i = i+1
             
-            if checkBox == self.listOfSpinCtrl[i].GetName().split("-")[0].encode("utf-8"):
+            if checkBox == self.listOfSpinCtrl[i].GetName().split("-")[0]:
                 
                 limitInf = self.listOfSpinCtrl[i].GetValue()
                 limitSup = self.listOfSpinCtrl[i + 1].GetValue()

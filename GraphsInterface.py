@@ -448,9 +448,9 @@ class ScatterPlotInterface ( wx.Dialog ):
         checkBox = event.GetEventObject()
         
         if checkBox.IsChecked():
-            self.selectedCheckBoxes.append(checkBox.GetLabel().encode("utf-8"))
+            self.selectedCheckBoxes.append(checkBox.GetLabel())
         else:
-            self.selectedCheckBoxes.remove(checkBox.GetLabel().encode("utf-8"))
+            self.selectedCheckBoxes.remove(checkBox.GetLabel())
         
         if len(self.selectedCheckBoxes)==1:
             self.yAxisNameTextCtrl.SetValue(self.selectedCheckBoxes[0])
@@ -758,7 +758,7 @@ class BoxPlotInterface ( wx.Dialog ):
         #Here the checkboxes are created
         for i in listOfVariables:
             
-            self.m_checkBox = wx.CheckBox( self, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_checkBox = wx.CheckBox( self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
             fgSizer5.Add( self.m_checkBox, 0, wx.ALL| wx.EXPAND, 5 )
             
             self.Bind(wx.EVT_CHECKBOX, self.updateSelectedCheckBoxes,self.m_checkBox)
@@ -831,9 +831,9 @@ class BoxPlotInterface ( wx.Dialog ):
     def updateSelectedCheckBoxes(self, event):
         checkBox = event.GetEventObject()
         if checkBox.IsChecked():
-            self.selectedCheckBoxes.append(checkBox.GetLabel().encode("utf-8"))      
+            self.selectedCheckBoxes.append(checkBox.GetLabel())      
         else:
-            self.selectedCheckBoxes.remove(checkBox.GetLabel().encode("utf-8"))
+            self.selectedCheckBoxes.remove(checkBox.GetLabel())
         
     def updateShowGrid(self, event):
         radioButton = event.GetEventObject()

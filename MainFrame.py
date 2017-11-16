@@ -1065,10 +1065,9 @@ class MainFrame ( wx.Frame ):
             
             dataFrame = self.controller.programState.dataToAnalyse
             variablesList = self.controller.floatValues + self.controller.integerValues
-            minimum = int(self.controller.programState.dataToAnalyse.min(numeric_only = True).min().round()) -1
-            maximum = int(self.controller.programState.dataToAnalyse.max(numeric_only = True).max().round()) +1
+
             
-            significanceTestFrame = SignificanceTestInterface(self, variablesList, self.tagsAndValues, self.controller.integerValues, minimum, maximum, dataFrame)
+            significanceTestFrame = SignificanceTestInterface(self, variablesList, self.tagsAndValues, self.controller.integerValues, dataFrame)
             significanceTestFrame.Show()
     
             if significanceTestFrame.ShowModal() == wx.ID_CANCEL:
@@ -1346,11 +1345,11 @@ class DeleteColumnsInterface ( wx.Dialog ):
         
         if checkBox.IsChecked():
             
-            self.selectedColumns[checkBox.GetLabel().encode("utf-8")]= True
+            self.selectedColumns[checkBox.GetLabel()]= True
                         
         else:
             
-            self.selectedColumns[checkBox.GetLabel().encode("utf-8")]= False
+            self.selectedColumns[checkBox.GetLabel()]= False
 
          
             
@@ -1465,15 +1464,14 @@ class ExportCsvOptions ( wx.Dialog ):
     
     def setCharacterSetValue(self, event):
         
-        option = event.GetEventObject().GetValue().encode("utf-8").lower()
+        option = event.GetEventObject().GetValue().lower()
         
         self.exportOptions.setCharacterSet(option)
     
     
     def setFieldDelimiterValue(self, event):
         
-        option = event.GetEventObject().GetValue().encode("utf-8")
-        
+        option = event.GetEventObject().GetValue()
         if option == "{Tab}":
             
             self.exportOptions.setFieldDelimiter("\t")
@@ -1490,7 +1488,7 @@ class ExportCsvOptions ( wx.Dialog ):
             
     def setDecimalSeparatorValue(self,event):
         
-        option = event.GetEventObject().GetValue().encode("utf-8")
+        option = event.GetEventObject().GetValue()
         
         self.exportOptions.setdecimalSeparator(option)
     

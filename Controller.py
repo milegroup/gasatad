@@ -234,7 +234,7 @@ class Controller():
     def createHistogram(self, histogramOptions):
 
         # No tag selected
-        if histogramOptions['secondVarSelected'].encode('utf-8') == 'None'.encode('utf-8'):
+        if histogramOptions['secondVarSelected'] == 'None':
             
             dataForChart = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
             dataForChart = [ x for x in dataForChart if str(x) != 'nan']
@@ -307,7 +307,7 @@ class Controller():
             elif histogramOptions['yAxisGrid']:                
                 plt.grid(axis = 'y')
             
-            if histogramOptions['legendPosition'] == "default".encode("utf-8"):
+            if histogramOptions['legendPosition'] == "default":
                 plt.legend()
             else:
                 plt.legend(loc = histogramOptions['legendPosition'])
@@ -356,7 +356,7 @@ class Controller():
             plt.xlim(xmin,xmax)
             plt.ylim(ymin-yf,ymax+yf)
 
-            if scatterOptions['legendPosition'] == "default".encode("utf-8"):
+            if scatterOptions['legendPosition'] == "default":
                 plt.legend(scatterpoints=1)
             else:
                 plt.legend(loc = scatterOptions['legendPosition'], scatterpoints=1)
@@ -424,7 +424,7 @@ class Controller():
         for v in dataForPie:
             sizes.append(100.0*v/numberSamples)
 
-        if pieChartOptions['legendPosition'] == "default".encode("utf-8"):
+        if pieChartOptions['legendPosition'] == "default":
             for l in dataForPie.index:
                 labels.append(l)
             patches = plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=90, colors=self.colorsPatch, explode=explode)
@@ -493,7 +493,7 @@ class Controller():
         operation = barChartOptions['operation']
 
         # No tag selected
-        if barChartOptions['secondVarSelected'].encode('utf-8') == 'None'.encode('utf-8'):
+        if barChartOptions['secondVarSelected'] == 'None':
             
             if operation == 'Mean':
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].mean()

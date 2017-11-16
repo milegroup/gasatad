@@ -339,7 +339,7 @@ class AddColumnInterface ( wx.Dialog ):
             Se crea un diccionario cuya clave es el nombre del factor y el valor es el par compuesto por el 
             límite superior e inferior del intervalo
             ''' 
-            self.factorsAndValues[textControl.GetValue().encode("utf-8")] = self.paarList[index]
+            self.factorsAndValues[textControl.GetValue()] = self.paarList[index]
             
             index += 1
         
