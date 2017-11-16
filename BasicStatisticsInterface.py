@@ -416,6 +416,9 @@ class BasicStatisticsInterface ( wx.Dialog ):
             self.writeParam("Median")
             self.writeNum(data.median())
 
+            self.writeParam("Mode")
+            self.writeNum(data.mode())
+
             self.writeParam("Std Deviation")
             self.writeNum(data.std())
 
