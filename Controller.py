@@ -75,7 +75,7 @@ class Controller():
         try:
             self.recalculateRowsIndexes()
         except:
-            print "Error: ", sys.exc_info()
+            # print "Error: ", sys.exc_info()
             None
 
         self.programState.setInformationFile(len(data.columns), len(data.index))

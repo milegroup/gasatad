@@ -648,98 +648,95 @@ class MainFrame ( wx.Frame ):
         self.Layout()
 
 
-
-
     def OpenFile(self, event, fileName = None):       
         
-        self.Datafile = None
+        readCorrect = True
         self.data = None
         
-        try:
             
-            self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
-            
-            wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
-            
-            if wOpenFile.ShowModal() == wx.ID_OK:
-                self.filename = wOpenFile.GetFilename()
-                self.directory = wOpenFile.GetDirectory()
-                self.params['options']['dirfrom'] = self.directory
-                self.Datafile = open(os.path.join(self.directory, self.filename), 'rU')
-                self.fileExtension = self.filename.rpartition(".")[-1]
+        self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
+        
+        wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
+        
+        if wOpenFile.ShowModal() == wx.ID_OK:
+            self.filename = wOpenFile.GetFilename()
+            self.directory = wOpenFile.GetDirectory()
+            self.params['options']['dirfrom'] = self.directory
+            self.fileExtension = self.filename.rpartition(".")[-1]
 
-                discardCol = False
-                if self.params['options']['discardfirstcolumn']=='True':
-                    discardCol=True
+            discardCol = False
+            if self.params['options']['discardfirstcolumn']=='True':
+                discardCol=True
 
-                sepChar = ''
-                if self.params['options']['sepchar']=="Comma":
-                    sepChar=','
-                elif self.params['options']['sepchar']=="Semicolon":
-                    sepChar=';'
-                elif self.params['options']['sepchar']=="Tab":
-                    sepChar='\t'
-
+            try:
                 if self.fileExtension == "csv":
-                    self.data = read_csv(self.Datafile, sep = sepChar, header=0, engine = 'python')    
+                    sepChar = ''
+                    if self.params['options']['sepchar']=="Comma":
+                        sepChar=','
+                    elif self.params['options']['sepchar']=="Semicolon":
+                        sepChar=';'
+                    elif self.params['options']['sepchar']=="Tab":
+                        sepChar='\t'
+                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python')    
                 if self.fileExtension == "xlsx" or self.fileExtension == "xls":
-                    self.data = read_excel(self.Datafile,sheetname=0, header = 0)
+                    self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
+            except:
+                # print "Error: ", sys.exc_info()
+                type, value, traceback = sys.exc_info()
+                self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+                readCorrect = False
 
+            
+            wOpenFile.Destroy()
+
+            if readCorrect:
                 if discardCol:
-                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
+                    self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
+            
+                self.controller.OpenFile(self.data)
                 
-                wOpenFile.Destroy()
+                self.m_menuAddFile.Enable(True)
+                self.m_menuNewFile.Enable(False)                                            
 
-                if (self.Datafile is not None):
-                    self.controller.OpenFile(self.data )
-                    
-                    self.m_menuAddFile.Enable(True)
-                    self.m_menuNewFile.Enable(False)                                            
+                self.fillInGrid()
+                self.m_dataTable.AutoSize()
+                self.markTextColumns()
+                self.markNans() 
+                self.Layout()
+                self.m_dataTable.Enable()
 
-                    self.fillInGrid()
-                    self.m_dataTable.AutoSize()
-                    self.markTextColumns()
-                    self.markNans() 
-                    self.Layout()
-                    self.m_dataTable.Enable()
-
-                    if self.controller.nullValuesInFile(self.data):
-                        self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
-                        if self.dlg.ShowModal() == wx.ID_OK:
-                            self.dlg.Destroy()
+                if self.controller.nullValuesInFile(self.data):
+                    self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
+                    if self.dlg.ShowModal() == wx.ID_OK:
+                        self.dlg.Destroy()
+            
+                self.descriptiveStatsBtn.Enable()
+                self.newColumnBtn.Enable()
+                self.resetDataBtn.Enable()
+                self.deleteColumnsBtn.Enable()
+                self.exportDataBtn.Enable()
                 
-                    self.descriptiveStatsBtn.Enable()
-                    self.newColumnBtn.Enable()
-                    self.resetDataBtn.Enable()
-                    self.deleteColumnsBtn.Enable()
-                    self.exportDataBtn.Enable()
+                self.m_menuResetData.Enable()
+                self.histogramBtn.Enable()
+                self.scatterPlotBtn.Enable()
+                self.pieChartBtn.Enable()
+                self.boxPlotBtn.Enable()
+                self.barChartBtn.Enable()
+                self.significanceTestBtn.Enable() 
+
                     
-                    self.m_menuResetData.Enable()
-                    self.histogramBtn.Enable()
-                    self.scatterPlotBtn.Enable()
-                    self.pieChartBtn.Enable()
-                    self.boxPlotBtn.Enable()
-                    self.barChartBtn.Enable()
-                    self.significanceTestBtn.Enable() 
+                self.params['dataPresent'] = True
+                self.params['noOfFiles'] += 1
+                self.updateDataInfo()
+                # self.firstFileAdded()
 
-                        
-                    self.params['dataPresent'] = True
-                    self.params['noOfFiles'] += 1
-                    self.updateDataInfo()
-                    # self.firstFileAdded()
+        
 
-        except:
-            
-            # print("Error: ", sys.exc_info()[0])
-            type, value, traceback = sys.exc_info()
-            
-            self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
-            
-            if self.dlg.ShowModal() == wx.ID_OK:
-            
-                self.dlg.Destroy()
 
+  
 
                 
     def OpenAdditionalFile(self, *events):       
