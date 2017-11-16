@@ -93,7 +93,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
  
         for i in namesCheckBox:
         
-            self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
             checkSizer.Add( self.m_checkBox, 0, wx.ALL| wx.EXPAND, 5 )
             #self.listOfCheckBoxes.append(self.m_checkBox)
             
@@ -292,6 +292,7 @@ class BasicStatisticsInterface ( wx.Dialog ):
             return DataFrame()
             
         else: # Everything is Ok
+
             tempList = []
             
             # Lista de listas
@@ -304,9 +305,10 @@ class BasicStatisticsInterface ( wx.Dialog ):
             # tempList contains the marked discrete variables
             
             if not tempList:
-                
+
                 auxIndex1 = list(self.dataToAnalyse.index)
                 indices.append(auxIndex1)
+
             
                 if self.intervalNameAndLimitsLeft:
                     for nameVariable, paarList in self.intervalNameAndLimitsLeft.iteritems():

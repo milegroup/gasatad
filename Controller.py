@@ -69,15 +69,9 @@ class Controller():
    
 
     def OpenFile (self, data):
-         
         self.programState.quantitativeData = data
         self.programState.dataToAnalyse = data
-        try:
-            self.recalculateRowsIndexes()
-        except:
-            # print "Error: ", sys.exc_info()
-            None
-
+        self.recalculateRowsIndexes()
         self.programState.setInformationFile(len(data.columns), len(data.index))
 
 
@@ -152,9 +146,7 @@ class Controller():
 
 
     def recalculateRowsIndexes(self):
-        newIndexes = range(0,len(self.programState.dataToAnalyse.index))
-        self.programState.dataToAnalyse.reindex(newIndexes)
-        #self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
+        self.programState.dataToAnalyse.index = range(0,len(self.programState.dataToAnalyse.index))
 
 
         

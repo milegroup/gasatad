@@ -25,6 +25,7 @@ import wx.richtext as rt
 class SignificanceTestInterface ( wx.Dialog ):
     
     def __init__( self, parent, namesCheckBox,  tagsAndValues, integerValues, minimum, maximum, dataFrame ):
+        
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Significance test", size =(1400, 600), pos = wx.DefaultPosition)
 
         self.SetMinSize((640, 480))
@@ -95,13 +96,13 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             #Si es el primer elemento
             if i == namesCheckBox[0]:
-                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
                 checkSizer.Add( self.m_radioBtn15, 0, wx.ALL| wx.EXPAND, 5 )
                 self.Bind(wx.EVT_RADIOBUTTON, self.changeSelectedRadioButtonLeft, self.m_radioBtn15)
                 
                 
             else:    
-                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
                 checkSizer.Add( self.m_radioBtn15, 0, wx.ALL| wx.EXPAND, 5 )
                 self.Bind(wx.EVT_RADIOBUTTON, self.changeSelectedRadioButtonLeft, self.m_radioBtn15)
         
@@ -189,12 +190,12 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             #Si es el primer elemento
             if i == namesCheckBox[0]:
-                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
+                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP )
                 checkSizer2.Add( self.m_radioBtn15, 0, wx.ALL| wx.EXPAND, 5 )
                 self.Bind(wx.EVT_RADIOBUTTON, self.changeSelectedRadioButtonRight, self.m_radioBtn15)
                 
             else:    
-                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+                self.m_radioBtn15 = wx.RadioButton( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
                 checkSizer2.Add( self.m_radioBtn15, 0, wx.ALL| wx.EXPAND, 5 )
                 self.Bind(wx.EVT_RADIOBUTTON, self.changeSelectedRadioButtonRight, self.m_radioBtn15)
                 
@@ -563,9 +564,9 @@ class SignificanceTestInterface ( wx.Dialog ):
         #RP means Right Panel        
         dataSelectedRP = self.dataToAnalyse.loc[listIndex2, self.clickedRadiobuttonRight]
 
-        # print "## dataLP"
+        # print "# dataLP"
         # print dataSelectedLP
-        # print "## dataRP"
+        # print "# dataRP"
         # print dataSelectedRP
         # print dataSelectedRP.count()
 
@@ -589,8 +590,8 @@ class SignificanceTestInterface ( wx.Dialog ):
             self.textResultsWindow.Newline()
             
                         
-            print "## d1:\n",dataSelectedLP
-            print "## d2:\n",dataSelectedRP
+            # print "# d1:\n",dataSelectedLP
+            # print "# d2:\n",dataSelectedRP
 
             self.textResultsWindow.BeginBold()
             self.textResultsWindow.BeginItalic()
