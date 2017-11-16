@@ -1,6 +1,5 @@
 ALL:
 	Help
-	When exporting csvs, it always adds the .csv extension (check this)
 	Problem when reading xls or xlsx files
 	When network is slow, it takes a while to open
 	Review buttons, menus...

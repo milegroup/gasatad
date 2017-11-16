@@ -917,17 +917,14 @@ class MainFrame ( wx.Frame ):
             self.directory = saveFile.GetDirectory()
             
             path = self.directory + "/" + self.filename
-            
             exportCsv = ExportCsvOptions(self)
             
             if exportCsv.ShowModal() == wx.ID_OK:
-                
-                self.controller.exportData(path + '.csv', exportCsv.getSelectedExportOptions())
+                self.controller.exportData(path, exportCsv.getSelectedExportOptions())
 
 
     
     def resetData(self, event):
-        
         
         self.controller.resetDataToAnalyse()
 
