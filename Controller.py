@@ -47,23 +47,20 @@ class Controller():
 
         dataFrame_1.reset_index(drop=True, inplace=True)
         dataFrame_2.reset_index(drop=True, inplace=True)
-               
         nameColumns = list(dataFrame_1.columns)
-        
+
         for column in dataFrame_2.columns:
-            
+            print "@@",column," - ",type(column)
             colIndex=2
-            auxColumn = str(column)
+            auxColumn = column
             while auxColumn in dataFrame_1.columns:
-                auxColumn = str(column) + "_" + str(colIndex)
+                auxColumn = column + "_" + str(colIndex)
                 colIndex += 1
-                    
             nameColumns.append(auxColumn)
-            
+
         self.data = pandas.concat([dataFrame_1,dataFrame_2], axis = 1)
-        
         self.data.columns = nameColumns
-        
+
         return self.data
 
    
@@ -77,35 +74,20 @@ class Controller():
 
 
     def OpenAdditionalFile (self,data):
-         
         try:
             sameNumberRows = False
-            
             self.programState.qualitativeData = data
-
-            
             if len(data.index) == (self.programState.informationFile.numRows):
-                
                 sameNumberRows = True
-            
             if self.programState.qualitativeData is not None:
-                
                 self.programState.dataToAnalyse = self.ConcatDataFrame(self.programState.quantitativeData, self.programState.qualitativeData)
                 self.programState.quantitativeData = self.programState.dataToAnalyse
-                # self.programState.setInformationAdditionalFile(len(data.columns), len(data.index), nameOfFile)
                 self.recalculateRowsIndexes()
-    
             return sameNumberRows
-        
         except:
-            
-            print "Error: ", sys.exc_info()[0]
+            print "Error: ", sys.exc_info()
 
-    
-    
-    
     def getDataToAnalyse(self):
-        
         return self.programState.dataToAnalyse       
 
 
