@@ -653,7 +653,6 @@ class MainFrame ( wx.Frame ):
         readCorrect = True
         fileType = "csv"
         self.data = None
-        
             
         self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
         
@@ -689,7 +688,6 @@ class MainFrame ( wx.Frame ):
                 if self.dlg.ShowModal() == wx.ID_OK:
                     self.dlg.Destroy()
                 readCorrect = False
-
             
             wOpenFile.Destroy()
 
@@ -733,12 +731,6 @@ class MainFrame ( wx.Frame ):
                 self.params['dataPresent'] = True
                 self.params['noOfFiles'] += 1
                 self.updateDataInfo()
-                # self.firstFileAdded()
-
-        
-
-
-  
 
                 
     def OpenAdditionalFile(self, *events):       
@@ -782,14 +774,17 @@ class MainFrame ( wx.Frame ):
                     self.dlg.Destroy()
                 readCorrect = False
 
+            if readCorrect and self.controller.OpenAdditionalFile(self.data)==False:
+                self.dlg = wx.MessageDialog(None, "Number of rows does not match: \n  Loaded data has "+str(self.m_dataTable.GetNumberRows())+" rows \n  File "+self.filename+" has "+str(len(self.data.index))+" rows ", "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+                readCorrect = False
+
             if readCorrect:
                 if discardCol and fileType=="csv":
                     self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                if self.controller.OpenAdditionalFile(self.data)==False:
-                    raise ValueError("No. of rows does not match")
-
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
                 self.markTextColumns()
@@ -811,7 +806,10 @@ class MainFrame ( wx.Frame ):
 
                 self.params['noOfFiles'] += 1
                 self.updateDataInfo()
-                #self.m_menuAddFile.Enable(False)              
+
+                # Move the view of the table to the last column
+                self.m_dataTable.SetGridCursor(0,self.controller.getNumberOfColumns()-1)
+                self.m_dataTable.MakeCellVisible(0,self.controller.getNumberOfColumns()-1)
         
     
        

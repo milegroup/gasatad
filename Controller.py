@@ -50,7 +50,6 @@ class Controller():
         nameColumns = list(dataFrame_1.columns)
 
         for column in dataFrame_2.columns:
-            print "@@",column," - ",type(column)
             colIndex=2
             auxColumn = column
             while auxColumn in dataFrame_1.columns:
