@@ -9,6 +9,7 @@ ALL:
     Add options to discard rows and columns in excel files
     See extensions when exporting to file
     See how to open cvs without .cvs extension 
+    Move columns
 
 WIN:
 
@@ -17,3 +18,8 @@ MAC:
 	Improve detection of new versions: now, running GASATaD from source detects new binary versions for MacOS
 
 DEB:
+
+
+For the future:
+	Edit new columns (opening the options used to create them)
+	Edit plot options after building them
