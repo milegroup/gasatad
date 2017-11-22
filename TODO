@@ -7,6 +7,8 @@ ALL:
 	Add an option to transform columns to continous variables
 	Add gini value, geometric mean and harmonic mean to basic statistics
     Add options to discard rows and columns in excel files
+    See extensions when exporting to file
+    See how to open cvs without .cvs extension 
 
 WIN:
 
