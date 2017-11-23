@@ -53,7 +53,7 @@ class MainFrame ( wx.Frame ):
         # splash = MySplashScreen()
         # splash.Show()
 
-        bmp = wx.Image("icons/SplashScreen1.2.png").ConvertToBitmap()
+        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.2.png").ConvertToBitmap()
         splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
 
         wx.Yield()
@@ -543,7 +543,7 @@ class MainFrame ( wx.Frame ):
     def CheckUpdates(self):
         from sys import argv
         import urllib2
-        import os
+        import os, sys
 
         remoteVersion = ""
         remoteVersionFile = ""
@@ -555,7 +555,7 @@ class MainFrame ( wx.Frame ):
         if platform=="linux2" and argv[0]=="/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/deb.txt"
 
-        if platform=="darwin" and os.getcwd().startswith("/usr/local"):
+        if platform=="darwin" and os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/mac.txt"
 
         if platform=="win32" and argv[0].endswith(".exe"):
