@@ -548,18 +548,18 @@ class MainFrame ( wx.Frame ):
         remoteVersion = ""
         remoteVersionFile = ""
 
-        if argv[0].endswith("MainApp.py"):
-            # print "# Running GASATaD from source"
-            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/src.txt"
-
         if platform=="linux2" and argv[0]=="/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/deb.txt"
 
-        if platform=="darwin" and os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.py":
+        elif platform=="darwin" and os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/mac.txt"
 
-        if platform=="win32" and argv[0].endswith(".exe"):
+        elif platform=="win32" and argv[0].endswith(".exe"):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/win.txt"
+
+        elif argv[0].endswith("MainApp.py"):
+            # print "# Running GASATaD from source"
+            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/src.txt"
 
         try:
             remoteFile = urllib2.urlopen(remoteVersionFile)
