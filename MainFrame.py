@@ -551,7 +551,7 @@ class MainFrame ( wx.Frame ):
         if platform=="linux2" and argv[0]=="/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/deb.txt"
 
-        elif platform=="darwin" and os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.py":
+        elif platform=="darwin" and (os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.py" or os.path.realpath(__file__)=="/Applications/GASATaD.app/Contents/MacOS/MainFrame.pyc"):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/mac.txt"
 
         elif platform=="win32" and argv[0].endswith(".exe"):
