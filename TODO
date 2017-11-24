@@ -10,6 +10,7 @@ ALL:
     See extensions when exporting to file
     See how to open cvs without .cvs extension 
     Move columns
+	It allways opens the first column when adding files (see testfile#.csv)
 
 WIN:
 
