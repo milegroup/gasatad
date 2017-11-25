@@ -80,18 +80,26 @@ class MainFrame ( wx.Frame ):
 
         self.m_fileMenu = wx.Menu()
 
-        self.m_menuNewFile = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Open new file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuNewFile = wx.MenuItem( self.m_fileMenu,wx.ID_NEW, u"Open new file...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuNewFile )
         
-        self.m_menuAddFile = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Add file", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuAddFile = wx.MenuItem( self.m_fileMenu, wx.ID_OPEN, u"Add file...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuAddFile )
         self.m_menuAddFile.Enable(False)
 
-        self.m_menuResetData = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendSeparator()
+
+        self.m_menuExportData = wx.MenuItem( self.m_fileMenu,wx.ID_SAVE, u"Export data...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_fileMenu.AppendItem(self.m_menuExportData)
+        self.m_menuExportData.Enable(False)
+
+        self.m_fileMenu.AppendSeparator()
+
+        self.m_menuResetData = wx.MenuItem( self.m_fileMenu,wx.ID_CLOSE, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem(self.m_menuResetData)
         self.m_menuResetData.Enable(False)
 
-        self.m_menuQuit = wx.MenuItem( self.m_fileMenu, wx.ID_ANY, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuQuit = wx.MenuItem( self.m_fileMenu, wx.ID_EXIT, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuQuit )
 
         # ------------ Options menu
@@ -354,6 +362,7 @@ class MainFrame ( wx.Frame ):
 
         self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuNewFile)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
+        self.Bind(wx.EVT_MENU, self.exportData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
@@ -627,6 +636,7 @@ class MainFrame ( wx.Frame ):
         self.exportDataBtn.Enable()
         self.m_dataTable.Enable()
         self.m_menuResetData.Enable()
+        self.m_menuExporData.Enable()
         self.histogramBtn.Enable()
         self.scatterPlotBtn.Enable()
         self.pieChartBtn.Enable()
@@ -720,6 +730,7 @@ class MainFrame ( wx.Frame ):
                 self.exportDataBtn.Enable()
                 
                 self.m_menuResetData.Enable()
+                self.m_menuExportData.Enable()
                 self.histogramBtn.Enable()
                 self.scatterPlotBtn.Enable()
                 self.pieChartBtn.Enable()
@@ -774,6 +785,13 @@ class MainFrame ( wx.Frame ):
                     self.dlg.Destroy()
                 readCorrect = False
 
+            
+
+            if readCorrect:
+                if discardCol and fileType=="csv":
+                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
+                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
+            
             if readCorrect and self.controller.OpenAdditionalFile(self.data)==False:
                 self.dlg = wx.MessageDialog(None, "Number of rows does not match: \n  Loaded data has "+str(self.m_dataTable.GetNumberRows())+" rows \n  File "+self.filename+" has "+str(len(self.data.index))+" rows ", "File error", wx.OK | wx.ICON_EXCLAMATION)
                 if self.dlg.ShowModal() == wx.ID_OK:
@@ -781,10 +799,6 @@ class MainFrame ( wx.Frame ):
                 readCorrect = False
 
             if readCorrect:
-                if discardCol and fileType=="csv":
-                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
-                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-                
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
                 self.markTextColumns()
@@ -933,6 +947,7 @@ class MainFrame ( wx.Frame ):
         self.m_menuNewFile.Enable(True)
         self.m_menuAddFile.Enable(False)
         self.m_menuResetData.Enable(False)
+        self.m_menuExportData.Enable(False)
         
         #Graphs
         self.histogramBtn.Enable( False )
