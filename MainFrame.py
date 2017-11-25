@@ -103,9 +103,14 @@ class MainFrame ( wx.Frame ):
         # ------------ Edit menu
 
         self.m_editMenu = wx.Menu()
-        self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add new column...", wx.EmptyString, wx.ITEM_NORMAL )
+
+        self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add discrete column...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_addNewColumn )
         self.m_addNewColumn.Enable(False)
+
+        self.m_deleteColumns = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete columns...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_deleteColumns )
+        self.m_deleteColumns.Enable(False)
 
         # ------------ Options menu
 
@@ -234,35 +239,19 @@ class MainFrame ( wx.Frame ):
         buttonsSizer.AddSpacer(10)
 
         
-        # self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset data", wx.DefaultPosition, wx.DefaultSize, 0 )
-        # self.resetDataBtn.Enable( False )
-        #self.resetDataBtn.SetMinSize( wx.Size( -1,25 ) )
-        
-        # buttonsSizer.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
-        
-        self.deleteColumnsBtn = wx.Button( self, wx.ID_ANY, u"Delete columns", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.deleteColumnsBtn.Enable( False )
-        #self.deleteColumnsBtn.SetMinSize( wx.Size( -1,25 ) )
-        
-        buttonsSizer.Add( self.deleteColumnsBtn, 0, wx.ALL|wx.EXPAND, 5 )
-        
-        # self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
-        # self.exportDataBtn.Enable( False )
-        #self.exportDataBtn.SetMinSize( wx.Size( -1,25 ) )
-        
-        # buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
-        
         self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Basic statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.descriptiveStatsBtn.Enable( False )
         #self.descriptiveStatsBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.descriptiveStatsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.significanceTestBtn = wx.Button( self, wx.ID_ANY, u"Significance test", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.significanceTestBtn = wx.Button( self, wx.ID_ANY, u"Significance tests", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.significanceTestBtn.Enable( False )
         #self.significanceTestBtn.SetMinSize( wx.Size( -1,25 ) )
         
         buttonsSizer.Add( self.significanceTestBtn, 0, wx.ALL|wx.EXPAND, 5 )
+
+        buttonsSizer.AddSpacer(10)
         
         leftSizer.Add( buttonsSizer, flag= wx.ALL | wx.EXPAND, border=5)
 
@@ -391,11 +380,11 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
+        self.Bind(wx.EVT_MENU, self.deleteColumns, self.m_deleteColumns)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.deleteColumns, self.deleteColumnsBtn)
         self.Bind(wx.EVT_BUTTON, self.exportData, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
@@ -659,7 +648,7 @@ class MainFrame ( wx.Frame ):
         self.descriptiveStatsBtn.Enable()
         self.m_addNewColumn.Enable()
         self.resetDataBtn.Enable()
-        self.deleteColumnsBtn.Enable()
+        self.m_deleteColumns.Enable()
         self.exportDataBtn.Enable()
         self.m_dataTable.Enable()
         self.m_menuResetData.Enable()
@@ -755,7 +744,7 @@ class MainFrame ( wx.Frame ):
                 self.descriptiveStatsBtn.Enable()
                 self.m_addNewColumn.Enable()
                 self.resetDataBtn.Enable()
-                self.deleteColumnsBtn.Enable()
+                self.m_deleteColumns.Enable()
                 self.exportDataBtn.Enable()
                 
                 self.m_menuResetData.Enable()
@@ -842,7 +831,7 @@ class MainFrame ( wx.Frame ):
                 self.descriptiveStatsBtn.Enable()
                 self.m_addNewColumn.Enable()
                 self.resetDataBtn.Enable()
-                self.deleteColumnsBtn.Enable()
+                self.m_deleteColumns.Enable()
                 self.exportDataBtn.Enable()
                 self.significanceTestBtn.Enable()
                 self.m_dataTable.Enable()
@@ -974,7 +963,7 @@ class MainFrame ( wx.Frame ):
             self.descriptiveStatsBtn.Enable(False)
             self.m_addNewColumn.Enable(False)
             self.resetDataBtn.Enable(False)
-            self.deleteColumnsBtn.Enable(False)
+            self.m_deleteColumns.Enable(False)
             self.exportDataBtn.Enable(False)
             self.significanceTestBtn.Enable(False)
             
