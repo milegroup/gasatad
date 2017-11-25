@@ -100,6 +100,13 @@ class MainFrame ( wx.Frame ):
         self.m_menuQuit = wx.MenuItem( self.m_fileMenu, wx.ID_EXIT, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuQuit )
 
+        # ------------ Edit menu
+
+        self.m_editMenu = wx.Menu()
+        self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add new column...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_addNewColumn )
+        self.m_addNewColumn.Enable(False)
+
         # ------------ Options menu
 
         self.m_optionsMenu = wx.Menu()
@@ -134,6 +141,7 @@ class MainFrame ( wx.Frame ):
         self.m_aboutMenu.AppendItem(self.m_menuAbout)
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
+        self.m_menubar1.Append( self.m_editMenu, u"Edit" )
         self.m_menubar1.Append( self.m_optionsMenu, u"Options")
         self.m_menubar1.Append( self.m_aboutMenu, u"About" )
                 
@@ -144,6 +152,7 @@ class MainFrame ( wx.Frame ):
         globalSizer = wx.BoxSizer(wx.HORIZONTAL)
 
         leftSizer = wx.BoxSizer(wx.VERTICAL)
+
 
 
         #  -------------------- Information part of the interface
@@ -203,17 +212,33 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.newColumnBtn = wx.Button( self, wx.ID_ANY, u"Add new column", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.newColumnBtn.Enable( False )
-        # self.newColumnBtn.SetMinSize( wx.Size( -1,25 ) )
-        
-        buttonsSizer.Add( self.newColumnBtn, 0, wx.ALL|wx.EXPAND, 5 )
-        
+        buttonsSubSizer1 = wx.GridSizer(rows=2, cols=2, vgap=0, hgap=0)
+
+        self.openNewFileBtn = wx.Button( self, wx.ID_ANY, u"Open new file", wx.DefaultPosition, wx.DefaultSize, 0 )
+        buttonsSubSizer1.Add( self.openNewFileBtn, 0, wx.TOP|wx.BOTTOM|wx.LEFT|wx.EXPAND, 5 )
+
+        self.addFileBtn = wx.Button( self, wx.ID_ANY, u"Add file", wx.DefaultPosition, wx.DefaultSize, 0 )
+        buttonsSubSizer1.Add( self.addFileBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        self.addFileBtn.Enable(False)
+
+        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        buttonsSubSizer1.Add( self.exportDataBtn, 0, wx.TOP|wx.BOTTOM|wx.LEFT|wx.EXPAND, 5 )
+        self.exportDataBtn.Enable(False)
+
         self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset data", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.resetDataBtn.Enable( False )
+        buttonsSubSizer1.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        self.resetDataBtn.Enable(False)
+
+        buttonsSizer.Add( buttonsSubSizer1, 0, wx.EXPAND, 0 )
+
+        buttonsSizer.AddSpacer(10)
+
+        
+        # self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.resetDataBtn.Enable( False )
         #self.resetDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        buttonsSizer.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        # buttonsSizer.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.deleteColumnsBtn = wx.Button( self, wx.ID_ANY, u"Delete columns", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.deleteColumnsBtn.Enable( False )
@@ -221,11 +246,11 @@ class MainFrame ( wx.Frame ):
         
         buttonsSizer.Add( self.deleteColumnsBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
-        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
-        self.exportDataBtn.Enable( False )
+        # self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        # self.exportDataBtn.Enable( False )
         #self.exportDataBtn.SetMinSize( wx.Size( -1,25 ) )
         
-        buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
+        # buttonsSizer.Add( self.exportDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         
         self.descriptiveStatsBtn = wx.Button( self, wx.ID_ANY, u"Basic statistics", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.descriptiveStatsBtn.Enable( False )
@@ -359,14 +384,16 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
 
         self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuNewFile)
+        self.Bind(wx.EVT_BUTTON, self.OpenFile, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
+        self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
         self.Bind(wx.EVT_MENU, self.exportData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
+        self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
-        self.Bind(wx.EVT_BUTTON, self.createNewColumn, self.newColumnBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
         self.Bind(wx.EVT_BUTTON, self.deleteColumns, self.deleteColumnsBtn)
         self.Bind(wx.EVT_BUTTON, self.exportData, self.exportDataBtn)
@@ -617,8 +644,10 @@ class MainFrame ( wx.Frame ):
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 self.controller.OpenFile(self.data)  
-                self.m_menuNewFile.Enable(False)                  
+                self.m_menuNewFile.Enable(False)          
+                self.openNewFileBtn.Enable(False)        
                 self.m_menuAddFile.Enable(True)
+                self.addFileBtn.Enable(True)
                     
         except:
             
@@ -628,13 +657,13 @@ class MainFrame ( wx.Frame ):
 
         self.fillInGrid()
         self.descriptiveStatsBtn.Enable()
-        self.newColumnBtn.Enable()
+        self.m_addNewColumn.Enable()
         self.resetDataBtn.Enable()
         self.deleteColumnsBtn.Enable()
         self.exportDataBtn.Enable()
         self.m_dataTable.Enable()
         self.m_menuResetData.Enable()
-        self.m_menuExporData.Enable()
+        self.m_menuExportData.Enable()
         self.histogramBtn.Enable()
         self.scatterPlotBtn.Enable()
         self.pieChartBtn.Enable()
@@ -707,7 +736,9 @@ class MainFrame ( wx.Frame ):
                 self.controller.OpenFile(self.data)
                 
                 self.m_menuAddFile.Enable(True)
-                self.m_menuNewFile.Enable(False)                                            
+                self.addFileBtn.Enable(True)
+                self.m_menuNewFile.Enable(False)     
+                self.openNewFileBtn.Enable(False)                                       
 
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
@@ -722,7 +753,7 @@ class MainFrame ( wx.Frame ):
                         self.dlg.Destroy()
             
                 self.descriptiveStatsBtn.Enable()
-                self.newColumnBtn.Enable()
+                self.m_addNewColumn.Enable()
                 self.resetDataBtn.Enable()
                 self.deleteColumnsBtn.Enable()
                 self.exportDataBtn.Enable()
@@ -809,7 +840,7 @@ class MainFrame ( wx.Frame ):
                         self.dlg.Destroy()
 
                 self.descriptiveStatsBtn.Enable()
-                self.newColumnBtn.Enable()
+                self.m_addNewColumn.Enable()
                 self.resetDataBtn.Enable()
                 self.deleteColumnsBtn.Enable()
                 self.exportDataBtn.Enable()
@@ -925,42 +956,49 @@ class MainFrame ( wx.Frame ):
 
     
     def resetData(self, event):
-        
-        self.controller.resetDataToAnalyse()
 
-        self.fillInGrid()
+        dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?","Reset table", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
+        result = dlg.ShowModal()
+        dlg.Destroy()
+        if result == wx.ID_OK:
         
-        self.m_dataTable.AppendRows(45)
-        self.m_dataTable.AppendCols(45)
-        
-        self.m_dataTable.Enable( False )
+            self.controller.resetDataToAnalyse()
 
-        self.descriptiveStatsBtn.Enable(False)
-        self.newColumnBtn.Enable(False)
-        self.resetDataBtn.Enable(False)
-        self.deleteColumnsBtn.Enable(False)
-        self.exportDataBtn.Enable(False)
-        self.significanceTestBtn.Enable(False)
-        
-        self.m_menuNewFile.Enable(True)
-        self.m_menuAddFile.Enable(False)
-        self.m_menuResetData.Enable(False)
-        self.m_menuExportData.Enable(False)
-        
-        #Graphs
-        self.histogramBtn.Enable( False )
-        self.scatterPlotBtn.Enable( False )
-        self.pieChartBtn.Enable( False )
-        self.boxPlotBtn.Enable( False )
-        self.barChartBtn.Enable( False )
+            self.fillInGrid()
+            
+            self.m_dataTable.AppendRows(45)
+            self.m_dataTable.AppendCols(45)
+            
+            self.m_dataTable.Enable( False )
 
-        self.params['dataPresent'] = False
-        self.params['noOfFiles'] = 0
-        self.updateDataInfo()
+            self.descriptiveStatsBtn.Enable(False)
+            self.m_addNewColumn.Enable(False)
+            self.resetDataBtn.Enable(False)
+            self.deleteColumnsBtn.Enable(False)
+            self.exportDataBtn.Enable(False)
+            self.significanceTestBtn.Enable(False)
+            
+            self.m_menuNewFile.Enable(True)
+            self.openNewFileBtn.Enable(True)
+            self.m_menuAddFile.Enable(False)
+            self.addFileBtn.Enable(False)
+            self.m_menuResetData.Enable(False)
+            self.m_menuExportData.Enable(False)
+            
+            #Graphs
+            self.histogramBtn.Enable( False )
+            self.scatterPlotBtn.Enable( False )
+            self.pieChartBtn.Enable( False )
+            self.boxPlotBtn.Enable( False )
+            self.barChartBtn.Enable( False )
 
-        self.m_dataTable.SetColLabelSize( 30 )
-        self.m_dataTable.SetRowLabelSize( 80 )
-        self.Layout()
+            self.params['dataPresent'] = False
+            self.params['noOfFiles'] = 0
+            self.updateDataInfo()
+
+            self.m_dataTable.SetColLabelSize( 30 )
+            self.m_dataTable.SetRowLabelSize( 80 )
+            self.Layout()
 
 
     def resetOptions(self,event):
