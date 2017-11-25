@@ -112,6 +112,20 @@ class MainFrame ( wx.Frame ):
         self.m_editMenu.AppendItem( self.m_deleteColumns )
         self.m_deleteColumns.Enable(False)
 
+        self.m_editMenu.AppendSeparator()
+
+        self.m_deletedSelectedCR = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete selected columns/rows", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_deletedSelectedCR )
+        self.m_deletedSelectedCR.Enable(False)
+
+        self.m_renameSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Rename selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_renameSelectedCol )
+        self.m_renameSelectedCol.Enable(False)
+
+        self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Discretize selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_discretizeSelectedCol )
+        self.m_discretizeSelectedCol.Enable(False)
+
         # ------------ Options menu
 
         self.m_optionsMenu = wx.Menu()
@@ -338,10 +352,13 @@ class MainFrame ( wx.Frame ):
         self.m_dataTable.EnableDragRowSize( False )
         self.m_dataTable.SetRowLabelSize( 80 )
         self.m_dataTable.SetRowLabelAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTRE )
-        
 
         # Cell Defaults
         self.m_dataTable.SetDefaultCellAlignment( wx.ALIGN_CENTRE, wx.ALIGN_CENTER )
+
+        # Selection mode
+        self.m_dataTable.SetSelectionMode(wx.grid.Grid.wxGridSelectRows | wx.grid.Grid.wxGridSelectColumns)
+        # self.m_dataTable.EnableEditing(True)
 
         fgSizer8 = wx.BoxSizer(wx.VERTICAL)
         fgSizer8.Add(self.m_dataTable)
@@ -367,6 +384,7 @@ class MainFrame ( wx.Frame ):
         else:
             self.Maximize()
         self.SetMinSize((1024,768))
+
         
         #Binding between buttons and functions which will control the events
 
@@ -381,6 +399,9 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
         self.Bind(wx.EVT_MENU, self.deleteColumns, self.m_deleteColumns)
+        self.Bind(wx.EVT_MENU, self.deleteColumnsRows, self.m_deletedSelectedCR)
+        self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
+        self.Bind(wx.EVT_MENU, self.discretizeCol, self.m_discretizeSelectedCol)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
@@ -394,10 +415,14 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.doSignificanceTest, self.significanceTestBtn)
         self.Bind(wx.grid.EVT_GRID_CELL_RIGHT_CLICK, self.rightClickOnTable,self.m_dataTable)
         self.Bind(wx.grid.EVT_GRID_LABEL_RIGHT_CLICK, self.rightClickOnTable,self.m_dataTable)
+        self.Bind(wx.grid.EVT_GRID_RANGE_SELECT, self.contentSelected, self.m_dataTable)
+        self.Bind(wx.grid.EVT_GRID_CELL_LEFT_DCLICK, self.cellModification, self.m_dataTable)
         
         
         #A controller object is created
         self.controller = Controller()
+
+        
 
         HelpString = (
             "      -help: shows this information\n"
@@ -427,6 +452,97 @@ class MainFrame ( wx.Frame ):
                     print "Loading CSV file: "+CSVFileName
                     self.OpenCSVFileNoGUI(CSVFileName)
 
+    def cellModification(self,event):
+        dlg = wx.TextEntryDialog(self, "Type new value for cell (empty for 'null'):", 'Change Cell', '')
+        if dlg.ShowModal() == wx.ID_OK:
+            newValue = dlg.GetValue()
+            dlg.Destroy()
+            if newValue=="":
+                newValue2 = numpy.NaN
+            else:
+                try:
+                    newValue2 = numpy.float64(newValue)
+                except:
+                    newValue2 = newValue
+            self.controller.changeCellValue(event.GetRow(),event.GetCol(),newValue2)
+            self.fillInGrid()
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.markTextColumns()
+            self.markNans()
+            self.updateDataInfo()
+            self.Layout()
+            event.Skip()
+        else:
+            dlg.Destroy()
+
+    def contentSelected(self,event):
+
+        columnsSelected = self.m_dataTable.GetSelectedCols()
+        rowsSelected = self.m_dataTable.GetSelectedRows()
+
+        if len(rowsSelected)==0 and len(columnsSelected)==0:
+            self.m_deletedSelectedCR.Enable(False)
+        else:
+            self.m_deletedSelectedCR.Enable()
+
+        if len(rowsSelected)==0 and len(columnsSelected)==1:
+            self.m_renameSelectedCol.Enable()
+            columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+            if columnSelectedLabel not in self.controller.characterValues:
+                self.m_discretizeSelectedCol.Enable()
+        else:
+            self.m_renameSelectedCol.Enable(False)
+            self.m_discretizeSelectedCol.Enable(False)
+
+        event.Skip()
+
+
+    def deleteColumnsRows(self,event):
+
+        rowsSelected = self.m_dataTable.GetSelectedRows()
+        columnsSelected = self.m_dataTable.GetSelectedCols()
+
+        msgString = "Deleting: "
+        if len(rowsSelected)>0:
+            msgString += str(len(rowsSelected))+" row"
+            if len(rowsSelected)>1:
+                msgString += "s"
+        if len(rowsSelected)>0 and len(columnsSelected)>0:
+            msgString += " and "
+        if len(columnsSelected)>0:
+            msgString += str(len(columnsSelected))+" column"
+            if len(columnsSelected)>1:
+                msgString += "s"
+            
+
+        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?", "Delete data", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
+            
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.Destroy()
+
+            columnsSelectedLabels = []
+            for columnIndex in columnsSelected:
+                columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
+            self.controller.deleteColumns(columnsSelectedLabels)
+            if len(rowsSelected)>0:
+                self.controller.deleteRows(rowsSelected)
+
+            
+            if self.controller.programState.dataToAnalyse.empty:
+                self.resetData(None)
+            else:
+                self.fillInGrid()
+                self.m_dataTable.AutoSize()
+                self.m_dataTable.ClearSelection()
+                self.markTextColumns()
+                self.markNans()
+                self.updateDataInfo()
+                self.Layout()
+        else:
+            dlg.Destroy()
+
+
 
     def rightClickOnTable(self, event):
         columnClicked = event.GetCol()
@@ -440,14 +556,14 @@ class MainFrame ( wx.Frame ):
             popupMenu = wx.Menu()
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
-            self.Bind(wx.EVT_MENU, self.onPopupDeleteCols, id=self.popupDeleteID)
+            self.Bind(wx.EVT_MENU, self.deleteCols, id=self.popupDeleteID)
 
             if len(columnsSelected)==1:
 
                 # Renaming menu entry
                 self.popupRenameID = wx.NewId()
                 popupMenu.Append(self.popupRenameID,"Rename column")
-                self.Bind(wx.EVT_MENU, self.onPopupRenameCol, id=self.popupRenameID)
+                self.Bind(wx.EVT_MENU, self.renameCol, id=self.popupRenameID)
                 
                 # Discretizing menu entry
                 columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
@@ -456,7 +572,7 @@ class MainFrame ( wx.Frame ):
                 if columnSelectedLabel not in self.controller.characterValues:
                     self.popupDiscretizeID = wx.NewId()
                     popupMenu.Append(self.popupDiscretizeID,"Discretize column")
-                    self.Bind(wx.EVT_MENU, self.onPopupDiscretizeCol, id=self.popupDiscretizeID)
+                    self.Bind(wx.EVT_MENU, self.discretizeCol, id=self.popupDiscretizeID)
 
             
             self.PopupMenu( popupMenu )
@@ -471,20 +587,29 @@ class MainFrame ( wx.Frame ):
             popupMenu = wx.Menu()
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
-            self.Bind(wx.EVT_MENU, self.onPopupDeleteRows, id=self.popupDeleteID)
+            self.Bind(wx.EVT_MENU, self.deleteRows, id=self.popupDeleteID)
             self.PopupMenu( popupMenu )
             popupMenu.Destroy()
 
         event.Skip()
-    
-    def onPopupDeleteCols(self,event):
-        dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
-                                   "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
+
+    def deleteCols(self,event):
+
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+
+        msgString = "Deleting: "
+        msgString += str(len(columnsSelectedIndex))+" column"
+        if len(columnsSelectedIndex)>1:
+            msgString += "s"
+
+        
+        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?",
+                                "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
         if dlg.ShowModal() == wx.ID_OK:
             dlg.Destroy()
 
-            columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+            
             columnsSelectedLabels = []
             for columnIndex in columnsSelectedIndex:
                 columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
@@ -503,8 +628,9 @@ class MainFrame ( wx.Frame ):
                 self.Layout()
         else:
             dlg.Destroy()
+    
 
-    def onPopupRenameCol(self,event):
+    def renameCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         oldLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         dlg = wx.TextEntryDialog(self, "Type new label for column '"+oldLabel+"':", 'Rename column', '')
@@ -517,11 +643,14 @@ class MainFrame ( wx.Frame ):
             self.m_dataTable.AutoSize()
             self.m_dataTable.ClearSelection()
             self.Layout()
+            self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+            self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
         else:
             dlg.Destroy()
 
-    def onPopupDiscretizeCol(self,event):
-        columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+    def discretizeCol(self,event):
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         # print "# Going to discretize: ",columnSelectedLabel
         self.controller.programState.dataToAnalyse[columnSelectedLabel] = self.controller.programState.dataToAnalyse[columnSelectedLabel].astype(str)
         # print self.controller.programState.dataToAnalyse.dtypes
@@ -533,16 +662,26 @@ class MainFrame ( wx.Frame ):
         self.markNans()
         # self.updateDataInfo()
         self.Layout()
+        self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+        self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+
+    def deleteRows(self,event):
+
+        rowsSelectedIndex = self.m_dataTable.GetSelectedRows()
+
+        msgString = "Deleting: "
+        msgString += str(len(rowsSelectedIndex))+" row"
+        if len(rowsSelectedIndex)>1:
+            msgString += "s"
 
 
-    def onPopupDeleteRows(self,event):
-        dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
-                                   "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?",
+                                   "Delete rows", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
         if dlg.ShowModal() == wx.ID_OK:
             dlg.Destroy()
 
-            rowsSelectedIndex = self.m_dataTable.GetSelectedRows()
+            
             rowsSelectedLabels = []
             for rowIndex in rowsSelectedIndex:
                 rowsSelectedLabels.append(self.m_dataTable.GetRowLabelValue(rowIndex))
@@ -561,6 +700,7 @@ class MainFrame ( wx.Frame ):
                 self.Layout()
         else:
             dlg.Destroy()
+
 
 
     def CheckUpdates(self):
@@ -669,6 +809,7 @@ class MainFrame ( wx.Frame ):
         self.params['dataPresent'] = True
         self.params['noOfFiles'] += 1
         self.updateDataInfo()
+        self.m_dataTable.SetFocus()
 
         
         self.Layout()
@@ -760,6 +901,9 @@ class MainFrame ( wx.Frame ):
                 self.params['dataPresent'] = True
                 self.params['noOfFiles'] += 1
                 self.updateDataInfo()
+                self.m_dataTable.SetFocus()
+
+                
 
                 
     def OpenAdditionalFile(self, *events):       
@@ -838,6 +982,7 @@ class MainFrame ( wx.Frame ):
 
                 self.params['noOfFiles'] += 1
                 self.updateDataInfo()
+                self.m_dataTable.SetFocus()
 
                 # Move the view of the table to the last column
                 self.m_dataTable.SetGridCursor(0,self.controller.getNumberOfColumns()-1)
@@ -892,10 +1037,16 @@ class MainFrame ( wx.Frame ):
             for col in range (numCols):
                 if dataToAnalyse.iloc[row, col] != dataToAnalyse.iloc[row, col]:
                     self.m_dataTable.SetCellValue(row,col,"nan")
-                elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):        
-                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
-                else:                      
-                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+                else:
+                    try:
+                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
+                    except:
+                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+
+                # elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):   
+                #     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
+                # else:                      
+                #     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
         self.controller.sortVariables()
 
@@ -946,7 +1097,7 @@ class MainFrame ( wx.Frame ):
     
     def resetData(self, event):
 
-        dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?","Reset table", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
+        dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?","Reset table", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
         result = dlg.ShowModal()
         dlg.Destroy()
         if result == wx.ID_OK:
@@ -973,6 +1124,10 @@ class MainFrame ( wx.Frame ):
             self.addFileBtn.Enable(False)
             self.m_menuResetData.Enable(False)
             self.m_menuExportData.Enable(False)
+
+            self.m_deletedSelectedCR.Enable(False)
+            self.m_renameSelectedCol.Enable(False)
+            self.m_discretizeSelectedCol.Enable(False)
             
             #Graphs
             self.histogramBtn.Enable( False )
@@ -996,6 +1151,7 @@ class MainFrame ( wx.Frame ):
         self.m_discardColumn.Check()
         self.m_CSVSeparator1.Check()
 
+
     
     def deleteColumns(self, event):
         
@@ -1003,7 +1159,7 @@ class MainFrame ( wx.Frame ):
         
         if  selectedColumnsInterface.ShowModal() == wx.ID_OK:
             
-            dlg = wx.MessageDialog(self, "This action cannot be undone.\nAre you sure to proceed?",
+            dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?",
                                    "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
             

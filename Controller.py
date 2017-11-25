@@ -121,6 +121,10 @@ class Controller():
         if self.programState.dataToAnalyse.empty:
             self.resetDataToAnalyse()    
 
+    def changeCellValue(self, row, col, newValue):
+        self.programState.dataToAnalyse.iloc[row,col] = newValue
+        self.sortVariables()
+
 
     def renameColumn(self,oldLabel,newLabel):
         self.programState.dataToAnalyse.rename(columns={oldLabel:newLabel},inplace=True)

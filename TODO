@@ -10,6 +10,8 @@ ALL:
     See how to open cvs without .cvs extension 
     Move columns
 	Add new column: position of buttons
+	See problems when converting numerical to text (lots of decimals)
+	Change "discrete" to "text"
 
 WIN:
 
