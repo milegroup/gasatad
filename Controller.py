@@ -129,6 +129,8 @@ class Controller():
     def renameColumn(self,oldLabel,newLabel):
         self.programState.dataToAnalyse.rename(columns={oldLabel:newLabel},inplace=True)
 
+    def reorderColumns(self,newIndex):
+        self.programState.dataToAnalyse = self.programState.dataToAnalyse[newIndex]
 
     def recalculateRowsIndexes(self):
         self.programState.dataToAnalyse.index = range(0,len(self.programState.dataToAnalyse.index))

@@ -104,6 +104,26 @@ class MainFrame ( wx.Frame ):
 
         self.m_editMenu = wx.Menu()
 
+        self.m_deletedSelectedCR = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete selected columns/rows", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_deletedSelectedCR )
+        self.m_deletedSelectedCR.Enable(False)
+
+        self.m_editMenu.AppendSeparator()
+
+        self.m_renameSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Rename selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_renameSelectedCol )
+        self.m_renameSelectedCol.Enable(False)
+
+        self.m_moveSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Move selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_moveSelectedCol )
+        self.m_moveSelectedCol.Enable(False)
+
+        self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Discretize selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_discretizeSelectedCol )
+        self.m_discretizeSelectedCol.Enable(False)
+
+        self.m_editMenu.AppendSeparator()
+
         self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add discrete column...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_addNewColumn )
         self.m_addNewColumn.Enable(False)
@@ -111,20 +131,6 @@ class MainFrame ( wx.Frame ):
         self.m_deleteColumns = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete columns...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_deleteColumns )
         self.m_deleteColumns.Enable(False)
-
-        self.m_editMenu.AppendSeparator()
-
-        self.m_deletedSelectedCR = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete selected columns/rows", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_editMenu.AppendItem( self.m_deletedSelectedCR )
-        self.m_deletedSelectedCR.Enable(False)
-
-        self.m_renameSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Rename selected column", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_editMenu.AppendItem( self.m_renameSelectedCol )
-        self.m_renameSelectedCol.Enable(False)
-
-        self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Discretize selected column", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_editMenu.AppendItem( self.m_discretizeSelectedCol )
-        self.m_discretizeSelectedCol.Enable(False)
 
         # ------------ Options menu
 
@@ -401,6 +407,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.deleteColumns, self.m_deleteColumns)
         self.Bind(wx.EVT_MENU, self.deleteColumnsRows, self.m_deletedSelectedCR)
         self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
+        self.Bind(wx.EVT_MENU, self.moveCol, self.m_moveSelectedCol)
         self.Bind(wx.EVT_MENU, self.discretizeCol, self.m_discretizeSelectedCol)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
@@ -488,11 +495,13 @@ class MainFrame ( wx.Frame ):
 
         if len(rowsSelected)==0 and len(columnsSelected)==1:
             self.m_renameSelectedCol.Enable()
+            self.m_moveSelectedCol.Enable()
             columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
             if columnSelectedLabel not in self.controller.characterValues:
                 self.m_discretizeSelectedCol.Enable()
         else:
             self.m_renameSelectedCol.Enable(False)
+            self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
 
         event.Skip()
@@ -550,13 +559,15 @@ class MainFrame ( wx.Frame ):
 
         if columnClicked in columnsSelected:
 
+            popupMenu = wx.Menu()
+
             textPopupDelete = "Delete column"
             if len(columnsSelected)>1:
                 textPopupDelete += "s"
-            popupMenu = wx.Menu()
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
             self.Bind(wx.EVT_MENU, self.deleteCols, id=self.popupDeleteID)
+            
 
             if len(columnsSelected)==1:
 
@@ -564,6 +575,10 @@ class MainFrame ( wx.Frame ):
                 self.popupRenameID = wx.NewId()
                 popupMenu.Append(self.popupRenameID,"Rename column")
                 self.Bind(wx.EVT_MENU, self.renameCol, id=self.popupRenameID)
+
+                self.popupMoveID = wx.NewId()
+                popupMenu.Append(self.popupMoveID,"Move column")
+                self.Bind(wx.EVT_MENU, self.moveCol, id=self.popupMoveID)
                 
                 # Discretizing menu entry
                 columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
@@ -628,6 +643,41 @@ class MainFrame ( wx.Frame ):
                 self.Layout()
         else:
             dlg.Destroy()
+
+    def moveCol(self,event):
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        oldPos = columnsSelectedIndex[0]
+        maxPos = self.controller.getNumberOfColumns() - 1
+        newPosOk = False
+        while not newPosOk:
+            dlg = wx.TextEntryDialog(self, "New position for column (between 0 and "+str(maxPos)+"):", "Move column", "")
+            if dlg.ShowModal() == wx.ID_OK:
+                newPos = dlg.GetValue()
+                dlg.Destroy()
+                try:
+                    newPos = int(newPos)
+                    newPosOk=True
+                except:
+                    None
+                if newPosOk and (newPos < 0 or newPos > maxPos):
+                    newPosOk = False
+            else:
+                dlg.Destroy()
+                break
+        if newPosOk:
+            colIndex =  list(self.controller.getDataToAnalyse().columns)
+            label = colIndex[columnsSelectedIndex[0]]
+            colIndex.pop(columnsSelectedIndex[0])
+            colIndex.insert(newPos,label)
+            self.controller.reorderColumns(colIndex)
+            self.fillInGrid()
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.markTextColumns()
+            self.markNans()
+            self.Layout()
+            self.m_dataTable.SetGridCursor(0,newPos)
+            self.m_dataTable.MakeCellVisible(0,newPos)
     
 
     def renameCol(self,event):
@@ -1037,16 +1087,13 @@ class MainFrame ( wx.Frame ):
             for col in range (numCols):
                 if dataToAnalyse.iloc[row, col] != dataToAnalyse.iloc[row, col]:
                     self.m_dataTable.SetCellValue(row,col,"nan")
-                else:
-                    try:
-                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
-                    except:
-                        self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+                elif type(dataToAnalyse.iloc[row, col]) == float:
+                    dataToAnalyse.iloc[row, col] = numpy.float64(dataToAnalyse.iloc[row, col])
 
-                # elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):   
-                #     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
-                # else:                      
-                #     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+                elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):   
+                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
+                else:                      
+                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
         self.controller.sortVariables()
 
@@ -1127,6 +1174,7 @@ class MainFrame ( wx.Frame ):
 
             self.m_deletedSelectedCR.Enable(False)
             self.m_renameSelectedCol.Enable(False)
+            self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
             
             #Graphs
@@ -1491,7 +1539,7 @@ class DeleteColumnsInterface ( wx.Dialog ):
         self.selectedColumns = dict.fromkeys(listOfColumns, False)
         
         
-        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Delete Columns", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL )
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Delete columns", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL )
         
         self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         

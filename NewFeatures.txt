@@ -1,1 +1,5 @@
 File menu rebuilt
+New edit menu
+Buttons resized and redistributed
+Edition of cells
+Columns can be moved
