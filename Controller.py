@@ -176,11 +176,15 @@ class Controller():
 
 
         
-    def exportData(self, filePath, exportOptions):
+    def exportDataCSV(self, filePath, exportOptions):
         
         self.programState.dataToAnalyse.to_csv(path_or_buf = filePath, sep = exportOptions.getFieldDelimiter(),
                                                header = exportOptions.getWriteColNames(), index = exportOptions.getWriteRowNames(),
-                                               encoding = exportOptions.getCharacterSet(), decimal = exportOptions.getDecimalSeparator())    
+                                               encoding = exportOptions.getCharacterSet(), decimal = exportOptions.getDecimalSeparator())
+
+    def exportDataExcel(self, filePath):
+        
+        self.programState.dataToAnalyse.to_excel(filePath)    
         
     
 

@@ -87,7 +87,7 @@ class MainFrame ( wx.Frame ):
 
         self.m_fileMenu.AppendSeparator()
 
-        self.m_menuExportData = wx.MenuItem( self.m_fileMenu,wx.ID_SAVE, u"Export data...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuExportData = wx.MenuItem( self.m_fileMenu,wx.ID_SAVE, u"Save data...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem(self.m_menuExportData)
         self.m_menuExportData.Enable(False)
 
@@ -246,7 +246,7 @@ class MainFrame ( wx.Frame ):
         buttonsSubSizer1.Add( self.addFileBtn, 0, wx.ALL|wx.EXPAND, 5 )
         self.addFileBtn.Enable(False)
 
-        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Export data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.exportDataBtn = wx.Button( self, wx.ID_ANY, u"Save data", wx.DefaultPosition, wx.DefaultSize, 0 )
         buttonsSubSizer1.Add( self.exportDataBtn, 0, wx.TOP|wx.BOTTOM|wx.LEFT|wx.EXPAND, 5 )
         self.exportDataBtn.Enable(False)
 
@@ -400,7 +400,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.OpenFile, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
-        self.Bind(wx.EVT_MENU, self.exportData, self.m_menuExportData)
+        self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
@@ -413,7 +413,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.exportData, self.exportDataBtn)
+        self.Bind(wx.EVT_BUTTON, self.saveData, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
         self.Bind(wx.EVT_BUTTON, self.createPieChart, self.pieChartBtn)
@@ -871,7 +871,7 @@ class MainFrame ( wx.Frame ):
         fileType = "csv"
         self.data = None
             
-        self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
+        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
         
         wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
         
@@ -962,7 +962,7 @@ class MainFrame ( wx.Frame ):
         fileType = "csv"
         self.data = None
             
-        self.fileExtensions = "CSV files (*.csv)|*.csv|Excel files (*.xls;*.xlsx)|*.xls;*xlsx|All files (*.*)|*.*"
+        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
             
         wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard=self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
         
@@ -1091,7 +1091,7 @@ class MainFrame ( wx.Frame ):
                     dataToAnalyse.iloc[row, col] = numpy.float64(dataToAnalyse.iloc[row, col])
 
                 elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):   
-                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col].round(3)))
+                    self.m_dataTable.SetCellValue(row, col, '{:5g}'.format(dataToAnalyse.iloc[row, col]))
                 else:                      
                     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
@@ -1125,20 +1125,32 @@ class MainFrame ( wx.Frame ):
                         self.m_dataTable.SetCellBackgroundColour(row,col,'white')
 
     
-    def exportData(self, event):
+    def saveData(self, event):
         
         self.fileExtensions = ".CSV (*.csv*)|*.csv*"
-        saveFile = wx.FileDialog(self, message = 'Open file',defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
+        saveFile = wx.FileDialog(self, message = 'Save file', defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
             
         if saveFile.ShowModal() == wx.ID_OK:
             self.filename = saveFile.GetFilename()
             self.directory = saveFile.GetDirectory()
-            
-            path = self.directory + "/" + self.filename
-            exportCsv = ExportCsvOptions(self)
-            
-            if exportCsv.ShowModal() == wx.ID_OK:
-                self.controller.exportData(path, exportCsv.getSelectedExportOptions())
+
+            fileExtension = self.filename.rpartition(".")[-1]
+            if fileExtension.lower()  not in ["csv","xls","xlsx"]:
+                self.dlg = wx.MessageDialog(None, "Error file exporting file "+self.filename+"\nFile extension (.csv|.xlsx) is required", "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+            else:
+                if fileExtension.lower() == "csv" :
+                    path = self.directory + "/" + self.filename
+                    exportCsv = ExportCsvOptions(self)
+                    
+                    if exportCsv.ShowModal() == wx.ID_OK:
+                        self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
+                else:
+                    path = self.directory + "/" + self.filename
+                    self.controller.exportDataExcel(path)
+                    print "@@ exporting to excel"
 
 
     
