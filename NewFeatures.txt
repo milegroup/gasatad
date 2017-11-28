@@ -4,3 +4,4 @@ Buttons resized and redistributed
 Edition of cells
 Columns can be moved
 Export to excel
+Sorting by a column

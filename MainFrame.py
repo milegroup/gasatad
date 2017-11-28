@@ -93,7 +93,7 @@ class MainFrame ( wx.Frame ):
 
         self.m_fileMenu.AppendSeparator()
 
-        self.m_menuResetData = wx.MenuItem( self.m_fileMenu,wx.ID_CLOSE, u"Reset data", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuResetData = wx.MenuItem( self.m_fileMenu,wx.ID_CLOSE, u"Close data", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem(self.m_menuResetData)
         self.m_menuResetData.Enable(False)
 
@@ -117,6 +117,13 @@ class MainFrame ( wx.Frame ):
         self.m_moveSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Move selected column", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_moveSelectedCol )
         self.m_moveSelectedCol.Enable(False)
+
+        self.m_sortSubMenu = wx.Menu()
+        self.m_sortAscending = self.m_sortSubMenu.Append(wx.ID_ANY, "ascending")
+        self.m_sortDescending = self.m_sortSubMenu.Append(wx.ID_ANY, "descending")
+        self.sortMenuID = wx.NewId()
+        self.m_editMenu.AppendMenu(self.sortMenuID, "Sort using selected column",self.m_sortSubMenu )
+        self.m_editMenu.Enable(self.sortMenuID,False)
 
         self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Discretize selected column", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_discretizeSelectedCol )
@@ -250,7 +257,7 @@ class MainFrame ( wx.Frame ):
         buttonsSubSizer1.Add( self.exportDataBtn, 0, wx.TOP|wx.BOTTOM|wx.LEFT|wx.EXPAND, 5 )
         self.exportDataBtn.Enable(False)
 
-        self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Reset data", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.resetDataBtn = wx.Button( self, wx.ID_ANY, u"Close data", wx.DefaultPosition, wx.DefaultSize, 0 )
         buttonsSubSizer1.Add( self.resetDataBtn, 0, wx.ALL|wx.EXPAND, 5 )
         self.resetDataBtn.Enable(False)
 
@@ -409,6 +416,8 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
         self.Bind(wx.EVT_MENU, self.moveCol, self.m_moveSelectedCol)
         self.Bind(wx.EVT_MENU, self.discretizeCol, self.m_discretizeSelectedCol)
+        self.Bind(wx.EVT_MENU, self.sortAscendingCol, self.m_sortAscending)
+        self.Bind(wx.EVT_MENU, self.sortDescendingCol, self.m_sortDescending)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
@@ -496,13 +505,16 @@ class MainFrame ( wx.Frame ):
         if len(rowsSelected)==0 and len(columnsSelected)==1:
             self.m_renameSelectedCol.Enable()
             self.m_moveSelectedCol.Enable()
+            self.m_editMenu.Enable(self.sortMenuID,True)
             columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
             if columnSelectedLabel not in self.controller.characterValues:
                 self.m_discretizeSelectedCol.Enable()
+                
         else:
             self.m_renameSelectedCol.Enable(False)
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
+            self.m_editMenu.Enable(self.sortMenuID,False)
 
         event.Skip()
 
@@ -572,18 +584,33 @@ class MainFrame ( wx.Frame ):
             if len(columnsSelected)==1:
 
                 # Renaming menu entry
-                self.popupRenameID = wx.NewId()
-                popupMenu.Append(self.popupRenameID,"Rename column")
-                self.Bind(wx.EVT_MENU, self.renameCol, id=self.popupRenameID)
+                popupRenameID = wx.NewId()
+                popupMenu.Append(popupRenameID,"Rename column")
+                self.Bind(wx.EVT_MENU, self.renameCol, id=popupRenameID)
 
-                self.popupMoveID = wx.NewId()
-                popupMenu.Append(self.popupMoveID,"Move column")
-                self.Bind(wx.EVT_MENU, self.moveCol, id=self.popupMoveID)
+                # Moving menu entry
+                popupMoveID = wx.NewId()
+                popupMenu.Append(popupMoveID,"Move column")
+                self.Bind(wx.EVT_MENU, self.moveCol, id=popupMoveID)
+
+                # Sort menu entry
+                popupSortSubMenuID = wx.NewId()
+                popupSortAscendingID = wx.NewId()
+                popupSortDescendingID = wx.NewId()
+                popupSubMenuSort = wx.Menu()
+                popupSubMenuSort.Append(popupSortAscendingID, "ascending")
+                popupSubMenuSort.Append(popupSortDescendingID, "descending")
+                popupMenu.AppendMenu(popupSortSubMenuID,"Sort using column",popupSubMenuSort)
+                self.Bind(wx.EVT_MENU, self.sortAscendingCol, id=popupSortAscendingID)
+                self.Bind(wx.EVT_MENU, self.sortDescendingCol, id=popupSortDescendingID)
+
+                # self.m_sortDescending = self.m_sortSubMenu.Append(wx.ID_ANY, "Descending")
+                # self.sortMenuID = wx.NewId()
+                # self.m_editMenu.AppendMenu(self.sortMenuID, "Sort using selected column",self.m_sortSubMenu )
+                # self.m_editMenu.Enable(self.sortMenuID,False)
                 
                 # Discretizing menu entry
                 columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
-                # print "# Selected column:",columnSelectedLabel
-                # print "# Character columns:",self.controller.characterValues
                 if columnSelectedLabel not in self.controller.characterValues:
                     self.popupDiscretizeID = wx.NewId()
                     popupMenu.Append(self.popupDiscretizeID,"Discretize column")
@@ -678,6 +705,7 @@ class MainFrame ( wx.Frame ):
             self.Layout()
             self.m_dataTable.SetGridCursor(0,newPos)
             self.m_dataTable.MakeCellVisible(0,newPos)
+            self.m_dataTable.SelectCol(newPos)
     
 
     def renameCol(self,event):
@@ -695,6 +723,7 @@ class MainFrame ( wx.Frame ):
             self.Layout()
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+            self.m_dataTable.SelectCol(columnsSelectedIndex[0])
         else:
             dlg.Destroy()
 
@@ -705,6 +734,10 @@ class MainFrame ( wx.Frame ):
         self.controller.programState.dataToAnalyse[columnSelectedLabel] = self.controller.programState.dataToAnalyse[columnSelectedLabel].astype(str)
         # print self.controller.programState.dataToAnalyse.dtypes
         self.controller.characterValues.append(columnSelectedLabel)
+        if columnSelectedLabel in self.controller.floatValues:
+            self.controller.floatValues.remove(columnSelectedLabel)
+        if columnSelectedLabel in self.controller.integerValues:
+            self.controller.integerValues.remove(columnSelectedLabel)
         self.fillInGrid()
         self.m_dataTable.AutoSize()
         self.m_dataTable.ClearSelection()
@@ -714,6 +747,30 @@ class MainFrame ( wx.Frame ):
         self.Layout()
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+        # self.m_dataTable.SelectCol(columnsSelectedIndex[0])
+
+    def sortAscendingCol(self,event):
+        self.sortCol(True)
+
+    def sortDescendingCol(self,event):
+        self.sortCol(False)
+        
+    def sortCol (self, ascendingBool):
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
+        self.controller.programState.dataToAnalyse.sort_values(columnSelectedLabel,ascending=ascendingBool,inplace=True)
+        self.fillInGrid()
+        self.m_dataTable.AutoSize()
+        self.m_dataTable.ClearSelection()
+        self.markTextColumns()
+        self.markNans()
+        self.Layout()
+        self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+        self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+        self.m_dataTable.SelectCol(columnsSelectedIndex[0])
+
+
+
 
     def deleteRows(self,event):
 
@@ -1188,6 +1245,7 @@ class MainFrame ( wx.Frame ):
             self.m_renameSelectedCol.Enable(False)
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
+            self.m_editMenu.Enable(self.sortMenuID,False)
             
             #Graphs
             self.histogramBtn.Enable( False )
