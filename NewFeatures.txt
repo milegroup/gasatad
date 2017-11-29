@@ -5,3 +5,4 @@ Edition of cells
 Columns can be moved
 Export to excel
 Sorting by a column
+Text columns can be converted to numbers

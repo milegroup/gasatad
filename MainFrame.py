@@ -22,6 +22,7 @@ import wx
 import wx.grid
 import os
 import sys
+from pandas import to_numeric
 from pandas.io.parsers import read_csv
 from pandas.io.excel import read_excel
 import numpy
@@ -125,13 +126,17 @@ class MainFrame ( wx.Frame ):
         self.m_editMenu.AppendMenu(self.sortMenuID, "Sort using selected column",self.m_sortSubMenu )
         self.m_editMenu.Enable(self.sortMenuID,False)
 
-        self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Discretize selected column", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_discretizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Convert selected column to text", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_discretizeSelectedCol )
         self.m_discretizeSelectedCol.Enable(False)
 
+        self.m_numerizeSelectedCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Convert selected column to numbers", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_numerizeSelectedCol )
+        self.m_numerizeSelectedCol.Enable(False)
+
         self.m_editMenu.AppendSeparator()
 
-        self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add discrete column...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_addNewColumn = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Add text column...", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_addNewColumn )
         self.m_addNewColumn.Enable(False)
 
@@ -416,6 +421,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
         self.Bind(wx.EVT_MENU, self.moveCol, self.m_moveSelectedCol)
         self.Bind(wx.EVT_MENU, self.discretizeCol, self.m_discretizeSelectedCol)
+        self.Bind(wx.EVT_MENU, self.numerizeCol, self.m_numerizeSelectedCol)
         self.Bind(wx.EVT_MENU, self.sortAscendingCol, self.m_sortAscending)
         self.Bind(wx.EVT_MENU, self.sortDescendingCol, self.m_sortDescending)
         self.Bind(wx.EVT_MENU, self.appInformation, self.m_menuAbout)
@@ -509,11 +515,14 @@ class MainFrame ( wx.Frame ):
             columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
             if columnSelectedLabel not in self.controller.characterValues:
                 self.m_discretizeSelectedCol.Enable()
+            if columnSelectedLabel in self.controller.characterValues:
+                self.m_numerizeSelectedCol.Enable()
                 
         else:
             self.m_renameSelectedCol.Enable(False)
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
+            self.m_numerizeSelectedCol.Enable(False)
             self.m_editMenu.Enable(self.sortMenuID,False)
 
         event.Skip()
@@ -613,8 +622,12 @@ class MainFrame ( wx.Frame ):
                 columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
                 if columnSelectedLabel not in self.controller.characterValues:
                     self.popupDiscretizeID = wx.NewId()
-                    popupMenu.Append(self.popupDiscretizeID,"Discretize column")
+                    popupMenu.Append(self.popupDiscretizeID,"Convert column to text")
                     self.Bind(wx.EVT_MENU, self.discretizeCol, id=self.popupDiscretizeID)
+                if columnSelectedLabel in self.controller.characterValues:
+                    self.popupNumerizeID = wx.NewId()
+                    popupMenu.Append(self.popupNumerizeID,"Convert column to numbers")
+                    self.Bind(wx.EVT_MENU, self.numerizeCol, id=self.popupNumerizeID)
 
             
             self.PopupMenu( popupMenu )
@@ -748,6 +761,37 @@ class MainFrame ( wx.Frame ):
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
         # self.m_dataTable.SelectCol(columnsSelectedIndex[0])
+
+    def numerizeCol(self,event):
+        print "@@ Numerizing column..."
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
+        oldType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
+        self.controller.programState.dataToAnalyse[columnSelectedLabel] = to_numeric(self.controller.programState.dataToAnalyse[columnSelectedLabel], errors='ignore')
+        newType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
+        if oldType == newType:
+            print "@@ No conversion"
+            dlg = wx.MessageDialog(None, "The column '"+columnSelectedLabel+"' could not be converted to numerical values", "Invalid conversion", wx.OK | wx.ICON_INFORMATION)
+                        
+            if dlg.ShowModal() == wx.ID_OK:
+                dlg.Destroy()
+        else:
+            self.controller.characterValues.remove(columnSelectedLabel)
+            if newType == 'float64':
+                self.controller.floatValues.append(columnSelectedLabel)
+            else:
+                self.controller.integerValues.append(columnSelectedLabel)
+            self.fillInGrid()
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.markTextColumns()
+            self.markNans()
+            # self.updateDataInfo()
+            self.Layout()
+            self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+            self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+
+        
 
     def sortAscendingCol(self,event):
         self.sortCol(True)
@@ -1152,7 +1196,7 @@ class MainFrame ( wx.Frame ):
                 else:                      
                     self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
         
-        self.controller.sortVariables()
+        self.controller.detectColumnTypes()
 
 
     def markTextColumns(self):
@@ -1160,7 +1204,6 @@ class MainFrame ( wx.Frame ):
             if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
                 for row in range(self.controller.getNumberOfRows()):
                     self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
-                    # self.m_dataTable.SetCellBackgroundColour(row,col,'lightgoldenrodyellow')
     
 
     def markNans(self):
@@ -1245,6 +1288,7 @@ class MainFrame ( wx.Frame ):
             self.m_renameSelectedCol.Enable(False)
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
+            self.m_numerizeSelectedCol.Enable(False)
             self.m_editMenu.Enable(self.sortMenuID,False)
             
             #Graphs
@@ -1498,17 +1542,6 @@ class MainFrame ( wx.Frame ):
             
             dlg.Destroy()
     
-    
-    
-    def firstFileAdded(self):
-        
-        dlg = wx.MessageDialog(None, "A file has been opened\nClick 'yes' to add another file to the data", "Additional File", wx.YES_NO | wx.ICON_INFORMATION)
-                        
-        if dlg.ShowModal() == wx.ID_YES:            
-            self.OpenAdditionalFile()
-    
-        else:  
-            dlg.Destroy()
 
 
     

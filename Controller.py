@@ -123,7 +123,7 @@ class Controller():
 
     def changeCellValue(self, row, col, newValue):
         self.programState.dataToAnalyse.iloc[row,col] = newValue
-        self.sortVariables()
+        self.detectColumnTypes()
 
 
     def renameColumn(self,oldLabel,newLabel):
@@ -137,7 +137,7 @@ class Controller():
 
 
         
-    def sortVariables(self):
+    def detectColumnTypes(self):
        
         '''
         Check  the type of the variables saved on Dataframe: int, float or string
