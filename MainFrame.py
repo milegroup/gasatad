@@ -763,14 +763,12 @@ class MainFrame ( wx.Frame ):
         # self.m_dataTable.SelectCol(columnsSelectedIndex[0])
 
     def numerizeCol(self,event):
-        print "@@ Numerizing column..."
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         oldType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
         self.controller.programState.dataToAnalyse[columnSelectedLabel] = to_numeric(self.controller.programState.dataToAnalyse[columnSelectedLabel], errors='ignore')
         newType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
         if oldType == newType:
-            print "@@ No conversion"
             dlg = wx.MessageDialog(None, "The column '"+columnSelectedLabel+"' could not be converted to numerical values", "Invalid conversion", wx.OK | wx.ICON_INFORMATION)
                         
             if dlg.ShowModal() == wx.ID_OK:
@@ -1104,14 +1102,16 @@ class MainFrame ( wx.Frame ):
                 if discardCol and fileType=="csv":
                     self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-            
-            if readCorrect and self.controller.OpenAdditionalFile(self.data)==False:
+
+            if readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
                 self.dlg = wx.MessageDialog(None, "Number of rows does not match: \n  Loaded data has "+str(self.m_dataTable.GetNumberRows())+" rows \n  File "+self.filename+" has "+str(len(self.data.index))+" rows ", "File error", wx.OK | wx.ICON_EXCLAMATION)
                 if self.dlg.ShowModal() == wx.ID_OK:
                     self.dlg.Destroy()
                 readCorrect = False
 
             if readCorrect:
+                self.controller.OpenAdditionalFile(self.data)
+
                 self.fillInGrid()
                 self.m_dataTable.AutoSize()
                 self.markTextColumns()
@@ -1250,7 +1250,6 @@ class MainFrame ( wx.Frame ):
                 else:
                     path = self.directory + "/" + self.filename
                     self.controller.exportDataExcel(path)
-                    print "@@ exporting to excel"
 
 
     
