@@ -17,7 +17,6 @@ MAC:
 	Export to xls: add modules xlwt and openpyxl in dependencies
 
 DEB:
-	Export to xls: add modules xlwt and openpyxl in dependencies
 
 
 For the future:
