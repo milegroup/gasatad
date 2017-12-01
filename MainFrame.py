@@ -119,6 +119,10 @@ class MainFrame ( wx.Frame ):
         self.m_editMenu.AppendItem( self.m_moveSelectedCol )
         self.m_moveSelectedCol.Enable(False)
 
+        self.m_replaceInCol = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Replace in selected column...", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_replaceInCol )
+        self.m_replaceInCol.Enable(False)
+
         self.m_sortSubMenu = wx.Menu()
         self.m_sortAscending = self.m_sortSubMenu.Append(wx.ID_ANY, "ascending")
         self.m_sortDescending = self.m_sortSubMenu.Append(wx.ID_ANY, "descending")
@@ -420,6 +424,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.deleteColumnsRows, self.m_deletedSelectedCR)
         self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
         self.Bind(wx.EVT_MENU, self.moveCol, self.m_moveSelectedCol)
+        self.Bind(wx.EVT_MENU, self.replaceInCol, self.m_replaceInCol)
         self.Bind(wx.EVT_MENU, self.discretizeCol, self.m_discretizeSelectedCol)
         self.Bind(wx.EVT_MENU, self.numerizeCol, self.m_numerizeSelectedCol)
         self.Bind(wx.EVT_MENU, self.sortAscendingCol, self.m_sortAscending)
@@ -475,7 +480,7 @@ class MainFrame ( wx.Frame ):
                     self.OpenCSVFileNoGUI(CSVFileName)
 
     def cellModification(self,event):
-        dlg = wx.TextEntryDialog(self, "Type new value for cell (empty for 'null'):", 'Change Cell', '')
+        dlg = wx.TextEntryDialog(self, "Type new value for cell (empty for 'null'):", 'Change cell', '')
         if dlg.ShowModal() == wx.ID_OK:
             newValue = dlg.GetValue()
             dlg.Destroy()
@@ -517,12 +522,14 @@ class MainFrame ( wx.Frame ):
                 self.m_discretizeSelectedCol.Enable()
             if columnSelectedLabel in self.controller.characterValues:
                 self.m_numerizeSelectedCol.Enable()
+                self.m_replaceInCol.Enable()
                 
         else:
             self.m_renameSelectedCol.Enable(False)
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
             self.m_numerizeSelectedCol.Enable(False)
+            self.m_replaceInCol.Enable(False)
             self.m_editMenu.Enable(self.sortMenuID,False)
 
         event.Skip()
@@ -739,6 +746,29 @@ class MainFrame ( wx.Frame ):
             self.m_dataTable.SelectCol(columnsSelectedIndex[0])
         else:
             dlg.Destroy()
+
+    def replaceInCol(self,event):
+        columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+        colLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
+        print "@@ Going to replace in column",colLabel
+        listTags = list(self.controller.programState.dataToAnalyse[str(colLabel)].unique())
+        print "@@ Tags in column:", listTags
+
+        selectValuesInterface = ReplaceInColInterface(self,listTags)
+
+        if selectValuesInterface.ShowModal() == wx.ID_OK:
+            oldTag, newTag = selectValuesInterface.getValues()
+
+        print "@@ Old tag:", oldTag
+        print "@@ New tag:", newTag
+        self.controller.replaceInTextCol(colLabel,oldTag,newTag)
+        self.fillInGrid()
+        self.m_dataTable.AutoSize()
+        self.m_dataTable.ClearSelection()
+        self.Layout()
+        self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+        self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+        self.m_dataTable.SelectCol(columnsSelectedIndex[0])
 
     def discretizeCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
@@ -1288,6 +1318,7 @@ class MainFrame ( wx.Frame ):
             self.m_moveSelectedCol.Enable(False)
             self.m_discretizeSelectedCol.Enable(False)
             self.m_numerizeSelectedCol.Enable(False)
+            self.m_replaceInCol.Enable(False)
             self.m_editMenu.Enable(self.sortMenuID,False)
             
             #Graphs
@@ -1320,8 +1351,7 @@ class MainFrame ( wx.Frame ):
         
         if  selectedColumnsInterface.ShowModal() == wx.ID_OK:
             
-            dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?",
-                                   "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
+            dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?", "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
             
             if dlg.ShowModal() == wx.ID_OK:
@@ -1630,7 +1660,48 @@ class MainFrame ( wx.Frame ):
                 # print "param",param,"  -  value",value
 
 
+class ReplaceInColInterface(wx.Dialog):
+    def __init__(self,parent,listOfTags):
 
+        wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Replace in column", size = wx.DefaultSize, pos = wx.DefaultPosition)
+
+        mainSizer = wx.BoxSizer(wx.VERTICAL)
+
+        topSizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        leftSizer = wx.BoxSizer(wx.VERTICAL)
+        leftSizer.Add(wx.StaticText(self,-1,"Old value:"))
+        leftSizer.Add(wx.StaticText(self,-1,"New value (empty for 'null'):"))
+        topSizer.Add(leftSizer)
+
+        rightSizer = wx.BoxSizer(wx.VERTICAL)
+        rightSizer.Add(wx.StaticText(self,-1,"Old value:"))
+        rightSizer.Add(wx.StaticText(self,-1,"New value (empty for 'null'):"))
+        topSizer.Add(rightSizer)
+
+        mainSizer.Add(topSizer)
+
+        #Ok and Cancel buttons
+        okay = wx.Button( self, wx.ID_OK )
+        cancel = wx.Button( self, wx.ID_CANCEL )
+        btns = wx.StdDialogButtonSizer()
+        btns.AddButton(okay)
+        btns.AddButton(cancel)
+        btns.Realize()
+
+        mainSizer.Add( btns ) 
+        mainSizer.Fit(self)              
+        
+        self.SetSizer( mainSizer )
+
+        self.Layout()
+        self.Fit()
+        self.Centre( wx.BOTH )
+
+        self.Show(True)
+
+    def getValues(self):
+        return "Night","Proba"
 
 class DeleteColumnsInterface ( wx.Dialog ):    
 
@@ -1643,7 +1714,6 @@ class DeleteColumnsInterface ( wx.Dialog ):
         
         wx.Dialog.__init__ ( self, parent, id = wx.ID_ANY, title = "Delete columns", pos = wx.DefaultPosition, size = wx.DefaultSize, style = wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL )
         
-        self.SetSizeHintsSz( wx.DefaultSize, wx.DefaultSize )
         
         gbSizer1 = wx.GridBagSizer( 0, 0 )
         gbSizer1.SetFlexibleDirection( wx.BOTH )
@@ -1684,30 +1754,17 @@ class DeleteColumnsInterface ( wx.Dialog ):
 
 
     def changeValueCheckBox(self, event):
-        
         checkBox = event.GetEventObject()
-        
         if checkBox.IsChecked():
-            
             self.selectedColumns[checkBox.GetLabel()]= True
-                        
         else:
-            
             self.selectedColumns[checkBox.GetLabel()]= False
 
-         
-            
     def getSelectedColumns(self):
-        
         listSelectedColumns = []
-        
         for key in self.selectedColumns.keys():
-            
             if self.selectedColumns[key]:
-                
                 listSelectedColumns.append(key)
-                
-        
         return listSelectedColumns
 
 

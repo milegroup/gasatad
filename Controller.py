@@ -125,6 +125,8 @@ class Controller():
         self.programState.dataToAnalyse.iloc[row,col] = newValue
         self.detectColumnTypes()
 
+    def replaceInTextCol(self,colLabel,oldTag,newTag):
+        self.programState.dataToAnalyse[colLabel].replace([oldTag],newTag,inplace=True)
 
     def renameColumn(self,oldLabel,newLabel):
         self.programState.dataToAnalyse.rename(columns={oldLabel:newLabel},inplace=True)
@@ -162,16 +164,9 @@ class Controller():
                 
                 self.characterValues.append(col)
     
-    '''
-    def initializationComboBox(self):
-        
-        self.programState.initializationComboBoxStatus(self.characterValues)
-    '''
     
     def resetDataToAnalyse(self):
-        
         for column in self.programState.dataToAnalyse.columns:
-        
             del self.programState.dataToAnalyse[column]
 
 
