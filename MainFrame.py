@@ -1671,12 +1671,14 @@ class ReplaceInColInterface(wx.Dialog):
 
         leftSizer = wx.BoxSizer(wx.VERTICAL)
         leftSizer.Add(wx.StaticText(self,-1,"Old value:"))
-        leftSizer.Add(wx.StaticText(self,-1,"New value (empty for 'null'):"))
+        self.cb = wx.ComboBox(self,choices = listOfTags)
+        leftSizer.Add(self.cb)
         topSizer.Add(leftSizer)
 
         rightSizer = wx.BoxSizer(wx.VERTICAL)
-        rightSizer.Add(wx.StaticText(self,-1,"Old value:"))
         rightSizer.Add(wx.StaticText(self,-1,"New value (empty for 'null'):"))
+        self.tc = wx.TextCtrl(self)
+        rightSizer.Add(self.tc)
         topSizer.Add(rightSizer)
 
         mainSizer.Add(topSizer)
@@ -1701,7 +1703,7 @@ class ReplaceInColInterface(wx.Dialog):
         self.Show(True)
 
     def getValues(self):
-        return "Night","Proba"
+        return self.cb.GetValue() ,self.tc.GetValue()
 
 class DeleteColumnsInterface ( wx.Dialog ):    
 
