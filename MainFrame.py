@@ -609,6 +609,13 @@ class MainFrame ( wx.Frame ):
                 popupMenu.Append(popupMoveID,"Move column")
                 self.Bind(wx.EVT_MENU, self.moveCol, id=popupMoveID)
 
+                columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+
+                if columnSelectedLabel in self.controller.characterValues:
+                    self.popupReplaceInColID = wx.NewId()
+                    popupMenu.Append(self.popupReplaceInColID,"Replace in column")
+                    self.Bind(wx.EVT_MENU, self.replaceInCol, id=self.popupReplaceInColID)
+
                 # Sort menu entry
                 popupSortSubMenuID = wx.NewId()
                 popupSortAscendingID = wx.NewId()
@@ -626,7 +633,7 @@ class MainFrame ( wx.Frame ):
                 # self.m_editMenu.Enable(self.sortMenuID,False)
                 
                 # Discretizing menu entry
-                columnSelectedLabel = self.m_dataTable.GetColLabelValue(self.m_dataTable.GetSelectedCols()[0])
+                
                 if columnSelectedLabel not in self.controller.characterValues:
                     self.popupDiscretizeID = wx.NewId()
                     popupMenu.Append(self.popupDiscretizeID,"Convert column to text")
@@ -750,25 +757,29 @@ class MainFrame ( wx.Frame ):
     def replaceInCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         colLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
-        print "@@ Going to replace in column",colLabel
         listTags = list(self.controller.programState.dataToAnalyse[str(colLabel)].unique())
-        print "@@ Tags in column:", listTags
+
+        if numpy.NaN in listTags:
+            listTags.remove(numpy.NaN)
+            listTags.insert(0,'null')
 
         selectValuesInterface = ReplaceInColInterface(self,listTags)
 
         if selectValuesInterface.ShowModal() == wx.ID_OK:
             oldTag, newTag = selectValuesInterface.getValues()
-
-        print "@@ Old tag:", oldTag
-        print "@@ New tag:", newTag
-        self.controller.replaceInTextCol(colLabel,oldTag,newTag)
-        self.fillInGrid()
-        self.m_dataTable.AutoSize()
-        self.m_dataTable.ClearSelection()
-        self.Layout()
-        self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
-        self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
-        self.m_dataTable.SelectCol(columnsSelectedIndex[0])
+            if oldTag == 'null':
+                oldTag = numpy.NaN
+            if newTag == "":
+                newTag = numpy.NaN
+            self.controller.replaceInTextCol(colLabel,oldTag,newTag)
+            self.fillInGrid()
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            self.markNans()
+            self.Layout()
+            self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
+            self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
+            self.m_dataTable.SelectCol(columnsSelectedIndex[0])
 
     def discretizeCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
@@ -989,10 +1000,8 @@ class MainFrame ( wx.Frame ):
         self.params['noOfFiles'] += 1
         self.updateDataInfo()
         self.m_dataTable.SetFocus()
-
         
         self.Layout()
-
 
     def OpenFile(self, event, fileName = None):       
         
@@ -1253,6 +1262,8 @@ class MainFrame ( wx.Frame ):
                 else:
                     if self.m_dataTable.GetColLabelValue(col) not in self.controller.characterValues:
                         self.m_dataTable.SetCellBackgroundColour(row,col,'white')
+                    else:
+                        self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
 
     
     def saveData(self, event):
@@ -1671,18 +1682,20 @@ class ReplaceInColInterface(wx.Dialog):
 
         leftSizer = wx.BoxSizer(wx.VERTICAL)
         leftSizer.Add(wx.StaticText(self,-1,"Old value:"))
-        self.cb = wx.ComboBox(self,choices = listOfTags)
-        leftSizer.Add(self.cb)
-        topSizer.Add(leftSizer)
+        self.cb = wx.ComboBox(self,choices = listOfTags, value=listOfTags[0])
+        leftSizer.Add(self.cb, 0, wx.TOP | wx.LEFT, 5)
+        topSizer.Add(leftSizer, 0, wx.ALL, 10)
+
+        
 
         rightSizer = wx.BoxSizer(wx.VERTICAL)
         rightSizer.Add(wx.StaticText(self,-1,"New value (empty for 'null'):"))
         self.tc = wx.TextCtrl(self)
-        rightSizer.Add(self.tc)
-        topSizer.Add(rightSizer)
+        rightSizer.Add(self.tc, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
+        topSizer.Add(rightSizer, 0, wx.ALL, 10)
 
         mainSizer.Add(topSizer)
-
+ 
         #Ok and Cancel buttons
         okay = wx.Button( self, wx.ID_OK )
         cancel = wx.Button( self, wx.ID_CANCEL )
@@ -1691,7 +1704,7 @@ class ReplaceInColInterface(wx.Dialog):
         btns.AddButton(cancel)
         btns.Realize()
 
-        mainSizer.Add( btns ) 
+        mainSizer.Add( btns, 0, wx.BOTTOM|wx.ALIGN_RIGHT, 10 ) 
         mainSizer.Fit(self)              
         
         self.SetSizer( mainSizer )
@@ -1743,7 +1756,7 @@ class DeleteColumnsInterface ( wx.Dialog ):
         btns.AddButton(cancel)
         btns.Realize()
 
-        gbSizer1.Add( btns, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND | wx.ALL, 5 )               
+        gbSizer1.Add( btns, wx.GBPosition( 1, 0 ), wx.GBSpan( 1, 1 ), wx.BOTTOM|wx.ALIGN_RIGHT, 10 )               
         
         self.SetSizer( gbSizer1 )
         gbSizer1.Fit(self)

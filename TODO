@@ -2,7 +2,7 @@ ALL:
 	Help
 	Change "Attention" to "ERROR"
 	See "No data" cells in NUTRITION_WH2
-	Add new column: position of buttons
+	Add new column: review the window
 	Autodetection of columns converted to ints?
 
 	Increase data information: number of text, integer and float columns?

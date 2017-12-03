@@ -161,7 +161,7 @@ class AddColumnInterface ( wx.Dialog ):
         btns.AddButton(cancel)
         btns.Realize()
         
-        mainSizer.Add( btns, 0, wx.ALIGN_CENTER | wx.ALL, 5 )
+        mainSizer.Add( btns, 0,wx.BOTTOM|wx.ALIGN_RIGHT, 10 )
         gbSizer1.Add( gbSizer2, wx.GBPosition( 0, 1 ), wx.GBSpan( 2, 1 ), wx.EXPAND|wx.LEFT, 5 )
         
         
