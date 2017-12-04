@@ -16,64 +16,15 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
-
-#from pandas.core.frame import DataFrame
-
-
-'''
-This class stores the data that comes from the first file
-'''
-
-class QuantitativeData():    
-    
-    def __init__(self):
-        
-        #It stores the data that comes from the first file
-        self.quantitativeData = None
-        
-        
-    def setQuantitativeData (self, data):
-        
-        self.quantitativeData = data    
-        
-    def getQuantitativeData(self):
-        
-        return self.quantitativeData   
-        
-
-
-class QualitativeData():
-
-    def __init__(self):
-        
-        #It stores the data that comes from the second file
-        self.qualitativeData = None
-     
-        
-    def setQualitativeData (self, data):
-        
-        self.qualitativeData = data
-        
-    def getQualitativeData(self):
-        
-        return self.qualitativeData
-    
-    
     
 
 class ProgramState():
-    
     
     def __init__(self):
         
         self.fileIsOpen = False
         self.additionalFileIsOpen = False
-        
-        
-        self.quantitativeData = QuantitativeData()
-        self.qualitativeData = QualitativeData()
-        
-        
+                
         self.dataToAnalyse = None
         self.result = None
         self.checkBoxStatus = []
@@ -81,95 +32,24 @@ class ProgramState():
         self.additionalFileOpened = False
         
         self.informationFile = FileInformation()
-        # self.informationAdditionalFile = FileInformation() 
         
-    def getDataToAnalyse(self):
-        
-        return self.dataToAnalyse
-    
-    
-    
-    def getQuatitativeData(self):
-        
-        return self.quantitativeData
-    
-    
-    
-    def getQualitativeData(self):
-        
-        return self.qualitativeData
-    
-    
-    
-    def setDataToAnalyse(self, newData):
-        
-        self.dataToAnalyse = newData
-    
-    
-    
-    def setQuantitativeData(self, newData):
-        
-        self.quantitativeData = newData
-    
-    
-        
-    def SetQualitativeData(self, newData):
-        
-        self.qualitativeData = newData
-    
-    
-    def changeStatusCheckBox(self, nameCheckBox, status):
-        
-        self.checkBoxStatus[nameCheckBox] = status
-            
-
-           
-    def initializationComboBoxStatus(self, characterValues):
-        
-        self.comboBoxStatus = dict.fromkeys(characterValues)
-        
-        '''
-        All the values of the dictionary are initialized into False, because at first, none of the
-        checkBox will be checked
-        '''
-        
-        for i in characterValues:
-            
-            self.comboBoxStatus[i] = ""
-            
-
-    def changeStatusComboBox(self, nameComboBox, status):
-        
-        self.comboBoxStatus[nameComboBox] = status
-
     
     def setInformationFile(self, nCols, nRows):
-        
         self.informationFile.setNumberOfCols(nCols)
         self.informationFile.setNumberOfRows(nRows)
         
         
-    # def setInformationAdditionalFile(self, nCols, nRows, name):
-        
-    #     self.informationAdditionalFile.setNumberOfCols(nCols)
-    #     self.informationAdditionalFile.setNumberOfRows(nRows)
-    #     self.informationAdditionalFile.setNameOfFile(name)
-
 class FileInformation():
 
     
     def __init__(self, nCols = 0, nRows = 0):
-        
         self.numColumns = nCols
         self.numRows = nRows
-
     
     def setNumberOfCols(self, nCols):
-        
         self.numColumns = nCols
         
     def setNumberOfRows(self, nRows):
-        
         self.numRows = nRows
         
    
