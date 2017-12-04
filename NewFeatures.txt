@@ -1,1 +1,8 @@
 Replace in text columns
+
+Undo:
+    Change cell
+
+    Move column
+    Replace
+    Sort using column

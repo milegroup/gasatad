@@ -21,15 +21,10 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 class ProgramState():
     
     def __init__(self):
-        
-        self.fileIsOpen = False
-        self.additionalFileIsOpen = False
                 
         self.dataToAnalyse = None
-        self.result = None
         self.checkBoxStatus = []
         self.comboBoxStatus = {}
-        self.additionalFileOpened = False
         
         self.informationFile = FileInformation()
         

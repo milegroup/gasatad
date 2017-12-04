@@ -105,6 +105,13 @@ class MainFrame ( wx.Frame ):
 
         self.m_editMenu = wx.Menu()
 
+        self.m_undo = wx.MenuItem( self.m_fileMenu,wx.ID_UNDO, u"Undo", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_editMenu.AppendItem( self.m_undo )
+        self.m_undo.Enable(False)
+
+        self.m_editMenu.AppendSeparator()
+        
+
         self.m_deletedSelectedCR = wx.MenuItem( self.m_fileMenu,wx.ID_ANY, u"Delete selected columns/rows", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_editMenu.AppendItem( self.m_deletedSelectedCR )
         self.m_deletedSelectedCR.Enable(False)
@@ -178,7 +185,7 @@ class MainFrame ( wx.Frame ):
 
         self.m_aboutMenu = wx.Menu()
 
-        self.m_menuAbout = wx.MenuItem( self.m_aboutMenu, wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+        self.m_menuAbout = wx.MenuItem( self.m_aboutMenu, wx.ID_ABOUT, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_aboutMenu.AppendItem(self.m_menuAbout)
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
@@ -419,6 +426,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
+        self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
         self.Bind(wx.EVT_MENU, self.deleteColumns, self.m_deleteColumns)
         self.Bind(wx.EVT_MENU, self.deleteColumnsRows, self.m_deletedSelectedCR)
@@ -479,6 +487,21 @@ class MainFrame ( wx.Frame ):
                     print "Loading CSV file: "+CSVFileName
                     self.OpenCSVFileNoGUI(CSVFileName)
 
+    def undo(self,event):
+        print "@@ Undo"
+        self.controller.recoverData()
+        if not self.m_dataTable.IsEnabled():
+            self.m_dataTable.Enable()
+        self.fillInGrid()
+        self.m_dataTable.AutoSize()
+        self.m_dataTable.ClearSelection()
+        self.markTextColumns()
+        self.markNans()
+        self.updateDataInfo()
+        self.Layout()
+        self.m_undo.SetText("Undo")
+        self.m_undo.Enable(False)
+
     def cellModification(self,event):
         dlg = wx.TextEntryDialog(self, "Type new value for cell (empty for 'null'):", 'Change cell', '')
         if dlg.ShowModal() == wx.ID_OK:
@@ -491,6 +514,11 @@ class MainFrame ( wx.Frame ):
                     newValue2 = numpy.float64(newValue)
                 except:
                     newValue2 = newValue
+
+            self.controller.storeData()
+            self.m_undo.SetText("Undo change cell")
+            self.m_undo.Enable()
+
             self.controller.changeCellValue(event.GetRow(),event.GetCol(),newValue2)
             self.fillInGrid()
             self.m_dataTable.AutoSize()
@@ -719,6 +747,10 @@ class MainFrame ( wx.Frame ):
                 dlg.Destroy()
                 break
         if newPosOk:
+            self.controller.storeData()
+            self.m_undo.SetText("Undo move column")
+            self.m_undo.Enable()
+
             colIndex =  list(self.controller.getDataToAnalyse().columns)
             label = colIndex[columnsSelectedIndex[0]]
             colIndex.pop(columnsSelectedIndex[0])
@@ -766,16 +798,22 @@ class MainFrame ( wx.Frame ):
         selectValuesInterface = ReplaceInColInterface(self,listTags)
 
         if selectValuesInterface.ShowModal() == wx.ID_OK:
+            self.controller.storeData()
+            self.m_undo.SetText("Undo replace")
+            self.m_undo.Enable()
+
             oldTag, newTag = selectValuesInterface.getValues()
             if oldTag == 'null':
                 oldTag = numpy.NaN
             if newTag == "":
                 newTag = numpy.NaN
+
             self.controller.replaceInTextCol(colLabel,oldTag,newTag)
             self.fillInGrid()
             self.m_dataTable.AutoSize()
             self.m_dataTable.ClearSelection()
             self.markNans()
+            self.updateDataInfo()
             self.Layout()
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -839,6 +877,10 @@ class MainFrame ( wx.Frame ):
         self.sortCol(False)
         
     def sortCol (self, ascendingBool):
+        self.controller.storeData()
+        self.m_undo.SetText("Undo sort rows")
+        self.m_undo.Enable()
+
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         self.controller.programState.dataToAnalyse.sort_values(columnSelectedLabel,ascending=ascendingBool,inplace=True)
@@ -1299,8 +1341,7 @@ class MainFrame ( wx.Frame ):
         dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?","Reset table", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
         result = dlg.ShowModal()
         dlg.Destroy()
-        if result == wx.ID_OK:
-        
+        if result == wx.ID_OK:        
             self.controller.resetDataToAnalyse()
 
             self.fillInGrid()

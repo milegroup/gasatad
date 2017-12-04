@@ -27,6 +27,8 @@ if sys.platform=="darwin":
     matplotlib.use('WXAgg')
 import matplotlib.pyplot as plt
 
+import copy
+
 from Model import  ProgramState
 
 
@@ -584,3 +586,26 @@ class Controller():
 
     def nullValuesInFile(self, data): 
         return pandas.isnull(data).values.any()
+
+    def storeData(self):
+        print "@@ Storing data"
+        self.programStateBackup = copy.deepcopy(self.programState)
+        self.characterValuesBackup = list(self.characterValues)
+        self.floatValuesBackup = list (self.floatValues)
+        self.integerValuesBackup = list (self.integerValues)
+
+    def recoverData(self):
+        print "@@ Recovering data"
+        self.programState = copy.deepcopy(self.programStateBackup)
+        self.characterValues = list(self.characterValuesBackup)
+        self.floatValues = list (self.floatValuesBackup)
+        self.integerValues = list (self.integerValuesBackup)
+
+        self.programStateBackup = None
+        self.characterValuesBackup = None
+        self.floatValuesBackup = None
+        self.integerValuesBackup = None
+
+
+
+
