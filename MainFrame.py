@@ -520,13 +520,7 @@ class MainFrame ( wx.Frame ):
             self.m_undo.Enable()
 
             self.controller.changeCellValue(event.GetRow(),event.GetCol(),newValue2)
-            self.fillInGrid()
-            self.m_dataTable.AutoSize()
-            self.m_dataTable.ClearSelection()
-            self.markTextColumns()
-            self.markNans()
-            self.updateDataInfo()
-            self.Layout()
+            self.refreshTable()
             event.Skip()
         else:
             dlg.Destroy()
@@ -756,12 +750,9 @@ class MainFrame ( wx.Frame ):
             colIndex.pop(columnsSelectedIndex[0])
             colIndex.insert(newPos,label)
             self.controller.reorderColumns(colIndex)
-            self.fillInGrid()
-            self.m_dataTable.AutoSize()
-            self.m_dataTable.ClearSelection()
-            self.markTextColumns()
-            self.markNans()
-            self.Layout()
+
+            self.refreshTable(updateDataInfo=False)
+            
             self.m_dataTable.SetGridCursor(0,newPos)
             self.m_dataTable.MakeCellVisible(0,newPos)
             self.m_dataTable.SelectCol(newPos)
@@ -809,12 +800,10 @@ class MainFrame ( wx.Frame ):
                 newTag = numpy.NaN
 
             self.controller.replaceInTextCol(colLabel,oldTag,newTag)
-            self.fillInGrid()
-            self.m_dataTable.AutoSize()
-            self.m_dataTable.ClearSelection()
-            self.markNans()
-            self.updateDataInfo()
-            self.Layout()
+
+            self.refreshTable(markTextColumns=False)
+
+            
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
             self.m_dataTable.SelectCol(columnsSelectedIndex[0])
@@ -884,12 +873,9 @@ class MainFrame ( wx.Frame ):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         self.controller.programState.dataToAnalyse.sort_values(columnSelectedLabel,ascending=ascendingBool,inplace=True)
-        self.fillInGrid()
-        self.m_dataTable.AutoSize()
-        self.m_dataTable.ClearSelection()
-        self.markTextColumns()
-        self.markNans()
-        self.Layout()
+
+        self.refreshTable(updateDataInfo = False)
+        
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
         self.m_dataTable.SelectCol(columnsSelectedIndex[0])
@@ -1395,8 +1381,19 @@ class MainFrame ( wx.Frame ):
         self.m_discardColumn.Check()
         self.m_CSVSeparator1.Check()
 
+    def refreshTable(self, updateDataInfo = True, markTextColumns = True):
 
-    
+        self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
+        self.m_dataTable.AutoSize()
+        self.m_dataTable.ClearSelection()
+        if markTextColumns:
+            self.markTextColumns()
+        self.markNans()
+        if updateDataInfo:
+            self.updateDataInfo()
+        self.Layout()
+
+            
     def deleteColumns(self, event):
         
         selectedColumnsInterface = DeleteColumnsInterface(self, list(self.controller.programState.dataToAnalyse.columns))
