@@ -3,7 +3,10 @@ Replace in text columns
 Undo:
     Change cell
 
+    Rename column
     Move column
     Replace
     Sort using column
     Convert to text
+    Convert to numbers
+    Add text column

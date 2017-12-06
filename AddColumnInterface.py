@@ -48,7 +48,7 @@ class AddColumnInterface ( wx.Dialog ):
         
         mainSizer.Add(gbSizer1)
         
-        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Select the Variable" ), wx.VERTICAL )
+        sbSizer1 = wx.StaticBoxSizer( wx.StaticBox( self, wx.ID_ANY, u"Source column" ), wx.VERTICAL )
         
         fgVarSizer = wx.FlexGridSizer( 0, 2, 0, 0 )
         fgVarSizer.SetFlexibleDirection( wx.BOTH )
@@ -71,15 +71,16 @@ class AddColumnInterface ( wx.Dialog ):
         
         bSizer2 = wx.BoxSizer( wx.HORIZONTAL )
         
-        self.staticTextCol = wx.StaticText( self, wx.ID_ANY, u"Column Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.staticTextCol = wx.StaticText( self, wx.ID_ANY, u"New column name:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.staticTextCol.Wrap( -1 )
-        bSizer2.Add( self.staticTextCol, 0, wx.ALIGN_CENTER|wx.ALL, 5 )
+        bSizer2.Add( self.staticTextCol, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
         self.textCtrlCol = wx.TextCtrl( self, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer2.Add( self.textCtrlCol, 0, wx.ALIGN_BOTTOM|wx.ALIGN_CENTER|wx.EXPAND, 20 )
+        bSizer2.Add( self.textCtrlCol, 0,  wx.ALL | wx.EXPAND, 5 )
         
+        gbSizer2.Add( bSizer2, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALL | wx.EXPAND, 5 )
+
         
-        gbSizer2.Add( bSizer2, wx.GBPosition( 0, 0 ), wx.GBSpan( 1, 1 ), wx.ALIGN_CENTER | wx.ALL, 10 )
         
         
         self.fgSizer9 = wx.FlexGridSizer( 0, 1, 0, 0 )
@@ -104,7 +105,7 @@ class AddColumnInterface ( wx.Dialog ):
         self.floatSpinCtrl_1.SetDigits(3)
         self.fgSizer10.Add( self.floatSpinCtrl_1, 0, wx.ALL, 5 )
         
-        self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"To:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"to:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.m_staticText10.Wrap( -1 )
         self.fgSizer10.Add( self.m_staticText10, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -114,7 +115,7 @@ class AddColumnInterface ( wx.Dialog ):
         self.floatSpinCtrl_2.SetDigits(3)
         self.fgSizer10.Add( self.floatSpinCtrl_2, 0, wx.ALL, 5 )
         
-        self.staticTextNameVar = wx.StaticText( self, wx.ID_ANY, u"Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.staticTextNameVar = wx.StaticText( self, wx.ID_ANY, u"name:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.staticTextNameVar.Wrap( -1 )
         self.fgSizer10.Add( self.staticTextNameVar, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -144,7 +145,7 @@ class AddColumnInterface ( wx.Dialog ):
         fgSizer4.SetFlexibleDirection( wx.HORIZONTAL )
         fgSizer4.SetNonFlexibleGrowMode( wx.FLEX_GROWMODE_SPECIFIED )
         
-        self.staticTextDefaultValue = wx.StaticText( self, wx.ID_ANY, u"Default Value:", wx.DefaultPosition, wx.DefaultSize, 0 )
+        self.staticTextDefaultValue = wx.StaticText( self, wx.ID_ANY, u"Default value:", wx.DefaultPosition, wx.DefaultSize, 0 )
         self.staticTextDefaultValue.Wrap( -1 )
         fgSizer4.Add( self.staticTextDefaultValue, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
         
@@ -152,7 +153,7 @@ class AddColumnInterface ( wx.Dialog ):
         fgSizer4.Add( self.textCtrlDefaultVal, 0, wx.ALL|wx.EXPAND, 5 )
         
         
-        gbSizer2.Add( fgSizer4, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.EXPAND, 5 )
+        gbSizer2.Add( fgSizer4, wx.GBPosition( 2, 0 ), wx.GBSpan( 1, 1 ), wx.ALL | wx.EXPAND, 5 )
 
         okay = wx.Button( self, wx.ID_OK )
         cancel = wx.Button( self, wx.ID_CANCEL )
@@ -164,15 +165,14 @@ class AddColumnInterface ( wx.Dialog ):
         mainSizer.Add( btns, 0,wx.BOTTOM|wx.ALIGN_RIGHT, 10 )
         gbSizer1.Add( gbSizer2, wx.GBPosition( 0, 1 ), wx.GBSpan( 2, 1 ), wx.EXPAND|wx.LEFT, 5 )
         
-        
         self.SetSizer( mainSizer )
-        mainSizer.Fit(self)
+
         self.Layout()
         self.Fit()
         self.Centre( wx.BOTH )   
         
         #List to control sizers
-        self.sizerList.append(self.fgSizer10)
+        self.sizerList.append(self.fgSizer10)   
         
         
         #Add the spinContrl to a list to have all of them controlled and to gain access to them
@@ -231,7 +231,7 @@ class AddColumnInterface ( wx.Dialog ):
             self.floatSpinCtrl_3.SetDigits(3)
             fgSizer.Add( self.floatSpinCtrl_3, 0, wx.ALL, 5 )
             
-            self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"To:", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.m_staticText10 = wx.StaticText( self, wx.ID_ANY, u"to:", wx.DefaultPosition, wx.DefaultSize, 0 )
             self.m_staticText10.Wrap( -1 )
             fgSizer.Add( self.m_staticText10, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
             
@@ -241,7 +241,7 @@ class AddColumnInterface ( wx.Dialog ):
             self.floatSpinCtrl_4.SetDigits(3)
             fgSizer.Add( self.floatSpinCtrl_4, 0, wx.ALL, 5 )
             
-            self.staticTextNameVar = wx.StaticText( self, wx.ID_ANY, u"Name:", wx.DefaultPosition, wx.DefaultSize, 0 )
+            self.staticTextNameVar = wx.StaticText( self, wx.ID_ANY, u"name:", wx.DefaultPosition, wx.DefaultSize, 0 )
             self.staticTextNameVar.Wrap( -1 )
             fgSizer.Add( self.staticTextNameVar, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 5 )
             

@@ -488,17 +488,12 @@ class MainFrame ( wx.Frame ):
                     self.OpenCSVFileNoGUI(CSVFileName)
 
     def undo(self,event):
-        print "@@ Undo"
         self.controller.recoverData()
         if not self.m_dataTable.IsEnabled():
             self.m_dataTable.Enable()
-        self.fillInGrid()
-        self.m_dataTable.AutoSize()
-        self.m_dataTable.ClearSelection()
-        self.markTextColumns()
-        self.markNans()
-        self.updateDataInfo()
-        self.Layout()
+
+        self.refreshTable()
+
         self.m_undo.SetText("Undo")
         self.m_undo.Enable(False)
 
@@ -765,12 +760,15 @@ class MainFrame ( wx.Frame ):
         if dlg.ShowModal() == wx.ID_OK:
             newLabel = dlg.GetValue()
             dlg.Destroy()
-            # print oldLabel,"->",newLabel
+
+            self.controller.storeData()
+            self.m_undo.SetText("Undo rename column")
+            self.m_undo.Enable()
+
             self.controller.renameColumn(oldLabel,newLabel)
-            self.fillInGrid()
-            self.m_dataTable.AutoSize()
-            self.m_dataTable.ClearSelection()
-            self.Layout()
+
+            self.refreshTable(updateDataInfo = False, markTextColumns = False, markNans = False)
+            
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
             self.m_dataTable.SelectCol(columnsSelectedIndex[0])
@@ -831,6 +829,11 @@ class MainFrame ( wx.Frame ):
     def numerizeCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
+
+        self.controller.storeData()
+        self.m_undo.SetText("Undo convert to numbers")
+        self.m_undo.Enable()
+
         oldType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
         self.controller.programState.dataToAnalyse[columnSelectedLabel] = to_numeric(self.controller.programState.dataToAnalyse[columnSelectedLabel], errors='ignore')
         newType = self.controller.programState.dataToAnalyse[columnSelectedLabel].dtypes
@@ -845,13 +848,9 @@ class MainFrame ( wx.Frame ):
                 self.controller.floatValues.append(columnSelectedLabel)
             else:
                 self.controller.integerValues.append(columnSelectedLabel)
-            self.fillInGrid()
-            self.m_dataTable.AutoSize()
-            self.m_dataTable.ClearSelection()
-            self.markTextColumns()
-            self.markNans()
-            # self.updateDataInfo()
-            self.Layout()
+            
+            self.refreshTable(updateDataInfo = False)
+
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
 
@@ -1379,19 +1378,20 @@ class MainFrame ( wx.Frame ):
         self.m_discardColumn.Check()
         self.m_CSVSeparator1.Check()
 
-    def refreshTable(self, updateDataInfo = True, markTextColumns = True):
+    def refreshTable(self, updateDataInfo = True, markTextColumns = True, markNans = True):
 
         self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
         self.m_dataTable.AutoSize()
         self.m_dataTable.ClearSelection()
         if markTextColumns:
             self.markTextColumns()
-        self.markNans()
+        if markNans:
+            self.markNans()
         if updateDataInfo:
             self.updateDataInfo()
-        self.Layout()
+        self.Layout() 
 
-            
+
     def deleteColumns(self, event):
         
         selectedColumnsInterface = DeleteColumnsInterface(self, list(self.controller.programState.dataToAnalyse.columns))
@@ -1437,15 +1437,22 @@ class MainFrame ( wx.Frame ):
             factorFrame.Show(True)
             
             if  factorFrame.ShowModal() == wx.ID_OK:
+
+                self.controller.storeData()
+                self.m_undo.SetText("Undo add new column")
+                self.m_undo.Enable()
                 
                 factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor = factorFrame.returnFactors()            
                 self.controller.addColumn(factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor)
+
+                self.refreshTable()
+
+                numCols = self.controller.getNumberOfColumns()
+                self.m_dataTable.SetGridCursor(0,numCols-1)
+                self.m_dataTable.MakeCellVisible(0,numCols-1)
+                self.m_dataTable.SelectCol(numCols-1)
                 
-                self.fillInGrid()
-                self.markTextColumns()
-                self.markNans()
-                self.m_dataTable.AutoSize()
-                self.Layout()         
+                    
         else:
             
             wx.MessageBox("There are no numerical values", "Attention!")
