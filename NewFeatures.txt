@@ -6,3 +6,4 @@ Undo:
     Move column
     Replace
     Sort using column
+    Convert to text

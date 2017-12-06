@@ -811,24 +811,22 @@ class MainFrame ( wx.Frame ):
     def discretizeCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
-        # print "# Going to discretize: ",columnSelectedLabel
+
+        self.controller.storeData()
+        self.m_undo.SetText("Undo convert to text")
+        self.m_undo.Enable()
+
         self.controller.programState.dataToAnalyse[columnSelectedLabel] = self.controller.programState.dataToAnalyse[columnSelectedLabel].astype(str)
-        # print self.controller.programState.dataToAnalyse.dtypes
         self.controller.characterValues.append(columnSelectedLabel)
         if columnSelectedLabel in self.controller.floatValues:
             self.controller.floatValues.remove(columnSelectedLabel)
         if columnSelectedLabel in self.controller.integerValues:
             self.controller.integerValues.remove(columnSelectedLabel)
-        self.fillInGrid()
-        self.m_dataTable.AutoSize()
-        self.m_dataTable.ClearSelection()
-        self.markTextColumns()
-        self.markNans()
-        # self.updateDataInfo()
-        self.Layout()
+
+        self.refreshTable(updateDataInfo = False)
+
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
-        # self.m_dataTable.SelectCol(columnsSelectedIndex[0])
 
     def numerizeCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
