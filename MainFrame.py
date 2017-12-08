@@ -356,11 +356,9 @@ class MainFrame ( wx.Frame ):
 
         fgSizer8 = wx.BoxSizer(wx.VERTICAL)
         fgSizer8.Add(self.m_dataTable)
-        # fgSizer8.Add( self.m_dataTable, 0, wx.ALL|wx.EXPAND, 5 )
         self.m_dataTable.Enable(False)
         self.m_dataTable.Show(True)
         
-        # globalSizer.Add( fgSizer8, wx.GBPosition( 0, 1 ), wx.GBSpan( 12, 12 ), wx.EXPAND, 5 )
         globalSizer.Add( fgSizer8, flag= wx.ALL | wx.EXPAND, border=10 )
         
         #Options to show the GUI
@@ -1168,6 +1166,8 @@ class MainFrame ( wx.Frame ):
         if not self.controller.programState.dataToAnalyse.empty: # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
             self.m_dataTable.AutoSize()
+            lastColumnOrigSize = self.m_dataTable.GetColSize(self.controller.getNumberOfColumns()-1)
+            self.m_dataTable.SetColSize(self.controller.getNumberOfColumns()-1,lastColumnOrigSize+30)
             self.m_dataTable.ClearSelection()
             if markTextColumns:
                 self.markTextColumns()
