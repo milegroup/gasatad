@@ -522,39 +522,22 @@ class MainFrame ( wx.Frame ):
         rowsSelected = self.m_dataTable.GetSelectedRows()
         columnsSelected = self.m_dataTable.GetSelectedCols()
 
-        msgString = "Deleting: "
+        self.controller.storeData()
+        self.m_undo.SetText("Undo delete columns/rows")
+        self.m_undo.Enable()
+
+        columnsSelectedLabels = []
+        for columnIndex in columnsSelected:
+            columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
+        self.controller.deleteColumns(columnsSelectedLabels)
         if len(rowsSelected)>0:
-            msgString += str(len(rowsSelected))+" row"
-            if len(rowsSelected)>1:
-                msgString += "s"
-        if len(rowsSelected)>0 and len(columnsSelected)>0:
-            msgString += " and "
-        if len(columnsSelected)>0:
-            msgString += str(len(columnsSelected))+" column"
-            if len(columnsSelected)>1:
-                msgString += "s"
-            
+            self.controller.deleteRows(rowsSelected)
 
-        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?", "Delete data", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
-            
-        if dlg.ShowModal() == wx.ID_OK:
-            dlg.Destroy()
+        
+        if self.controller.programState.dataToAnalyse.empty:
+            self.controller.resetDataToAnalyse()
+        self.refreshGUI()
 
-            columnsSelectedLabels = []
-            for columnIndex in columnsSelected:
-                columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
-            self.controller.deleteColumns(columnsSelectedLabels)
-            if len(rowsSelected)>0:
-                self.controller.deleteRows(rowsSelected)
-
-            
-            if self.controller.programState.dataToAnalyse.empty:
-                self.resetData(None)
-            else:
-                self.refreshGUI()
- 
-        else:
-            dlg.Destroy()
 
 
 
@@ -639,41 +622,24 @@ class MainFrame ( wx.Frame ):
 
         event.Skip()
 
-    def deleteColumns(self,event):
+    def deleteColumns(self,event): # Used after right-click on selected columns
 
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
+            
+        columnsSelectedLabels = []
+        for columnIndex in columnsSelectedIndex:
+            columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
 
-        msgString = "Deleting: "
-        msgString += str(len(columnsSelectedIndex))+" column"
-        if len(columnsSelectedIndex)>1:
-            msgString += "s"
-
+        self.controller.storeData()
+        self.m_undo.SetText("Undo delete columns")
+        self.m_undo.Enable()
+    
+        self.controller.deleteColumns(columnsSelectedLabels)
         
-        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?",
-                                "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
-            
-        if dlg.ShowModal() == wx.ID_OK:
-            dlg.Destroy()
+        if self.controller.programState.dataToAnalyse.empty:
+            self.controller.resetDataToAnalyse()
+        self.refreshGUI()
 
-            
-            columnsSelectedLabels = []
-            for columnIndex in columnsSelectedIndex:
-                columnsSelectedLabels.append(self.m_dataTable.GetColLabelValue(columnIndex))
-        
-            self.controller.deleteColumns(columnsSelectedLabels)
-            
-            if self.controller.programState.dataToAnalyse.empty:
-                self.resetData(None)
-            else:
-                self.fillInGrid()
-                self.m_dataTable.AutoSize()
-                self.m_dataTable.ClearSelection()
-                self.markTextColumns()
-                self.markNans()
-                self.updateDataInfo()
-                self.Layout()
-        else:
-            dlg.Destroy()
 
     def moveCol(self,event):
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
@@ -838,44 +804,23 @@ class MainFrame ( wx.Frame ):
         self.m_dataTable.SelectCol(columnsSelectedIndex[0])
 
 
-
-
-    def deleteRows(self,event):
+    def deleteRows(self,event): # Used after right-click on selected rows
 
         rowsSelectedIndex = self.m_dataTable.GetSelectedRows()
-
-        msgString = "Deleting: "
-        msgString += str(len(rowsSelectedIndex))+" row"
-        if len(rowsSelectedIndex)>1:
-            msgString += "s"
-
-
-        dlg = wx.MessageDialog(self, msgString+"\nThis action cannot be undone\nAre you sure to proceed?",
-                                   "Delete rows", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
             
-        if dlg.ShowModal() == wx.ID_OK:
-            dlg.Destroy()
+        rowsSelectedLabels = []
+        for rowIndex in rowsSelectedIndex:
+            rowsSelectedLabels.append(self.m_dataTable.GetRowLabelValue(rowIndex))
 
-            
-            rowsSelectedLabels = []
-            for rowIndex in rowsSelectedIndex:
-                rowsSelectedLabels.append(self.m_dataTable.GetRowLabelValue(rowIndex))
+        self.controller.storeData()
+        self.m_undo.SetText("Undo delete rows")
+        self.m_undo.Enable()
 
-            self.controller.deleteRows(rowsSelectedIndex)
+        self.controller.deleteRows(rowsSelectedIndex)
 
-            if self.controller.programState.dataToAnalyse.empty:
-                self.resetData(None)
-            else:
-                self.fillInGrid()
-                self.m_dataTable.AutoSize()
-                self.m_dataTable.ClearSelection()
-                self.markTextColumns()
-                self.markNans()
-                self.updateDataInfo()
-                self.Layout()
-        else:
-            dlg.Destroy()
-
+        if self.controller.programState.dataToAnalyse.empty:
+            self.controller.resetDataToAnalyse()
+        self.refreshGUI()
 
 
     def CheckUpdates(self):
@@ -941,10 +886,7 @@ class MainFrame ( wx.Frame ):
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
                 self.controller.OpenFile(self.data)  
-                self.m_menuNewFile.Enable(False)          
-                self.openNewFileBtn.Enable(False)        
-                self.m_menuAddFile.Enable(True)
-                self.addFileBtn.Enable(True)
+
                     
         except:
             
@@ -952,31 +894,11 @@ class MainFrame ( wx.Frame ):
             print "There was some problem with the file"
             return 
 
-        self.fillInGrid()
-        self.descriptiveStatsBtn.Enable()
-        self.m_addNewColumn.Enable()
-        self.resetDataBtn.Enable()
-        self.m_deleteColumns.Enable()
-        self.exportDataBtn.Enable()
-        self.m_dataTable.Enable()
-        self.m_menuResetData.Enable()
-        self.m_menuExportData.Enable()
-        self.histogramBtn.Enable()
-        self.scatterPlotBtn.Enable()
-        self.pieChartBtn.Enable()
-        self.boxPlotBtn.Enable()
-        self.barChartBtn.Enable()
-        self.significanceTestBtn.Enable()   
+        self.refreshGUI()
 
         print "File: "+fileName+" loaded"
 
-        self.m_dataTable.AutoSize()
-        self.markTextColumns()
-        self.markNans()
-        self.updateDataInfo()
-        self.m_dataTable.SetFocus()
         
-        self.Layout()
 
     def OpenFile(self, event, fileName = None):       
         
@@ -1028,43 +950,13 @@ class MainFrame ( wx.Frame ):
             
                 self.controller.OpenFile(self.data)
                 
-                self.m_menuAddFile.Enable(True)
-                self.addFileBtn.Enable(True)
-                self.m_menuNewFile.Enable(False)     
-                self.openNewFileBtn.Enable(False)                                       
-
-                self.fillInGrid()
-                self.m_dataTable.AutoSize()
-                self.markTextColumns()
-                self.markNans() 
-                self.updateDataInfo()
-                self.Layout()
-                self.m_dataTable.Enable()
+                self.refreshGUI()
 
                 if self.controller.nullValuesInFile(self.data):
                     self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
                     if self.dlg.ShowModal() == wx.ID_OK:
                         self.dlg.Destroy()
             
-                self.descriptiveStatsBtn.Enable()
-                self.m_addNewColumn.Enable()
-                self.resetDataBtn.Enable()
-                self.m_deleteColumns.Enable()
-                self.exportDataBtn.Enable()
-                
-                self.m_menuResetData.Enable()
-                self.m_menuExportData.Enable()
-                self.histogramBtn.Enable()
-                self.scatterPlotBtn.Enable()
-                self.pieChartBtn.Enable()
-                self.boxPlotBtn.Enable()
-                self.barChartBtn.Enable()
-                self.significanceTestBtn.Enable() 
-
-                    
-                self.updateDataInfo()
-                self.m_dataTable.SetFocus()
-
 
                 
 
@@ -1124,30 +1016,19 @@ class MainFrame ( wx.Frame ):
                 readCorrect = False
 
             if readCorrect:
+
+                self.controller.storeData()
+                self.m_undo.SetText("Undo add file")
+                self.m_undo.Enable()
+
                 self.controller.OpenAdditionalFile(self.data)
 
-                self.fillInGrid()
-                self.m_dataTable.AutoSize()
-                self.markTextColumns()
-                self.markNans()
-                self.updateDataInfo()
-                self.Layout()
-
+                self.refreshGUI()
+               
                 if self.controller.nullValuesInFile(self.data):
                     self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
                     if self.dlg.ShowModal() == wx.ID_OK:
                         self.dlg.Destroy()
-
-                self.descriptiveStatsBtn.Enable()
-                self.m_addNewColumn.Enable()
-                self.resetDataBtn.Enable()
-                self.m_deleteColumns.Enable()
-                self.exportDataBtn.Enable()
-                self.significanceTestBtn.Enable()
-                self.m_dataTable.Enable()
-
-                self.updateDataInfo()
-                self.m_dataTable.SetFocus()
 
                 # Move the view of the table to the last column
                 self.m_dataTable.SetGridCursor(0,self.controller.getNumberOfColumns()-1)
@@ -1242,7 +1123,6 @@ class MainFrame ( wx.Frame ):
 
     
     def saveData(self, event):
-        
         self.fileExtensions = ".CSV (*.csv*)|*.csv*"
         self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
         saveFile = wx.FileDialog(self, message = 'Save file', defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
@@ -1270,49 +1150,12 @@ class MainFrame ( wx.Frame ):
 
     
     def resetData(self, event):
+        self.controller.storeData()
+        self.m_undo.SetText("Undo close data")
+        self.m_undo.Enable()
 
         self.controller.resetDataToAnalyse()
-        self.fillInGrid()
-        
-        self.m_dataTable.AppendRows(45)
-        self.m_dataTable.AppendCols(45)
-        
-        self.m_dataTable.Enable( False )
-
-        self.descriptiveStatsBtn.Enable(False)
-        self.m_addNewColumn.Enable(False)
-        self.resetDataBtn.Enable(False)
-        self.m_deleteColumns.Enable(False)
-        self.exportDataBtn.Enable(False)
-        self.significanceTestBtn.Enable(False)
-        
-        self.m_menuNewFile.Enable(True)
-        self.openNewFileBtn.Enable(True)
-        self.m_menuAddFile.Enable(False)
-        self.addFileBtn.Enable(False)
-        self.m_menuResetData.Enable(False)
-        self.m_menuExportData.Enable(False)
-
-        self.m_deletedSelectedCR.Enable(False)
-        self.m_renameSelectedCol.Enable(False)
-        self.m_moveSelectedCol.Enable(False)
-        self.m_discretizeSelectedCol.Enable(False)
-        self.m_numerizeSelectedCol.Enable(False)
-        self.m_replaceInCol.Enable(False)
-        self.m_editMenu.Enable(self.sortMenuID,False)
-        
-        #Graphs
-        self.histogramBtn.Enable( False )
-        self.scatterPlotBtn.Enable( False )
-        self.pieChartBtn.Enable( False )
-        self.boxPlotBtn.Enable( False )
-        self.barChartBtn.Enable( False )
-
-        self.updateDataInfo()
-
-        self.m_dataTable.SetColLabelSize( 30 )
-        self.m_dataTable.SetRowLabelSize( 80 )
-        self.Layout()
+        self.refreshGUI()
 
 
     def resetOptions(self,event):
@@ -1322,7 +1165,6 @@ class MainFrame ( wx.Frame ):
         self.m_CSVSeparator1.Check()
 
     def refreshGUI(self, updateDataInfo = True, markTextColumns = True, markNans = True):
-
         if not self.controller.programState.dataToAnalyse.empty: # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
             self.m_dataTable.AutoSize()
@@ -1335,6 +1177,7 @@ class MainFrame ( wx.Frame ):
                 self.updateDataInfo()
             self.Layout()
             self.m_dataTable.Enable(True)
+            self.m_dataTable.SetFocus()
 
             # Graphs
             self.histogramBtn.Enable(True)
@@ -1646,7 +1489,13 @@ class MainFrame ( wx.Frame ):
         wx.AboutBox(info)
 
     def closeApp(self,event):
-        if not self.controller.programState.dataToAnalyse.empty:
+        emptyData = False
+        try:
+            emptyData =  self.controller.programState.dataToAnalyse.empty
+        except:
+            emptyData = True
+
+        if not emptyData:
             dlg = wx.MessageDialog(self, "Do you really want to close GASATaD?","Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
             result = dlg.ShowModal()
             dlg.Destroy()
