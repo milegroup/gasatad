@@ -1,7 +1,6 @@
 ALL:
 	Help
 	Change "Attention" to "ERROR"
-	See "No data" cells in NUTRITION_WH2
 	Autodetection of columns converted to ints?
 
 	Increase data information: number of text, integer and float columns?
