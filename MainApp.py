@@ -24,8 +24,6 @@ from MainFrame import MainFrame
 
 MainFrame.params = {}
 MainFrame.params['version'] = 1.3
-MainFrame.params['dataPresent'] = False
-MainFrame.params['noOfFiles'] = 0
 MainFrame.params['noOfNulls'] = 0
 MainFrame.params['configDir'] = os.path.expanduser('~')+os.sep+'.gasatad'
 MainFrame.params['configFile'] = MainFrame.params['configDir']+os.sep+"gasatad.cfg"

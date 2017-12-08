@@ -212,51 +212,16 @@ class MainFrame ( wx.Frame ):
         self.m_staticText2.SetFont( wx.Font( wx.NORMAL_FONT.GetPointSize(), wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, False, wx.EmptyString ) )
         
         informationSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
-        
-        informationGridSizer = wx.GridSizer(2, 2, 0, 0)    
 
-        # No. or rows
-        bSizer1a = wx.BoxSizer( wx.HORIZONTAL )    
-        self.m_staticText1 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer1a.Add( self.m_staticText1, 0, wx.LEFT, 5 )
-        self.infoNRows = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
-        bSizer1a.Add( self.infoNRows, 0, wx.LEFT, 5 )
-        self.infoNRows.SetLabel("0")
-        informationGridSizer.Add(bSizer1a)
+        informationBoxSizer = wx.BoxSizer(wx.VERTICAL)
+        self.m_information = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows: 0   Columns: 0   Nulls: 0", wx.DefaultPosition, wx.DefaultSize, 0 )
+        informationBoxSizer.Add( self.m_information, 0, wx.LEFT, 0 )
 
-        # No. of columns
-        bSizer1b = wx.BoxSizer( wx.HORIZONTAL )
-        self.m_staticText3 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Columns:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer1b.Add( self.m_staticText3, 0, wx.LEFT, 5 )
-        self.infoNCols = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ),0 )
-        bSizer1b.Add( self.infoNCols, 0, wx.LEFT, 5 )
-        self.infoNCols.SetLabel("0")
-        informationGridSizer.Add(bSizer1b)
+        informationSizer.Add( informationBoxSizer, 1, wx.RIGHT|wx.LEFT|wx.BOTTOM, 10 )
 
-        # No. of open files
-        bSizer2a = wx.BoxSizer( wx.HORIZONTAL )
-        self.m_staticText4 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"No. of files:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer2a.Add( self.m_staticText4, 0, wx.LEFT, 5 )
-        self.infoNFiles = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
-        bSizer2a.Add( self.infoNFiles, 0, wx.LEFT, 5 )
-        self.infoNFiles.SetLabel("0")
-        informationGridSizer.Add(bSizer2a)
-
-        # No. of null values
-        bSizer2b = wx.BoxSizer( wx.HORIZONTAL )
-        self.m_staticText5 = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Null values:", wx.DefaultPosition, wx.DefaultSize, 0 )
-        bSizer2b.Add( self.m_staticText5, 0, wx.LEFT, 5 )
-        self.infoNullValues = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 50,20 ), 0)
-        bSizer2b.Add( self.infoNullValues, 0, wx.LEFT, 5 )
-        self.infoNullValues.SetLabel("0")
-        informationGridSizer.Add(bSizer2b)
-
-        informationSizer.Add( informationGridSizer, 1, wx.EXPAND|wx.ALL, 5 )
-       
         leftSizer.Add(informationSizer,flag= wx.LEFT | wx.RIGHT | wx.BOTTOM | wx.EXPAND, border=10)
 
         #  -------------------- Buttons of the interface
-        
         
         buttonsSizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -428,7 +393,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
-        self.Bind(wx.EVT_MENU, self.deleteColumns, self.m_deleteColumns)
+        self.Bind(wx.EVT_MENU, self.deleteColumnsByLabels, self.m_deleteColumns)
         self.Bind(wx.EVT_MENU, self.deleteColumnsRows, self.m_deletedSelectedCR)
         self.Bind(wx.EVT_MENU, self.renameCol, self.m_renameSelectedCol)
         self.Bind(wx.EVT_MENU, self.moveCol, self.m_moveSelectedCol)
@@ -492,7 +457,7 @@ class MainFrame ( wx.Frame ):
         if not self.m_dataTable.IsEnabled():
             self.m_dataTable.Enable()
 
-        self.refreshTable()
+        self.refreshGUI()
 
         self.m_undo.SetText("Undo")
         self.m_undo.Enable(False)
@@ -515,7 +480,7 @@ class MainFrame ( wx.Frame ):
             self.m_undo.Enable()
 
             self.controller.changeCellValue(event.GetRow(),event.GetCol(),newValue2)
-            self.refreshTable()
+            self.refreshGUI()
             event.Skip()
         else:
             dlg.Destroy()
@@ -586,13 +551,8 @@ class MainFrame ( wx.Frame ):
             if self.controller.programState.dataToAnalyse.empty:
                 self.resetData(None)
             else:
-                self.fillInGrid()
-                self.m_dataTable.AutoSize()
-                self.m_dataTable.ClearSelection()
-                self.markTextColumns()
-                self.markNans()
-                self.updateDataInfo()
-                self.Layout()
+                self.refreshGUI()
+ 
         else:
             dlg.Destroy()
 
@@ -611,7 +571,7 @@ class MainFrame ( wx.Frame ):
                 textPopupDelete += "s"
             self.popupDeleteID = wx.NewId()
             popupMenu.Append(self.popupDeleteID,textPopupDelete)
-            self.Bind(wx.EVT_MENU, self.deleteCols, id=self.popupDeleteID)
+            self.Bind(wx.EVT_MENU, self.deleteColumns, id=self.popupDeleteID)
             
 
             if len(columnsSelected)==1:
@@ -679,7 +639,7 @@ class MainFrame ( wx.Frame ):
 
         event.Skip()
 
-    def deleteCols(self,event):
+    def deleteColumns(self,event):
 
         columnsSelectedIndex = self.m_dataTable.GetSelectedCols()
 
@@ -746,7 +706,7 @@ class MainFrame ( wx.Frame ):
             colIndex.insert(newPos,label)
             self.controller.reorderColumns(colIndex)
 
-            self.refreshTable(updateDataInfo=False)
+            self.refreshGUI(updateDataInfo=False)
             
             self.m_dataTable.SetGridCursor(0,newPos)
             self.m_dataTable.MakeCellVisible(0,newPos)
@@ -767,7 +727,7 @@ class MainFrame ( wx.Frame ):
 
             self.controller.renameColumn(oldLabel,newLabel)
 
-            self.refreshTable(updateDataInfo = False, markTextColumns = False, markNans = False)
+            self.refreshGUI(updateDataInfo = False, markTextColumns = False, markNans = False)
             
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -799,7 +759,7 @@ class MainFrame ( wx.Frame ):
 
             self.controller.replaceInTextCol(colLabel,oldTag,newTag)
 
-            self.refreshTable(markTextColumns=False)
+            self.refreshGUI(markTextColumns=False)
 
             
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
@@ -821,7 +781,7 @@ class MainFrame ( wx.Frame ):
         if columnSelectedLabel in self.controller.integerValues:
             self.controller.integerValues.remove(columnSelectedLabel)
 
-        self.refreshTable(updateDataInfo = False)
+        self.refreshGUI(updateDataInfo = False)
 
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -849,7 +809,7 @@ class MainFrame ( wx.Frame ):
             else:
                 self.controller.integerValues.append(columnSelectedLabel)
             
-            self.refreshTable(updateDataInfo = False)
+            self.refreshGUI(updateDataInfo = False)
 
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -871,7 +831,7 @@ class MainFrame ( wx.Frame ):
         columnSelectedLabel = self.m_dataTable.GetColLabelValue(columnsSelectedIndex[0])
         self.controller.programState.dataToAnalyse.sort_values(columnSelectedLabel,ascending=ascendingBool,inplace=True)
 
-        self.refreshTable(updateDataInfo = False)
+        self.refreshGUI(updateDataInfo = False)
         
         self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
         self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -963,19 +923,12 @@ class MainFrame ( wx.Frame ):
 
     
     def updateDataInfo(self):
-        if self.params['dataPresent'] == False:
-            self.infoNRows.SetLabel("0")
-            self.infoNCols.SetLabel("0")
-            self.infoNFiles.SetLabel("0")
-            self.infoNullValues.SetLabel("0")
+        if self.controller.programState.dataToAnalyse.empty:
+            self.m_information.SetLabel("Rows: 0   Columns: 0   Nulls: 0")
         else:
             numRows = self.controller.getNumberOfRows()
             numCols = self.controller.getNumberOfColumns()
-            self.infoNRows.SetLabel(str(numRows))
-            self.infoNCols.SetLabel(str(numCols))
-            self.infoNFiles.SetLabel(str(self.params['noOfFiles']))
-            self.infoNullValues.SetLabel(str(self.params['noOfNulls']))
-
+            self.m_information.SetLabel("Rows: {0:d}   Columns: {1:d}   Nulls: {2:d}".format(numRows,numCols,self.params['noOfNulls']))
     
     def OpenCSVFileNoGUI(self, fileName):       
         
@@ -1020,9 +973,6 @@ class MainFrame ( wx.Frame ):
         self.m_dataTable.AutoSize()
         self.markTextColumns()
         self.markNans()
-
-        self.params['dataPresent'] = True
-        self.params['noOfFiles'] += 1
         self.updateDataInfo()
         self.m_dataTable.SetFocus()
         
@@ -1087,6 +1037,7 @@ class MainFrame ( wx.Frame ):
                 self.m_dataTable.AutoSize()
                 self.markTextColumns()
                 self.markNans() 
+                self.updateDataInfo()
                 self.Layout()
                 self.m_dataTable.Enable()
 
@@ -1111,10 +1062,9 @@ class MainFrame ( wx.Frame ):
                 self.significanceTestBtn.Enable() 
 
                     
-                self.params['dataPresent'] = True
-                self.params['noOfFiles'] += 1
                 self.updateDataInfo()
                 self.m_dataTable.SetFocus()
+
 
                 
 
@@ -1180,6 +1130,7 @@ class MainFrame ( wx.Frame ):
                 self.m_dataTable.AutoSize()
                 self.markTextColumns()
                 self.markNans()
+                self.updateDataInfo()
                 self.Layout()
 
                 if self.controller.nullValuesInFile(self.data):
@@ -1195,7 +1146,6 @@ class MainFrame ( wx.Frame ):
                 self.significanceTestBtn.Enable()
                 self.m_dataTable.Enable()
 
-                self.params['noOfFiles'] += 1
                 self.updateDataInfo()
                 self.m_dataTable.SetFocus()
 
@@ -1321,55 +1271,48 @@ class MainFrame ( wx.Frame ):
     
     def resetData(self, event):
 
-        dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?","Reset table", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
-        result = dlg.ShowModal()
-        dlg.Destroy()
-        if result == wx.ID_OK:        
-            self.controller.resetDataToAnalyse()
+        self.controller.resetDataToAnalyse()
+        self.fillInGrid()
+        
+        self.m_dataTable.AppendRows(45)
+        self.m_dataTable.AppendCols(45)
+        
+        self.m_dataTable.Enable( False )
 
-            self.fillInGrid()
-            
-            self.m_dataTable.AppendRows(45)
-            self.m_dataTable.AppendCols(45)
-            
-            self.m_dataTable.Enable( False )
+        self.descriptiveStatsBtn.Enable(False)
+        self.m_addNewColumn.Enable(False)
+        self.resetDataBtn.Enable(False)
+        self.m_deleteColumns.Enable(False)
+        self.exportDataBtn.Enable(False)
+        self.significanceTestBtn.Enable(False)
+        
+        self.m_menuNewFile.Enable(True)
+        self.openNewFileBtn.Enable(True)
+        self.m_menuAddFile.Enable(False)
+        self.addFileBtn.Enable(False)
+        self.m_menuResetData.Enable(False)
+        self.m_menuExportData.Enable(False)
 
-            self.descriptiveStatsBtn.Enable(False)
-            self.m_addNewColumn.Enable(False)
-            self.resetDataBtn.Enable(False)
-            self.m_deleteColumns.Enable(False)
-            self.exportDataBtn.Enable(False)
-            self.significanceTestBtn.Enable(False)
-            
-            self.m_menuNewFile.Enable(True)
-            self.openNewFileBtn.Enable(True)
-            self.m_menuAddFile.Enable(False)
-            self.addFileBtn.Enable(False)
-            self.m_menuResetData.Enable(False)
-            self.m_menuExportData.Enable(False)
+        self.m_deletedSelectedCR.Enable(False)
+        self.m_renameSelectedCol.Enable(False)
+        self.m_moveSelectedCol.Enable(False)
+        self.m_discretizeSelectedCol.Enable(False)
+        self.m_numerizeSelectedCol.Enable(False)
+        self.m_replaceInCol.Enable(False)
+        self.m_editMenu.Enable(self.sortMenuID,False)
+        
+        #Graphs
+        self.histogramBtn.Enable( False )
+        self.scatterPlotBtn.Enable( False )
+        self.pieChartBtn.Enable( False )
+        self.boxPlotBtn.Enable( False )
+        self.barChartBtn.Enable( False )
 
-            self.m_deletedSelectedCR.Enable(False)
-            self.m_renameSelectedCol.Enable(False)
-            self.m_moveSelectedCol.Enable(False)
-            self.m_discretizeSelectedCol.Enable(False)
-            self.m_numerizeSelectedCol.Enable(False)
-            self.m_replaceInCol.Enable(False)
-            self.m_editMenu.Enable(self.sortMenuID,False)
-            
-            #Graphs
-            self.histogramBtn.Enable( False )
-            self.scatterPlotBtn.Enable( False )
-            self.pieChartBtn.Enable( False )
-            self.boxPlotBtn.Enable( False )
-            self.barChartBtn.Enable( False )
+        self.updateDataInfo()
 
-            self.params['dataPresent'] = False
-            self.params['noOfFiles'] = 0
-            self.updateDataInfo()
-
-            self.m_dataTable.SetColLabelSize( 30 )
-            self.m_dataTable.SetRowLabelSize( 80 )
-            self.Layout()
+        self.m_dataTable.SetColLabelSize( 30 )
+        self.m_dataTable.SetRowLabelSize( 80 )
+        self.Layout()
 
 
     def resetOptions(self,event):
@@ -1378,50 +1321,101 @@ class MainFrame ( wx.Frame ):
         self.m_discardColumn.Check()
         self.m_CSVSeparator1.Check()
 
-    def refreshTable(self, updateDataInfo = True, markTextColumns = True, markNans = True):
+    def refreshGUI(self, updateDataInfo = True, markTextColumns = True, markNans = True):
 
-        self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
-        self.m_dataTable.AutoSize()
-        self.m_dataTable.ClearSelection()
-        if markTextColumns:
-            self.markTextColumns()
-        if markNans:
-            self.markNans()
-        if updateDataInfo:
+        if not self.controller.programState.dataToAnalyse.empty: # data present
+            self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
+            self.m_dataTable.AutoSize()
+            self.m_dataTable.ClearSelection()
+            if markTextColumns:
+                self.markTextColumns()
+            if markNans:
+                self.markNans()
+            if updateDataInfo:
+                self.updateDataInfo()
+            self.Layout()
+            self.m_dataTable.Enable(True)
+
+            # Graphs
+            self.histogramBtn.Enable(True)
+            self.scatterPlotBtn.Enable(True)
+            self.pieChartBtn.Enable(True)
+            self.boxPlotBtn.Enable(True)
+            self.barChartBtn.Enable(True)
+
+            # Buttons
+            self.openNewFileBtn.Enable(False)
+            self.addFileBtn.Enable(True)
+            self.resetDataBtn.Enable(True)
+            self.exportDataBtn.Enable(True)
+            self.descriptiveStatsBtn.Enable(True)
+            self.significanceTestBtn.Enable(True)
+
+            # Menus
+            self.m_menuNewFile.Enable(False)
+            self.m_menuAddFile.Enable(True)
+            self.m_menuResetData.Enable(True)
+            self.m_menuExportData.Enable(True)
+            self.m_addNewColumn.Enable(True)
+            self.m_deleteColumns.Enable(True)
+
+        else: # no data
+            self.fillInGrid()
+            
+            self.m_dataTable.AppendRows(45)
+            self.m_dataTable.AppendCols(45)
+            
+            self.m_dataTable.Enable(False)
+
+            # Graphs
+            self.histogramBtn.Enable(False)
+            self.scatterPlotBtn.Enable(False)
+            self.pieChartBtn.Enable(False)
+            self.boxPlotBtn.Enable(False)
+            self.barChartBtn.Enable(False)
+
+            # Buttons
+            self.openNewFileBtn.Enable(True)
+            self.addFileBtn.Enable(False)
+            self.resetDataBtn.Enable(False)
+            self.exportDataBtn.Enable(False)
+            self.descriptiveStatsBtn.Enable(False)
+            self.significanceTestBtn.Enable(False)
+
+            # Menus
+            self.m_menuNewFile.Enable(True)
+            self.m_menuAddFile.Enable(False)
+            self.m_menuResetData.Enable(False)
+            self.m_menuExportData.Enable(False)
+            self.m_addNewColumn.Enable(False)
+            self.m_deleteColumns.Enable(False)
+
             self.updateDataInfo()
-        self.Layout() 
 
+            self.m_dataTable.SetColLabelSize( 30 )
+            self.m_dataTable.SetRowLabelSize( 80 )
+            self.Layout()
 
-    def deleteColumns(self, event):
+    def deleteColumnsByLabels(self, event):
         
         selectedColumnsInterface = DeleteColumnsInterface(self, list(self.controller.programState.dataToAnalyse.columns))
         
         if  selectedColumnsInterface.ShowModal() == wx.ID_OK:
-            
-            dlg = wx.MessageDialog(self, "This action cannot be undone\nAre you sure to proceed?", "Delete columns", wx.CANCEL | wx.CANCEL_DEFAULT | wx.ICON_EXCLAMATION)
-            
-            
-            if dlg.ShowModal() == wx.ID_OK:
-                
-                dlg.Destroy()
-                
-                listOfColumns = selectedColumnsInterface.getSelectedColumns()
 
-                # print "#:",listOfColumns
-                self.controller.deleteColumns(listOfColumns)
+            self.controller.storeData()
+            self.m_undo.SetText("Undo delete columns")
+            self.m_undo.Enable()
                 
-                if self.controller.programState.dataToAnalyse.empty:
-                    self.resetData(None)
-                else:
-                    self.fillInGrid()
-                    self.m_dataTable.AutoSize()
-                    self.markNans()
-                    self.Layout()
-  
-            else:
+            listOfColumns = selectedColumnsInterface.getSelectedColumns()
+            self.controller.deleteColumns(listOfColumns)
+
+            self.refreshGUI()
             
-                dlg.Destroy() 
-            
+            # if self.controller.programState.dataToAnalyse.empty:
+            #     self.resetData(None)
+            # else:
+            #     self.refreshGUI()
+           
 
         
     def createNewColumn(self, event):
@@ -1445,7 +1439,7 @@ class MainFrame ( wx.Frame ):
                 factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor = factorFrame.returnFactors()            
                 self.controller.addColumn(factorsFromInterface, self.selectedRadioButton, tagRestValues, nameOfFactor)
 
-                self.refreshTable()
+                self.refreshGUI()
 
                 numCols = self.controller.getNumberOfColumns()
                 self.m_dataTable.SetGridCursor(0,numCols-1)
@@ -1652,8 +1646,7 @@ class MainFrame ( wx.Frame ):
         wx.AboutBox(info)
 
     def closeApp(self,event):
-        #print "Closing application"
-        if self.params['dataPresent']:
+        if not self.controller.programState.dataToAnalyse.empty:
             dlg = wx.MessageDialog(self, "Do you really want to close GASATaD?","Confirm Exit", wx.OK|wx.CANCEL|wx.ICON_QUESTION|wx.CANCEL_DEFAULT)
             result = dlg.ShowModal()
             dlg.Destroy()

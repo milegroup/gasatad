@@ -10,3 +10,4 @@ Undo:
     Convert to text
     Convert to numbers
     Add text column
+    Delete columns by label
