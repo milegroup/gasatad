@@ -214,7 +214,8 @@ class MainFrame ( wx.Frame ):
         informationSizer.Add( self.m_staticText2, 0, wx.ALL, 5 )
 
         informationBoxSizer = wx.BoxSizer(wx.VERTICAL)
-        self.m_information = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, u"Rows: 0   Columns: 0   Nulls: 0", wx.DefaultPosition, wx.DefaultSize, 0 )
+        textInfo =  u"Rows: 0   Columns: 0   Nulls: 0"
+        self.m_information = wx.StaticText( informationSizer.GetStaticBox(), wx.ID_ANY, textInfo, wx.DefaultPosition, wx.DefaultSize, 0 )
         informationBoxSizer.Add( self.m_information, 0, wx.LEFT, 0 )
 
         informationSizer.Add( informationBoxSizer, 1, wx.RIGHT|wx.LEFT|wx.BOTTOM, 10 )
@@ -478,6 +479,7 @@ class MainFrame ( wx.Frame ):
             self.m_undo.Enable()
 
             self.controller.changeCellValue(event.GetRow(),event.GetCol(),newValue2)
+            self.controller.detectColumnTypes()
             self.refreshGUI()
             event.Skip()
         else:
@@ -867,11 +869,16 @@ class MainFrame ( wx.Frame ):
     
     def updateDataInfo(self):
         if self.controller.programState.dataToAnalyse.empty:
-            self.m_information.SetLabel("Rows: 0   Columns: 0   Nulls: 0")
+            textInfo =  u"Rows: 0   Columns: 0   Nulls: 0"
+            self.m_information.SetLabel(textInfo)
         else:
             numRows = self.controller.getNumberOfRows()
             numCols = self.controller.getNumberOfColumns()
-            self.m_information.SetLabel("Rows: {0:d}   Columns: {1:d}   Nulls: {2:d}".format(numRows,numCols,self.params['noOfNulls']))
+            textInfo = "Rows: {0:d}   Columns: {1:d}   Nulls: {2:d}".format(numRows,numCols,self.params['noOfNulls'])
+            # textInfo += "\nText columns: {0:d}".format(len(self.controller.characterValues))
+            # textInfo += "\nInteger columns: {0:d}".format(len(self.controller.integerValues))
+            # textInfo += "\nFloat columns: {0:d}".format(len(self.controller.floatValues))
+            self.m_information.SetLabel(textInfo)
     
     def OpenCSVFileNoGUI(self, fileName):       
         
@@ -1094,10 +1101,11 @@ class MainFrame ( wx.Frame ):
 
     def markTextColumns(self):
         for col in range(self.controller.getNumberOfColumns()):
+
             if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
                 for row in range(self.controller.getNumberOfRows()):
                     self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
-    
+
 
     def markNans(self):
         # print "# Going to mark nans"

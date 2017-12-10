@@ -145,12 +145,19 @@ class Controller():
         '''
         Check  the type of the variables saved on Dataframe: int, float or string
         '''
-        print "@@ detectColumnTypes called"
         colsDataframe = self.programState.dataToAnalyse.columns      
         
         del self.floatValues[:]
         del self.characterValues[:]
         del self.integerValues[:]
+
+        # Tries to convert float64 columns into int64 when possible
+        for col in colsDataframe:
+            if self.programState.dataToAnalyse[col].dtypes == 'float64':
+                t = self.programState.dataToAnalyse[col].astype(int)
+                result = list(self.programState.dataToAnalyse[col] == t)
+                if not (False in result):
+                    self.programState.dataToAnalyse[col] = t
         
         for col in colsDataframe:
             if self.programState.dataToAnalyse[col].dtypes == 'int64':
@@ -159,10 +166,6 @@ class Controller():
                 self.floatValues.append(col)
             else:
                 self.characterValues.append(col)
-        
-        print "@@ int", self.integerValues
-        print "@@ float", self.floatValues
-        print "@@ Char", self.characterValues
         
     
     
