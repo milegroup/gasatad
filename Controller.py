@@ -399,7 +399,7 @@ class Controller():
         dataForPie = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].value_counts() # Number of elements for each slice
         numberSamples = self.programState.dataToAnalyse[pieChartOptions['firstVarSelected']].count() # Total of elements
 
-        print dataForPie
+        # print dataForPie
 
         if( pieChartOptions['numOfSlices'] != 0) and (pieChartOptions['numOfSlices'] < len(dataForPie)-1):
             dataForPie = changeDataForPie(dataForPie, pieChartOptions['numOfSlices'])
