@@ -185,7 +185,11 @@ class MainFrame ( wx.Frame ):
 
         self.m_aboutMenu = wx.Menu()
 
-        self.m_menuAbout = wx.MenuItem( self.m_aboutMenu, wx.ID_ABOUT, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+        if platform != "darwin":
+            self.m_menuAbout = wx.MenuItem( self.m_aboutMenu, wx.ID_ABOUT, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+        else:
+            self.m_menuAbout = wx.MenuItem( self.m_aboutMenu,wx.ID_ANY, u"About GASATaD", wx.EmptyString, wx.ITEM_NORMAL )
+            
         self.m_aboutMenu.AppendItem(self.m_menuAbout)
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
