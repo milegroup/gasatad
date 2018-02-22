@@ -66,7 +66,7 @@
 					<h2>Interface description</h2>
 					<p>The main window of the application allows users to access all the functionalities.</p>
 					<br/>
-					<div class="mx-auto col-md-10">
+					<div class="mx-auto col-md-12">
 							<img src="./fiveimgs/MainWindow.png" alt="" style="width:100%"/>
 					</div>
 					<br/>
@@ -76,51 +76,86 @@
 					<br/>
 
 					<h2>A five minutes guided example in GASATaD</h2>
+					<p>First, download .csv data files from <a href="https://milegroup.github.io/gasatad/#download" target="_blank">https://milegroup.github.io/gasatad/#download</a>. Two files are provided: testfile1.csv and testfile2.csv.</p>
+					<br/>
+
 					<ol>
-						<li><p>First, download .csv data files from <a href="https://milegroup.github.io/gasatad/#download" target="_blank">https://milegroup.github.io/gasatad/#download</a>. Two files are provided: testfile1.csv and testfile2.csv.</p></li>
-						<br/>
 						<li>
-							<p>Open both files with GASATaD, using first <b>Open new file</b> and then <b>Add file</b>, on the left panel. The data will be shown as in the figure below.</p>
+							<p><i>Load data:</i>: open both files with GASATaD, using first <b>Open new file</b> and then <b>Add file</b>, on the left panel. The data will be shown as in the figure below.</p>
 							<br/>
-							<div class="mx-auto col-md-10">
+							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/CombinedFiles.png" alt="" style="width:100%"/>
 							</div>
 						</li>
 						<br/>
 						<li>
-							<p>Move the column <b>Marital Status</b> by selecting it, pressing the right mouse button; then clicking on <b>Move column</b> and selecting the desired position (see below).</p>
+							<p><i>Move column:</i> select the column <b>Marital Status</b>, press the right mouse button; click on <b>Move column</b> and enter the desired position (see below).</p>
 							<br/>
-							<div class="mx-auto col-md-10">
+							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/MoveColumn.png" alt="" style="width:100%"/>
 							</div>
 						</li>
 						<br/>
 						<li>
-							<p>Delete the column labeled <b>Case_2</b>: select the column, right-click and use the <b>Delete column</b> option.  Rows can be deleted likewise.</p>
+							<p><i>Delete a column:</i> select the column <b>Case_2</b>, right-click and use the <b>Delete column</b> option.  Rows can be deleted likewise.</p>
 							<br/>
-							<div class="mx-auto col-md-10">
+							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/DeleteColumn.png" alt="" style="width:100%"/>
 							</div>
 						</li>
 						<br/>
 						<li>
-							<p>Reorder the rows of the table using the <b>Age</b> column in ascending order. First, select the column. Then you can either use the main menu (<b>Edit → Sort using selected column → ascending</b>), or right-click and the <b>Sort using column → ascending</b> option.</p>
+							<p><i>Reorder the rows of the table:</i> select the <b>Age</b> column and then you can either use the main menu (<b>Edit → Sort using selected column → ascending</b>), or right-click and the <b>Sort using column → ascending</b> option.</p>
 							<br/>
-							<div class="mx-auto col-md-10">
+							<div class="mx-auto col-md-11">
 								<img src="./fiveimgs/SortData.png" alt="" style="width:100%"/>
 							</div>
 						</li>
 						<br/>
 						<li>
-							<p>Divide the data into new categories. On the main menu, use the <b>Edit → Add text column</b> option. On the new window that appears, complete the data as shown below.</p>
+							<p><i>Divide the data into new categories:</i> on the main menu, use the <b>Edit → Add text column</b> option. On the new window that appears, complete the data as shown below.</p>
 							<br/>
-							<div class="mx-auto col-md-10">
+							<div class="mx-auto col-md-9">
 								<img src="./fiveimgs/AddColumn.png" alt="" style="width:100%"/>
 							</div>
 							<br/>
-							<p>Afterwards, a new column labeled <b>Age ranges</b> will be created. This column will classify the rows into three different age ranges: young, median and elder.</p>
+							<p>Afterwards, a new column labeled <b>Age ranges</b> will be created. This column will classify the rows into three different age ranges: young, adult and elder.</p>
 						</li>
 						<br/>
+
+						<li>
+							<p><i>Calculate basic statistics of a numerical column:</i> on the left panel, click on the button <b>Basic statistics</b>, and select the column <b>Age</b>. You can restrict which values of the column are going to be used, and, after pressing <b>Show results</b>, a basic statistical analysis of these values is presented.</p>
+							<br/>
+							<div class="mx-auto col-md-10">
+								<img src="./fiveimgs/BasicStatistics.png" alt="" style="width:100%"/>
+							</div>
+						</li>
+						<br/>
+						<li>
+							<p><i>Perform a comparative analysis between variables:</i> on the main window, click on the button <b>Significance tests</b>. Select two numerical columns to be used which values of each column are to be included in the test. After pressing <b>Show results</b> values are presented for the following significance tests: standard t-test, Welch’s, Kolmogorov-Smirnov, and Wilcoxon rank-sum.</p>
+							<br/>
+							<div class="mx-auto col-md-12">
+								<img src="./fiveimgs/Significance.png" alt="" style="width:100%"/>
+							</div>
+						</li>
+						<br/>
+						<li>
+							<p><i>Plot data:</i> on the main window, click on the icon representing a pie-chart. Select the tag <b>Age range</b> and, after pressing <b>Ok</b>, a new window containing the plot will open.</p>
+							<br/>
+							<div class="mx-auto col-md-6">
+								<img src="./fiveimgs/PieChart.png" alt="" style="width:100%"/>
+							</div>
+							<br/>
+							<p>The plot can be modified by clicking on the buttons on the bar at the bottom of the image. Button <img src="./fiveimgs/PlotArrows.png"/> can be used to displace the plot along both the x and y axis. Parts of the graph can be zoomed with button <img src="./fiveimgs/PlotZoom.png"/>. Margins can be modified by means of button <img src="./fiveimgs/PlotMargins.png"/>, and actions can be either undone or redone with buttons <img src="./fiveimgs/PlotLR.png"/>. Modifications can be removed by using the button <img src="./fiveimgs/PlotHome.png"/>. Finally, the plot can be saved in different formats, such as .epg, .pgf, .pdf, .png, .ps, .raw, and .svg., by clicking on button <img src="./fiveimgs/PlotSave.png"/></p>
+						</li>
+						<br/>
+						<li>
+							<p><i>Exit:</i> to quit GASATaD, just use either the menu option <b>File -> Quit</b> or close the window using the top bar.</p>
+							<br/>
+							<div class="mx-auto col-md-12">
+								<img src="./fiveimgs/Exit.png" alt="" style="width:100%"/>
+							</div>
+						</li>
 
 					</ol>
 
