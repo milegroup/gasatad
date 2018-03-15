@@ -33,8 +33,8 @@ from Model import  ProgramState
 
 
 class Controller():
-    
-    #Main variables    
+
+    #Main variables
     programState = ProgramState()
 
     characterValues = []
@@ -64,7 +64,7 @@ class Controller():
 
         return self.data
 
-   
+
 
     def OpenFile (self, data):
         self.programState.quantitativeData = data
@@ -89,24 +89,24 @@ class Controller():
             print "Error: ", sys.exc_info()
 
     def getDataToAnalyse(self):
-        return self.programState.dataToAnalyse       
+        return self.programState.dataToAnalyse
 
 
 
     def getNumberOfColumns(self):
-        
+
         return len(self.programState.dataToAnalyse.columns)
 
 
-    
+
     def getNumberOfRows(self):
-        
+
         return len(self.programState.dataToAnalyse.index)
 
 
-    
+
     def getLabelsOfColumns(self):
-        
+
         return self.programState.dataToAnalyse.columns
 
 
@@ -114,14 +114,14 @@ class Controller():
     def deleteColumns(self, listOfColumnsName):
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(labels = listOfColumnsName, axis = 1)
         if self.programState.dataToAnalyse.empty:
-            self.resetDataToAnalyse()     
+            self.resetDataToAnalyse()
 
     def deleteRows(self, listOfRowsIndex):
         self.programState.dataToAnalyse.reset_index(drop=True, inplace=True)
         self.programState.dataToAnalyse = self.programState.dataToAnalyse.drop(listOfRowsIndex, axis=0)
         self.recalculateRowsIndexes()
         if self.programState.dataToAnalyse.empty:
-            self.resetDataToAnalyse()    
+            self.resetDataToAnalyse()
 
     def changeCellValue(self, row, col, newValue):
         self.programState.dataToAnalyse.iloc[row,col] = newValue
@@ -140,123 +140,128 @@ class Controller():
         self.programState.dataToAnalyse.index = range(0,len(self.programState.dataToAnalyse.index))
 
 
-        
+
     def detectColumnTypes(self):
         '''
         Check  the type of the variables saved on Dataframe: int, float or string
         '''
-        colsDataframe = self.programState.dataToAnalyse.columns      
-        
+        colsDataframe = self.programState.dataToAnalyse.columns
+
+
         del self.floatValues[:]
         del self.characterValues[:]
         del self.integerValues[:]
 
-        # Tries to convert float64 columns into int64 when possible
-        for col in colsDataframe:
-            if self.programState.dataToAnalyse[col].dtypes == 'float64':
-                t = self.programState.dataToAnalyse[col].astype(int)
-                result = list(self.programState.dataToAnalyse[col] == t)
-                if not (False in result):
-                    self.programState.dataToAnalyse[col] = t
-        
         for col in colsDataframe:
             if self.programState.dataToAnalyse[col].dtypes == 'int64':
                 self.integerValues.append(col)
             elif self.programState.dataToAnalyse[col].dtypes == 'float64':
-                self.floatValues.append(col)
+                if self.checkIntColumn(self.programState.dataToAnalyse[col]):
+                    self.integerValues.append(col)
+                else:
+                    self.floatValues.append(col)
             else:
                 self.characterValues.append(col)
-        
-    
-    
+
+
+    def checkIntColumn(self, column):
+        allInts = True
+        for elem in column:
+            if not np.isnan(elem) and (np.int64(elem) != elem):
+                allInts = False
+
+        return allInts
+
+
+
     def resetDataToAnalyse(self):
         for column in self.programState.dataToAnalyse.columns:
             del self.programState.dataToAnalyse[column]
 
 
-        
+
     def exportDataCSV(self, filePath, exportOptions):
-        
+
         self.programState.dataToAnalyse.to_csv(path_or_buf = filePath, sep = exportOptions.getFieldDelimiter(),
                                                header = exportOptions.getWriteColNames(), index = exportOptions.getWriteRowNames(),
                                                encoding = exportOptions.getCharacterSet(), decimal = exportOptions.getDecimalSeparator())
 
     def exportDataExcel(self, filePath):
-        
-        self.programState.dataToAnalyse.to_excel(filePath)    
-        
-    
+
+        self.programState.dataToAnalyse.to_excel(filePath)
+
+
 
     def addColumn(self, factorsFromInterface, nameRadioButton, tagRestValues, nameOFFactor):
-        
+
         self.isInRange = False
         self.itemAdded = False
         arrayToInsert = []
         dictKeys = factorsFromInterface.keys()
- 
-        
+
+
         for i in (self.programState.dataToAnalyse.index):
-            
+
             item = self.programState.dataToAnalyse.loc[i, nameRadioButton]
 
             if str(item) == 'nan':
                 arrayToInsert.append(item)
             else:
                 for factor in dictKeys:
-                    
+
                     if ( (item >= factorsFromInterface[factor][0]) and (item <= factorsFromInterface[factor][1])):
-                        
+
                         arrayToInsert.append(factor)
                         self.isInRange = True
                         self.itemAdded = True
 
                     else:
-                        if ((factor == dictKeys[-1]) and (self.isInRange == False) and (self.itemAdded == False)): 
+                        if ((factor == dictKeys[-1]) and (self.isInRange == False) and (self.itemAdded == False)):
                             arrayToInsert.append(tagRestValues)
                     self.isInRange = False
-                    
+
                 self.itemAdded = False
 
         self.programState.dataToAnalyse.insert(len(self.programState.dataToAnalyse.columns), nameOFFactor, arrayToInsert)
-        
 
-    
+
+
     def createHistogram(self, histogramOptions):
 
         # No tag selected
         if histogramOptions['secondVarSelected'] == 'None':
-            
+
             dataForChart = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
             dataForChart = [ x for x in dataForChart if str(x) != 'nan']
 
-            
+
             n,bins,patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75, bins=histogramOptions['numOfBins'])
-           
+
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
             plt.ylim(0,max(n)*1.1)
             for patch in patches:
                 patch.set_edgecolor('white')
-            
-            
-            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):                
+
+
+            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):
                 plt.grid()
-            
-            elif histogramOptions['xAxisGrid']:                
+
+            elif histogramOptions['xAxisGrid']:
                 plt.grid(axis = 'x')
-             
-            elif histogramOptions['yAxisGrid']:                
+
+            elif histogramOptions['yAxisGrid']:
                 plt.grid(axis = 'y')
-                       
+
             plt.title(histogramOptions['title'], fontsize = 18)
             plt.show()
-            
+
         else: # Some tag has been selected
-        
+
             dataForChart = {}
             selectedCategory = histogramOptions['secondVarSelected']
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
-            
+
             for tag in tags:
                 if str(tag) != 'nan':
                     dataForChart[tag] = []
@@ -268,17 +273,17 @@ class Controller():
                 if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
                     dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
-            dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}    
-            
+            dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
+
             colorsTmp = None
             if len(self.colorsPatch)>=len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
             n,bins,patches = plt.hist(dataForChart.values(), histtype='bar',  label=dataForChart.keys(), color=colorsTmp, bins=histogramOptions['numOfBins'])
-            
+
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
 
-            if type(n[0]) is np.ndarray:            
+            if type(n[0]) is np.ndarray:
                 n = [data for nl in n for data in nl]
             plt.ylim(0,max(n)*1.1)
 
@@ -287,21 +292,21 @@ class Controller():
                 patches = [data for pl in patches for data in pl]
             for patch in patches:
                 patch.set_edgecolor('white')
-            
-            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):                
+
+            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):
                 plt.grid()
-            
-            elif histogramOptions['xAxisGrid']:                
+
+            elif histogramOptions['xAxisGrid']:
                 plt.grid(axis = 'x')
-             
-            elif histogramOptions['yAxisGrid']:                
+
+            elif histogramOptions['yAxisGrid']:
                 plt.grid(axis = 'y')
-            
+
             if histogramOptions['legendPosition'] == "default":
                 plt.legend()
             else:
                 plt.legend(loc = histogramOptions['legendPosition'])
-            
+
             plt.title(histogramOptions['title'], fontsize = 18)
             plt.show()
 
@@ -322,9 +327,9 @@ class Controller():
                 m,b = np.polyfit(xdata,ydata,1)
                 xplotdata = np.array([xmin,xmax])
                 plt.plot(xplotdata, m*xplotdata + b, linewidth=2)
-                
 
-            
+
+
         else:
             for i in range(len(scatterOptions['selectedCheckBoxes'])):
                 xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
@@ -364,7 +369,7 @@ class Controller():
 
         plt.xlabel(scatterOptions['xAxisName'])
         plt.ylabel(scatterOptions['yAxisName'])
-        
+
         if (scatterOptions['xAxisGrid'] & scatterOptions['yAxisGrid']):
             plt.grid()
         elif scatterOptions['xAxisGrid']:
@@ -409,7 +414,7 @@ class Controller():
             explode = []
             for l in dataForPie.index:
                 explode.append(0.05)
-                    
+
 
         for v in dataForPie:
             sizes.append(100.0*v/numberSamples)
@@ -428,20 +433,20 @@ class Controller():
             for patch in patches[0]:
                 patch.set_edgecolor('white')
             plt.legend(patches[0], labels, loc = pieChartOptions['legendPosition'])
-        
+
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
         plt.tight_layout()
-        plt.title(pieChartOptions['title'],fontsize=18)                
+        plt.title(pieChartOptions['title'],fontsize=18)
         plt.show()
-        
+
 
     def createBoxPlot(self, boxPlotOptions):
 
         flierprops = dict(marker='o',markerfacecolor='white', markersize=8, linestyle='none')
         # No categorical variable was selected
         if boxPlotOptions['secondVarSelected'] == 'None':
-            
+
             bplot = self.programState.dataToAnalyse.plot.box(
                 y = boxPlotOptions['selectedCheckBoxes'],
                 rot=45,
@@ -455,7 +460,7 @@ class Controller():
                 patch.set_facecolor(color)
 
         else: # Some categorical value was selected => subplots
-            
+
             plotBoxes = boxPlotOptions['selectedCheckBoxes']
             result = self.programState.dataToAnalyse
 
@@ -468,14 +473,14 @@ class Controller():
                 patch_artist=True,
                 flierprops=flierprops
             )
-            
+
             for key in bplots.keys():
                 for patch, color in zip(bplots[key]['boxes'], self.colorsPatch):
                     patch.set_facecolor(color)
-            
+
         plt.suptitle(boxPlotOptions['title'], fontsize=18)
-        plt.show()   
-    
+        plt.show()
+
 
 
     def createBarChart(self, barChartOptions):
@@ -484,7 +489,7 @@ class Controller():
 
         # No tag selected
         if barChartOptions['secondVarSelected'] == 'None':
-            
+
             if operation == 'Mean':
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].mean()
             elif operation == 'Median':
@@ -496,17 +501,17 @@ class Controller():
 
             names = [str(barChartOptions['firstVarSelected'])]
             y_pos = np.arange(len(names))
-            
+
             plt.bar(y_pos, dataForChart, align='center', edgecolor='white', color=self.colorsPatch[0])
 
             plt.xticks(y_pos, '')
             plt.xlim(-0.5,0.5)
             plt.ylim(0,dataForChart*1.1)
-            
+
             plt.title(barChartOptions['title'], fontsize = 18)
             plt.xlabel(barChartOptions['xAxisName'])
             plt.ylabel(barChartOptions['yAxisName'])
-            
+
             if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
                 plt.grid()
             elif barChartOptions['xAxisGrid']:
@@ -514,9 +519,9 @@ class Controller():
             elif barChartOptions['yAxisGrid']:
                 plt.grid(axis = 'y')
             plt.show()
-            
+
         else: # Some tag has been selected
-        
+
             dataForChart = {}
             selectedCategory = barChartOptions['secondVarSelected']
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
@@ -524,7 +529,7 @@ class Controller():
             for tag in tags:
                 if str(tag) != 'nan':
                     dataForChart[tag] = []
-    
+
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
             valuesColumn = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']]
 
@@ -533,21 +538,21 @@ class Controller():
                     dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
-              
+
             labels = []
             for i in tags:
                 labels.append(i)
-                
-                
-            results = []  
+
+
+            results = []
             if operation == 'Mean':
-                
+
                 for data in dataForChart.values():
                     temp2 = pandas.Series(data)
                     results.append(temp2.mean())
 
             elif operation == 'Median':
-            
+
                 for data in dataForChart.values():
                     temp2 = pandas.Series(data)
                     results.append(temp2.median())
@@ -562,7 +567,7 @@ class Controller():
                     temp2 = pandas.Series(data)
                     results.append(temp2.std())
 
-                
+
             tags = np.asarray(tags)
             if (len(dataForChart)<=len(self.colorsPatch)):
                 plt.bar(range(len(dataForChart)), results, align='center', edgecolor='white', color=self.colorsPatch[0:len(dataForChart)])
@@ -571,10 +576,10 @@ class Controller():
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
             plt.xlim(-0.5,len(dataForChart)-0.5)
             plt.ylim(0,1.1*max(results))
-    
+
             plt.xlabel(barChartOptions['xAxisName'])
             plt.ylabel(barChartOptions['yAxisName'])
-            
+
             if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
                 plt.grid()
             elif barChartOptions['xAxisGrid']:
@@ -584,9 +589,9 @@ class Controller():
 
             plt.title(barChartOptions['title'], fontsize = 18)
             plt.show()
-    
 
-    def nullValuesInFile(self, data): 
+
+    def nullValuesInFile(self, data):
         return pandas.isnull(data).values.any()
 
     def storeData(self):
