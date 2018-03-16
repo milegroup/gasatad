@@ -52,7 +52,7 @@ class MainFrame ( wx.Frame ):
     def __init__( self, parent ):
 
 
-        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.4.png").ConvertToBitmap()
+        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.5.png").ConvertToBitmap()
         splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
 
         wx.Yield()
@@ -64,6 +64,15 @@ class MainFrame ( wx.Frame ):
         wx.Frame.__init__ ( self, parent, id = wx.ID_ANY, title = "GASATaD")
 
         if platform != "darwin":
+            # image = wx.Image('GasatadLogo.png', wx.BITMAP_TYPE_PNG).ConvertToBitmap()
+            # icon = wx.EmptyIcon()
+            # icon.CopyFromBitmap(image)
+            # self.SetIcon(icon)
+
+            # ib = wx.IconBundle()
+            # ib.AddIconFromFile("GasatadLogo.ico", wx.BITMAP_TYPE_ANY)
+            # self.SetIcons(ib)
+
             icon = wx.Icon("GasatadLogo.ico", wx.BITMAP_TYPE_ICO)
             self.SetIcon(icon)
 
@@ -942,6 +951,7 @@ class MainFrame ( wx.Frame ):
                 if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0, index_col=None)
+                    self.data = self.preprocessExcel(self.data)
             except:
                 # print "Error: ", sys.exc_info()
                 type, value, traceback = sys.exc_info()
@@ -1003,6 +1013,7 @@ class MainFrame ( wx.Frame ):
                 if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
+                    self.data = self.preprocessExcel(self.data)
             except:
                 # print "Error: ", sys.exc_info()
                 type, value, traceback = sys.exc_info()
@@ -1042,6 +1053,27 @@ class MainFrame ( wx.Frame ):
                 # Move the view of the table to the last column
                 self.m_dataTable.SetGridCursor(0,self.controller.getNumberOfColumns()-1)
                 self.m_dataTable.MakeCellVisible(0,self.controller.getNumberOfColumns()-1)
+
+    def preprocessExcel(self, data):
+        for row in range(len(data.index)):
+            for col in range(len(data.columns)):
+                if type(data.iloc[row, col]) == unicode or type(data.iloc[row, col]) == str:
+                    if data.iloc[row, col].isspace():
+                        data.iloc[row, col] = numpy.nan
+                if type(data.iloc[row, col]) == int:
+                    data.iloc[row, col] = float(data.iloc[row, col])
+
+        data.dropna(axis=0, how='all', inplace=True)
+
+        for col in data.columns:
+            allNumbers = True;
+            for row in data.index:
+                if not isinstance(data.loc[row, col], (int, long, float)):
+                    allNumbers = False;
+            if allNumbers:
+                data[col] = data[col].astype(numpy.float64)
+
+        return data
         
     
        
@@ -1494,7 +1526,7 @@ class MainFrame ( wx.Frame ):
         info.SetName('GASATaD')
         info.SetVersion(str(self.params['version']))
         info.SetDescription(description)
-        info.SetCopyright(u"\u00A9 2017");
+        info.SetCopyright(u"\u00A9 2018");
         info.SetIcon(wx.Icon(os.path.dirname(os.path.abspath(__file__)) + "/GasatadLogo.ico", wx.BITMAP_TYPE_ICO))
         info.SetWebSite("https://milegroup.github.io/gasatad/")
         
