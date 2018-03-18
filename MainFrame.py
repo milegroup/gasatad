@@ -86,8 +86,8 @@ class MainFrame ( wx.Frame ):
         
         # ------------ File menu
 
-        # TODO: shortcuts do not work in windows
-        
+        # TODO: shortcuts do not work in Windows and MacOS
+
         self.m_fileMenu = wx.Menu()
 
         self.m_menuNewFile = wx.MenuItem( self.m_fileMenu,wx.ID_NEW, u"Open new file...", wx.EmptyString, wx.ITEM_NORMAL )
