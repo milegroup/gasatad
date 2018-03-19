@@ -87,6 +87,7 @@ class MainFrame ( wx.Frame ):
         # ------------ File menu
 
         # TODO: shortcuts do not work in Windows and MacOS
+        # TODO: in windows, after loading a file it doesn't close
 
         self.m_fileMenu = wx.Menu()
 
