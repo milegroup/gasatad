@@ -90,8 +90,10 @@ class MainFrame ( wx.Frame ):
         # TODO: in windows, after loading a file it doesn't close
 
         self.m_fileMenu = wx.Menu()
-
-        self.m_menuNewFile = wx.MenuItem( self.m_fileMenu,wx.ID_NEW, u"Open new file...", wx.EmptyString, wx.ITEM_NORMAL )
+        if (sys.platform == "linux2") :
+            self.m_menuNewFile = wx.MenuItem( self.m_fileMenu,wx.ID_NEW, u"Open new file...", wx.EmptyString, wx.ITEM_NORMAL )
+        else:
+            self.m_menuNewFile = wx.MenuItem(self.m_fileMenu, wx.ID_NEW, u"Open new file...\tCtrl+N", wx.EmptyString, wx.ITEM_NORMAL)
         self.m_fileMenu.AppendItem( self.m_menuNewFile )
         
         self.m_menuAddFile = wx.MenuItem( self.m_fileMenu, wx.ID_OPEN, u"Add file...", wx.EmptyString, wx.ITEM_NORMAL )
@@ -112,6 +114,10 @@ class MainFrame ( wx.Frame ):
 
         self.m_menuQuit = wx.MenuItem( self.m_fileMenu, wx.ID_EXIT, u"Quit", wx.EmptyString, wx.ITEM_NORMAL )
         self.m_fileMenu.AppendItem( self.m_menuQuit )
+
+        self.accel_tbl = wx.AcceleratorTable([
+            (wx.ACCEL_CTRL,ord('N'),self.m_menuNewFile.GetId())
+        ])
 
         # ------------ Edit menu
 
