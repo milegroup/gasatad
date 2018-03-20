@@ -1,3 +1,2 @@
-Replace in text columns
-
-Undo
+Shortcuts in MacOS and Windows
+Reading excel files was improved
