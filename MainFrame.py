@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 '''
 This file is part of GASATaD.
@@ -85,8 +85,6 @@ class MainFrame ( wx.Frame ):
         
         
         # ------------ File menu
-
-        # TODO: in windows, after loading a file it doesn't close
 
         self.m_fileMenu = wx.Menu()
         if sys.platform == "linux2":
@@ -1598,9 +1596,18 @@ class MainFrame ( wx.Frame ):
         options.add_section('gasatad')
         
         for param in self.params['options'].keys():
-            options.set('gasatad',param,self.params['options'][param])
+            # In windows, if the path contains non-ascii characters, it is not saved in the configuration file
+            validParam = True
+            if param == "dirfrom" and sys.platform == "win32":
+                tmpStr = self.params['options'][param]
+                if any(ord(char)>126 for char in tmpStr):
+                    validParam = False
+            if validParam:
+                options.set('gasatad',param,self.params['options'][param])
+                # print "  ",param,"  -  ",self.params['options'][param]
         
         tempF = open(self.params['configFile'],'w')
+        #print "Trying to write configuration in ", self.params['configFile']
         options.write(tempF)
         tempF.close()
 

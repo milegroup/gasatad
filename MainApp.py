@@ -19,14 +19,23 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 
 import wx
 import os
+import sys
 
 from MainFrame import MainFrame
 
 MainFrame.params = {}
 MainFrame.params['version'] = 1.5
 MainFrame.params['noOfNulls'] = 0
-MainFrame.params['configDir'] = os.path.expanduser('~')+os.sep+'.gasatad'
-MainFrame.params['configFile'] = MainFrame.params['configDir']+os.sep+"gasatad.cfg"
+#MainFrame.params['configDir'] = os.path.expanduser('~')+os.sep+'.gasatad'
+MainFrame.params['configDir'] = os.path.join(os.path.expanduser('~'),'.gasatad')
+MainFrame.params['configFile'] = os.path.join(MainFrame.params['configDir'],"gasatad.cfg")
+
+if sys.platform == 'win32':
+    import locale
+    loc = locale.getdefaultlocale()
+    if loc[1]:
+        MainFrame.params['configFile'] = MainFrame.params['configFile'].decode(loc[1],"ignore")
+
 MainFrame.params['upgradable'] = False
 MainFrame.params['availableVersionToUpgrade'] = ""
 
