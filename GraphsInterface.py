@@ -862,7 +862,7 @@ class ValidatorForBoxplot(wx.PyValidator):
     
     def Validate(self, win):
         if not self.selectedCheckBoxes:
-            wx.MessageBox("Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+            wx.MessageBox("Please, select at least one checkBox", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
             return False
         else:
             return True
@@ -875,7 +875,7 @@ class ValidatorForBoxplot(wx.PyValidator):
     
     def noCheckBoxSelectedWarning(self):
         
-        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, "Please, select at least one checkBox", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
         if dlg.ShowModal() == wx.ID_OK:
             dlg.Destroy()
         else:

@@ -643,7 +643,7 @@ class SignificanceTestInterface ( wx.Dialog ):
             
         else:
             
-            wx.MessageBox("There is no data that match the selected filters in one of the variables", "Attention!",
+            wx.MessageBox("There is no data that match the selected filters in one of the variables", "ERROR",
                                    wx.OK | wx.ICON_EXCLAMATION)
 
 
@@ -651,7 +651,7 @@ class SignificanceTestInterface ( wx.Dialog ):
     
     def wrongIntervalWarning(self):
         
-        dlg = wx.MessageDialog(self, "The value of the FROM item have to be lower or equal than the TO item", "Attention!",
+        dlg = wx.MessageDialog(self, "The value of the FROM item have to be lower or equal than the TO item", "ERROR",
                                wx.OK | wx.ICON_EXCLAMATION)
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -704,7 +704,7 @@ class ValidatorForFactors(wx.PyValidator):
                 self.wrongInterval = True 
         
         if self.wrongInterval:
-            wx.MessageBox("The value of the FROM item have to be lower or equal than the TO item", "Attention!")
+            wx.MessageBox("The value of the FROM item have to be lower or equal than the TO item", "ERROR")
             return False
         
         

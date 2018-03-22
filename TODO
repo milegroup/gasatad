@@ -1,16 +1,13 @@
 ALL:
 	Help
-	Change "Attention" to "ERROR"
 
 	Increase data information: number of text, integer and float columns?
 	Add gini value, geometric mean and harmonic mean to basic statistics?
 
 WIN:
-	Export to xls: add modules xlwt and openpyxl in dependencies
 
 MAC:
 	Try to remove "python" fron the main app bar
-	Export to xls: add modules xlwt and openpyxl in dependencies
 
 DEB:
 

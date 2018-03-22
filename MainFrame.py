@@ -724,7 +724,7 @@ class MainFrame ( wx.Frame ):
 
             self.controller.renameColumn(oldLabel,newLabel)
 
-            self.refreshGUI(updateDataInfo = False, markTextColumns = False, markNans = False)
+            self.refreshGUI(updateDataInfo = False, markNans = False)
             
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
             self.m_dataTable.MakeCellVisible(0,columnsSelectedIndex[0])
@@ -756,7 +756,7 @@ class MainFrame ( wx.Frame ):
 
             self.controller.replaceInTextCol(colLabel,oldTag,newTag)
 
-            self.refreshGUI(markTextColumns=False)
+            self.refreshGUI()
 
             
             self.m_dataTable.SetGridCursor(0,columnsSelectedIndex[0])
@@ -1153,14 +1153,6 @@ class MainFrame ( wx.Frame ):
         self.controller.detectColumnTypes()
 
 
-    def markTextColumns(self):
-        for col in range(self.controller.getNumberOfColumns()):
-
-            if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
-                for row in range(self.controller.getNumberOfRows()):
-                    self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
-
-
     def markNans(self):
         # print "# Going to mark nans"
         numRows = self.controller.getNumberOfRows()
@@ -1176,10 +1168,13 @@ class MainFrame ( wx.Frame ):
                     self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(255,218,185))
                     self.params['noOfNulls'] += 1
                 else:
-                    if self.m_dataTable.GetColLabelValue(col) not in self.controller.characterValues:
-                        self.m_dataTable.SetCellBackgroundColour(row,col,'white')
+                    if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
+                        self.m_dataTable.SetCellBackgroundColour(row, col, wx.Colour(250, 250, 210))
+                    elif self.m_dataTable.GetColLabelValue(col) in self.controller.integerValues:
+                        self.m_dataTable.SetCellBackgroundColour(row, col, wx.Colour(255, 240, 240))
                     else:
-                        self.m_dataTable.SetCellBackgroundColour(row,col,wx.Colour(250,250,210))
+                        self.m_dataTable.SetCellBackgroundColour(row,col,'white')
+
 
     
     def saveData(self, event):
@@ -1224,15 +1219,13 @@ class MainFrame ( wx.Frame ):
         self.m_discardColumn.Check()
         self.m_CSVSeparator1.Check()
 
-    def refreshGUI(self, updateDataInfo = True, markTextColumns = True, markNans = True):
+    def refreshGUI(self, updateDataInfo = True, markNans = True):
         if not self.controller.programState.dataToAnalyse.empty: # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
             self.m_dataTable.AutoSize()
             lastColumnOrigSize = self.m_dataTable.GetColSize(self.controller.getNumberOfColumns()-1)
             self.m_dataTable.SetColSize(self.controller.getNumberOfColumns()-1,lastColumnOrigSize+30)
             self.m_dataTable.ClearSelection()
-            if markTextColumns:
-                self.markTextColumns()
             if markNans:
                 self.markNans()
             if updateDataInfo:
@@ -1354,7 +1347,7 @@ class MainFrame ( wx.Frame ):
                     
         else:
             
-            wx.MessageBox("There are no numerical values", "Attention!")
+            wx.MessageBox("There are no numerical values", "ERROR")
 
 
     def createBasicStatisticsInterface(self, event):
@@ -1414,7 +1407,7 @@ class MainFrame ( wx.Frame ):
         
         else:
             
-            wx.MessageBox("There are no numerical values", "Attention!")
+            wx.MessageBox("There are no numerical values", "ERROR")
 
 
 
@@ -1431,7 +1424,7 @@ class MainFrame ( wx.Frame ):
                     self.controller.createHistogram(histogramOptions) 
         else:
             
-            wx.MessageBox("There are no numerical values", "Attention!")
+            wx.MessageBox("There are no numerical values", "ERROR")
    
    
     def createScatterPlot(self, event):  
@@ -1462,7 +1455,7 @@ class MainFrame ( wx.Frame ):
 
         else:
             
-            wx.MessageBox("There are no categorical variables", "Attention!") 
+            wx.MessageBox("There are no categorical variables", "ERROR")
 
 
                 
@@ -1479,7 +1472,7 @@ class MainFrame ( wx.Frame ):
                     self.controller.createBoxPlot(boxPlotOptions)         
         else:
             
-            wx.MessageBox("There are no numerical variables", "Attention!")
+            wx.MessageBox("There are no numerical variables", "ERROR")
     
     
                    
@@ -1496,7 +1489,7 @@ class MainFrame ( wx.Frame ):
         
         else:
             
-            wx.MessageBox("There are no numerical variables", "Attention!")
+            wx.MessageBox("There are no numerical variables", "ERROR")
 
     
     def discardColumnCheckboxChanged(self, event):

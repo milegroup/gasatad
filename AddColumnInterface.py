@@ -360,7 +360,7 @@ class AddColumnInterface ( wx.Dialog ):
 
     def showWarningTooManyIntervals(self):
         
-        dlg = wx.MessageDialog(self, "You can not create more Intervals", "Attention!", wx.OK | wx.ICON_EXCLAMATION)
+        dlg = wx.MessageDialog(self, "You can not create more Intervals", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
         
         if dlg.ShowModal() == wx.ID_OK:
             
@@ -474,7 +474,7 @@ class ValidatorForFactors(wx.PyValidator):
             return False
             
         elif erroneousInterval:
-            wx.MessageBox("The value of the FROM item have to be lower or equal than the TO item", "Attention!")
+            wx.MessageBox("The value of the FROM item have to be lower or equal than the TO item", "ERROR")
             
             emptyField = False
             existOverlap = False
