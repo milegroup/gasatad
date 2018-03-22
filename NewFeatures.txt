@@ -1,4 +1,4 @@
 Shortcuts in MacOS and Windows
 Reading excel files was improved
 Solved problems with non-ascii characters in users' names in windows
-Integer columns are maked in light read
+Integer columns are maked in light grey
