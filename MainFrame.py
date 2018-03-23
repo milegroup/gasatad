@@ -873,7 +873,7 @@ class MainFrame ( wx.Frame ):
 
         elif argv[0].endswith("MainApp.py"):
             # print "# Running GASATaD from source"
-            remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/gh-pages/programVersions/src.txt"
+            remoteVersionFile = "https://github.com/milegroup/gasatad/raw/master/docs/programVersions/src.txt"
 
         try:
             remoteFile = urllib2.urlopen(remoteVersionFile)
