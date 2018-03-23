@@ -5,3 +5,4 @@ LIST OF DEPENDENCIES:
 	- Pandas (http://pandas.pydata.org/) -> BSD (Berkeley Software Distribution)) License
 	- NumPy (http://www.numpy.org/) -> BSD License
 	- SciPy (https://www.scipy.org/) -> 2-clause BSD
+	- xlrd, xlwt, openpyxl (http://www.python-excel.org) -> BSD License
