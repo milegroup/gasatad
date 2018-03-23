@@ -1171,7 +1171,7 @@ class MainFrame ( wx.Frame ):
                     if self.m_dataTable.GetColLabelValue(col) in self.controller.characterValues:
                         self.m_dataTable.SetCellBackgroundColour(row, col, wx.Colour(250, 250, 210))
                     elif self.m_dataTable.GetColLabelValue(col) in self.controller.integerValues:
-                        self.m_dataTable.SetCellBackgroundColour(row, col, wx.Colour(255, 240, 240))
+                        self.m_dataTable.SetCellBackgroundColour(row, col, wx.Colour(240, 255, 255))
                     else:
                         self.m_dataTable.SetCellBackgroundColour(row,col,'white')
 
