@@ -1188,7 +1188,7 @@ class MainFrame ( wx.Frame ):
 
             fileExtension = self.filename.rpartition(".")[-1]
             if fileExtension.lower()  not in ["csv","xls","xlsx"]:
-                self.dlg = wx.MessageDialog(None, "Error file exporting file "+self.filename+"\nFile extension (.csv|.xlsx) is required", "File error", wx.OK | wx.ICON_EXCLAMATION)
+                self.dlg = wx.MessageDialog(None, "Error exporting file "+self.filename+"\nFile extension (.csv|.xlsx) is required", "File error", wx.OK | wx.ICON_EXCLAMATION)
                 if self.dlg.ShowModal() == wx.ID_OK:
                     self.dlg.Destroy()
             else:
@@ -1197,10 +1197,35 @@ class MainFrame ( wx.Frame ):
                     exportCsv = ExportCsvOptions(self)
                     
                     if exportCsv.ShowModal() == wx.ID_OK:
-                        self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
+                        try:
+                            self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
+                        except:
+                            self.dlg = wx.MessageDialog(None,"Error saving to file " + self.filename,
+                                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
+                            if self.dlg.ShowModal() == wx.ID_OK:
+                                self.dlg.Destroy()
+                            return
+                        dlg = wx.MessageDialog(None, "Data saved to file: "+self.filename, "File operation",
+                                               wx.OK | wx.ICON_INFORMATION)
+
+                        if dlg.ShowModal() == wx.ID_OK:
+                            dlg.Destroy()
+
                 else:
                     path = self.directory + "/" + self.filename
-                    self.controller.exportDataExcel(path)
+                    try:
+                        self.controller.exportDataExcel(path)
+                    except:
+                        self.dlg = wx.MessageDialog(None, "Error saving to file " + self.filename,
+                                                    "File error", wx.OK | wx.ICON_EXCLAMATION)
+                        if self.dlg.ShowModal() == wx.ID_OK:
+                            self.dlg.Destroy()
+                        return
+                    dlg = wx.MessageDialog(None, "Data saved to file: " + self.filename, "File operation",
+                                           wx.OK | wx.ICON_INFORMATION)
+
+                    if dlg.ShowModal() == wx.ID_OK:
+                        dlg.Destroy()
 
 
     
