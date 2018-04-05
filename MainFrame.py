@@ -1583,41 +1583,52 @@ class MainFrame ( wx.Frame ):
 
     def configSave(self):
         """ Saves configuration file"""
-        from ConfigParser import SafeConfigParser
-        options = SafeConfigParser()
-        
-        options.add_section('gasatad')
-        
-        for param in self.params['options'].keys():
-            # In windows, if the path contains non-ascii characters, it is not saved in the configuration file
-            validParam = True
-            if param == "dirfrom" and sys.platform == "win32":
-                tmpStr = self.params['options'][param]
-                if any(ord(char)>126 for char in tmpStr):
-                    validParam = False
-            if validParam:
-                options.set('gasatad',param,self.params['options'][param])
-                # print "  ",param,"  -  ",self.params['options'][param]
-        
-        tempF = open(self.params['configFile'],'w')
-        #print "Trying to write configuration in ", self.params['configFile']
-        options.write(tempF)
-        tempF.close()
+        try:
+            from ConfigParser import SafeConfigParser
+            options = SafeConfigParser()
 
-        if platform=="win32":
-            import win32api,win32con
-            win32api.SetFileAttributes(self.params['configDir'],win32con.FILE_ATTRIBUTE_HIDDEN)
+            options.add_section('gasatad')
+
+            for param in self.params['options'].keys():
+                # In windows, if the path contains non-ascii characters, it is not saved in the configuration file
+                validParam = True
+                if param == "dirfrom" and sys.platform == "win32":
+                    tmpStr = self.params['options'][param]
+                    if any(ord(char)>126 for char in tmpStr):
+                        validParam = False
+                if validParam:
+                    options.set('gasatad',param,self.params['options'][param])
+                    # print "  ",param,"  -  ",self.params['options'][param]
+
+            tempF = open(self.params['configFile'],'w')
+            #print "Trying to write configuration in ", self.params['configFile']
+            options.write(tempF)
+            tempF.close()
+
+            if platform=="win32":
+                import win32api,win32con
+                win32api.SetFileAttributes(self.params['configDir'],win32con.FILE_ATTRIBUTE_HIDDEN)
+        except:
+            return
 
     def configLoad(self):
         """ Loads configuration file"""
         # print "Loading file",self.params['configFile']
-        from ConfigParser import SafeConfigParser
-        options=SafeConfigParser()
-        options.read(self.params['configFile'])
-        for section in options.sections():
-            for param,value in options.items(section):
-                self.params['options'][param]=value
-                # print "param",param,"  -  value",value
+        try:
+            from ConfigParser import SafeConfigParser
+            options=SafeConfigParser()
+            options.read(self.params['configFile'])
+            for section in options.sections():
+                for param,value in options.items(section):
+                    self.params['options'][param]=value
+                    # print "param",param,"  -  value",value
+        except:
+            #print "Problem loading configuration file", self.params['configFile']
+            try:
+                os.remove(self.params['configFile'])
+            except:
+                pass
+            return
 
 
 class ReplaceInColInterface(wx.Dialog):
