@@ -50,13 +50,13 @@
 						<li><p>Merges data of different nature from different files.</p></li>
 						<li><p>Calculates basic statistical results over the data.</p></li>
 						<li><p>Performs different significance test.</p></li>
-						<li><p>Generates and exports high quality plots.</p></li>
 						<li><p>Classifies data into different categories.</p></li>
+						<li><p>Generates and exports high quality plots.</p></li>
 					</ul>
 
 					<h2>Hardware and software requirements</h2>
 					<p>Basic hardware requirements to run GASATaD are 3GB of RAM, and 5GB free space of hard disk.</p>
-					<p>The application runs on GNU/Linux, 32 and 64 bits (e.g. Ubuntu Linux); Microsoft Windows, 32 and 64 bits; and MacOS, 32 and 64 bits.</p>
+					<p>The application runs on GNU/Linux (e.g. Ubuntu Linux), Microsoft Windows and MacOS.</p>
 					<br/>
 
 					<h2>Interface description</h2>
@@ -66,13 +66,13 @@
 							<img src="./fiveimgs/MainWindow.png" alt="" style="width:100%"/>
 					</div>
 					<br/>
-					<p>On the right side, data will be displayed on a table when files are opened. Initially, columns are labeled with letters and the rows using numbers. Numerical values appear in white cells whereas textual data will be presented with yellow background.</p>
-					<p>On the left panel, the upper area corresponds to information about the data (number of rows, columns and null values) . Just under this area, buttons are available to manage data and files, and to perform statistical analyses (basic or significance). Below, plotting functionalities are included.</p>
+					<p>On the right side of the window, the data will be displayed on a table when files are opened. Initially, columns will be labeled using letters and rows will be labeled with numbers. Numerical values will appear in white or light blue cells, depending if they belong to float or integer columns, respectively. Textual data will be presented in yellow background.</p>
+					<p>On the left panel, the upper area shows information about the data (number of rows, columns and null values). Just under this area, buttons are available to manage data and files, or to perform basic statistical analyses or significance tests. Below, plotting functionalities are included.</p>
 
 					<br/>
 
 					<h2>A five minutes guided example in GASATaD</h2>
-					<p>First, download .csv data files from <a href="https://milegroup.github.io/gasatad/#download" target="_blank">https://milegroup.github.io/gasatad/#download</a>. Two files are provided: testfile1.csv and testfile2.csv.</p>
+					<p>First, download .csv data files from <a href="https://milegroup.github.io/gasatad/#download" target="_blank">https://milegroup.github.io/gasatad/#download</a>. Uncompress to obtain two files: testfile1.csv and testfile2.csv.</p>
 					<br/>
 
 					<ol>
@@ -103,7 +103,7 @@
 						<li>
 							<p><i>Reorder the rows of the table:</i> select the <b>Age</b> column and then you can either use the main menu (<b>Edit → Sort using selected column → ascending</b>), or right-click and the <b>Sort using column → ascending</b> option.</p>
 							<br/>
-							<div class="mx-auto col-md-11">
+							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/SortData.png" alt="" style="width:100%"/>
 							</div>
 						</li>
@@ -115,12 +115,12 @@
 								<img src="./fiveimgs/AddColumn.png" alt="" style="width:100%"/>
 							</div>
 							<br/>
-							<p>Afterwards, a new column labeled <b>Age ranges</b> will be created. This column will classify the rows into three different age ranges: young, adult and elder.</p>
+							<p>A new column labeled <b>Age ranges</b> will be created. This column classifies the rows into three different age ranges: young, adult and elder.</p>
 						</li>
 						<br/>
 
 						<li>
-							<p><i>Calculate basic statistics of a numerical column:</i> on the left panel, click on the button <b>Basic statistics</b>, and select the column <b>Age</b>. You can restrict which values of the column are going to be used, and, after pressing <b>Show results</b>, a basic statistical analysis of these values is presented.</p>
+							<p><i>Calculate basic statistics of a numerical column:</i> on the left panel, click on the button <b>Basic statistics</b>, and select the column <b>Age</b>. You can restrict which values of the column are going to be used, and, after pressing <b>Show results</b>, a basic statistical analysis of these values will be presented.</p>
 							<br/>
 							<div class="mx-auto col-md-10">
 								<img src="./fiveimgs/BasicStatistics.png" alt="" style="width:100%"/>
@@ -128,7 +128,7 @@
 						</li>
 						<br/>
 						<li>
-							<p><i>Perform a comparative analysis between variables:</i> on the main window, click on the button <b>Significance tests</b>. Select two numerical columns to be used which values of each column are to be included in the test. After pressing <b>Show results</b> values are presented for the following significance tests: standard t-test, Welch’s, Kolmogorov-Smirnov, and Wilcoxon rank-sum.</p>
+							<p><i>Perform a comparative analysis between variables:</i> on the main window, click on the button <b>Significance tests</b>. Select two numerical columns to be used in the test. After pressing <b>Show results</b> values are presented for the following significance tests: standard t-test, Welch’s, Kolmogorov-Smirnov, and Wilcoxon rank-sum.</p>
 							<br/>
 							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/Significance.png" alt="" style="width:100%"/>
@@ -136,17 +136,34 @@
 						</li>
 						<br/>
 						<li>
-							<p><i>Plot data:</i> on the main window, click on the icon representing a pie-chart. Select the tag <b>Age range</b> and, after pressing <b>Ok</b>, a new window containing the plot will open.</p>
+							<p><i>Plot data:</i> on the main window, click on the button depicting a pie-chart. Select the tag <b>Age range</b> and, after pressing <b>Ok</b>, a new window containing the plot will open.</p>
 							<br/>
 							<div class="mx-auto col-md-6">
 								<img src="./fiveimgs/PieChart.png" alt="" style="width:100%"/>
 							</div>
 							<br/>
-							<p>The plot can be modified by clicking on the buttons on the bar at the bottom of the image. Button <img src="./fiveimgs/PlotArrows.png"/> can be used to displace the plot along both the x and y axis. Parts of the graph can be zoomed with button <img src="./fiveimgs/PlotZoom.png"/>. Margins can be modified by means of button <img src="./fiveimgs/PlotMargins.png"/>, and actions can be either undone or redone with buttons <img src="./fiveimgs/PlotLR.png"/>. Modifications can be removed by using the button <img src="./fiveimgs/PlotHome.png"/>. Finally, the plot can be saved in different formats, such as .epg, .pgf, .pdf, .png, .ps, .raw, and .svg., by clicking on button <img src="./fiveimgs/PlotSave.png"/></p>
+							<p>The plot can be modified by clicking on the buttons at the bottom of the image (the aspect of the buttons can be different depending on the operating system): </p>
+							<ul>
+								<li><img src="./fiveimgs/PlotArrows.png"/> moves the plot along the x and y axes.</li>
+								<li><img src="./fiveimgs/PlotZoom.png"/> selects and zooms in areas of the plot.</li>
+								<li><img src="./fiveimgs/PlotMargins.png"/> edits margins.</li>
+								<li><img src="./fiveimgs/PlotLR.png"/> allow users to un-do or re-do actions.</li>
+								<li><img src="./fiveimgs/PlotHome.png"/> resets the plot.</li>
+								<li><img src="./fiveimgs/PlotSave.png"/> saves the plot to file. Possible formats are .epg, .pgf, .pdf, .png, .ps, .raw, and .svg.</li>
+							</ul>
 						</li>
 						<br/>
 						<li>
-							<p><i>Exit:</i> to quit GASATaD, just use either the menu option <b>File -> Quit</b> or close the window using the top bar.</p>
+							<p><i>Edit data:</i> individual cells can be modified by double-clicking on them:</p>
+							<br/>
+							<div class="mx-auto col-md-12">
+								<img src="./fiveimgs/EditCell.png" alt="" style="width:100%"/>
+							</div>
+							<br/>
+						</li>
+						<br/>
+						<li>
+							<p><i>Exit:</i> to quit GASATaD, just use either use the <b>File -> Quit</b> menu option or close the window.</p>
 							<br/>
 							<div class="mx-auto col-md-12">
 								<img src="./fiveimgs/Exit.png" alt="" style="width:100%"/>
