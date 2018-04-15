@@ -876,9 +876,16 @@ class MainFrame ( wx.Frame ):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/src.txt"
 
         try:
-            remoteFile = urllib2.urlopen(remoteVersionFile)
-            remoteVersion=remoteFile.readline().strip()
-            remoteFile.close()
+            if platform != "darwin":
+                remoteFile = urllib2.urlopen(remoteVersionFile)
+                remoteVersion=remoteFile.readline().strip()
+                remoteFile.close()
+            else:
+                import ssl
+                context = ssl._create_unverified_context()
+                remoteFile = urllib2.urlopen(remoteVersionFile, context=context)
+                remoteVersion = remoteFile.readline().strip()
+                remoteFile.close()
             # print "# Version available in GASATaD web page: ", remoteVersion
         except urllib2.URLError:
             # print "# I couldn't check for updates"
