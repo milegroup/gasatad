@@ -52,7 +52,7 @@ class MainFrame ( wx.Frame ):
     def __init__( self, parent ):
 
 
-        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.5.png").ConvertToBitmap()
+        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.51.png").ConvertToBitmap()
         splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
 
         wx.Yield()
@@ -918,14 +918,24 @@ class MainFrame ( wx.Frame ):
         try:
                 self.Datafile = open(fileName, 'rU')            
                 self.data = read_csv(self.Datafile, sep = None, engine = 'python')
+
+                # Checks non-ascii characters in column names or strings
+                for c in self.data.columns:
+                    c.decode('ascii')
+                    if self.data[c].dtypes == 'object':
+                        for elem in self.data[c]:
+                            elem.decode('ascii')
+
                 self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
-                self.controller.OpenFile(self.data)  
+                self.controller.OpenFile(self.data)
 
+        except UnicodeDecodeError:
+            print "Error: non ascii files in file"
+            return
                     
         except:
-            
             print "Error: ", sys.exc_info()[0]
             print "There was some problem with the file"
             return 
@@ -970,6 +980,22 @@ class MainFrame ( wx.Frame ):
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0, index_col=None)
                     self.data = self.preprocessExcel(self.data)
+
+                # Checks non-ascii characters in column names or strings
+                for c in self.data.columns:
+                    c.decode('ascii')
+                    if self.data[c].dtypes == 'object':
+                        for elem in self.data[c]:
+                            elem.decode('ascii')
+
+
+            except UnicodeDecodeError:
+                self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+                readCorrect = False
+
             except:
                 # print "Error: ", sys.exc_info()
                 type, value, traceback = sys.exc_info()
@@ -1032,6 +1058,21 @@ class MainFrame ( wx.Frame ):
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
                     self.data = self.preprocessExcel(self.data)
+
+                # Checks non-ascii characters in column names or strings
+                for c in self.data.columns:
+                    c.decode('ascii')
+                    if self.data[c].dtypes == 'object':
+                        for elem in self.data[c]:
+                            elem.decode('ascii')
+
+            except UnicodeDecodeError:
+                self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+                readCorrect = False
+
             except:
                 # print "Error: ", sys.exc_info()
                 type, value, traceback = sys.exc_info()
