@@ -32,6 +32,7 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
 from SignificanceTestInterface import SignificanceTestInterface
+from OpenFileInterface import OpenFileInterface
 
 
 from Model import OptionsInExportInterface
@@ -413,8 +414,8 @@ class MainFrame ( wx.Frame ):
 
         self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
 
-        self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuNewFile)
-        self.Bind(wx.EVT_BUTTON, self.OpenFile, self.openNewFileBtn)
+        self.Bind(wx.EVT_MENU, self.CreateOpenFileInterface, self.m_menuNewFile)
+        self.Bind(wx.EVT_BUTTON, self.CreateOpenFileInterface, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
         self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
@@ -949,6 +950,14 @@ class MainFrame ( wx.Frame ):
         self.refreshGUI()
 
         print "File: "+fileName+" loaded"
+
+
+
+    def CreateOpenFileInterface(self, event):
+        print "Opening with new window"
+        openFileInterf = OpenFileInterface(self)
+        if openFileInterf.ShowModal() == wx.ID_CLOSE:
+            openFileInterf.Destroy()
 
         
 
