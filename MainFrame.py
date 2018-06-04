@@ -1430,7 +1430,8 @@ class MainFrame ( wx.Frame ):
             for value in self.controller.characterValues:
 
                 listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
-                listTags = [x for x in listTags if str(x) != 'nan']
+                # listTags = [x for x in listTags if str(x) != 'nan']
+                listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
 
                 # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
@@ -1460,7 +1461,8 @@ class MainFrame ( wx.Frame ):
             for value in self.controller.characterValues:
 
                 listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
-                listTags = [x for x in listTags if str(x) != 'nan']
+                # listTags = [x for x in listTags if str(x) != 'nan']
+                listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
                 
                 # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()

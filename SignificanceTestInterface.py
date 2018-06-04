@@ -118,7 +118,9 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             for j in values:
                 
-                self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = str(j), pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
+                # self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = str(j), pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
+                self.m_checkBox = wx.CheckBox(parent=self.scrolledPanel, id=wx.ID_ANY, label=j,
+                                              pos=wx.DefaultPosition, size=wx.DefaultSize, name=str(tag))
                 sbSizer.Add( self.m_checkBox, 0, wx.EXPAND, 5 )
                 self.Bind(wx.EVT_CHECKBOX, self.changeValueTagCheckBoxLeft, self.m_checkBox)
                 
@@ -213,7 +215,8 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             for j in values:
                 
-                self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = str(j), pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
+                # self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = str(j), pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
+                self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = j, pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
                 sbSizer2.Add( self.m_checkBox, 0, wx.EXPAND, 5 )
                 self.Bind(wx.EVT_CHECKBOX, self.changeValueTagCheckBoxRight, self.m_checkBox)
                 
