@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-
 import wx
 import wx.grid
 import os
@@ -924,14 +923,14 @@ class MainFrame ( wx.Frame ):
         
         try:
                 self.Datafile = open(fileName, 'rU')            
-                self.data = read_csv(self.Datafile, sep = None, engine = 'python')
+                self.data = read_csv(self.Datafile, sep = None, engine = 'python', encoding='utf-8')
 
                 # Checks non-ascii characters in column names or strings
-                for c in self.data.columns:
-                    c.decode('ascii')
-                    if self.data[c].dtypes == 'object':
-                        for elem in self.data[c]:
-                            elem.decode('ascii')
+                # for c in self.data.columns:
+                #     c.decode('ascii')
+                #     if self.data[c].dtypes == 'object':
+                #         for elem in self.data[c]:
+                #             elem.decode('ascii')
 
                 self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
@@ -982,18 +981,18 @@ class MainFrame ( wx.Frame ):
                         sepChar=';'
                     elif self.params['options']['sepchar']=="Tab":
                         sepChar='\t'
-                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python')    
+                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python', encoding='utf-8')
                 if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0, index_col=None)
                     self.data = self.preprocessExcel(self.data)
 
                 # Checks non-ascii characters in column names or strings
-                for c in self.data.columns:
-                    c.decode('ascii')
-                    if self.data[c].dtypes == 'object':
-                        for elem in self.data[c]:
-                            elem.decode('ascii')
+                # for c in self.data.columns:
+                #     c.decode('ascii')
+                #     if self.data[c].dtypes == 'object':
+                #         for elem in self.data[c]:
+                #             elem.decode('ascii')
 
 
             except UnicodeDecodeError:
@@ -1060,18 +1059,18 @@ class MainFrame ( wx.Frame ):
                         sepChar=';'
                     elif self.params['options']['sepchar']=="Tab":
                         sepChar='\t'
-                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python')
+                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python', encoding='utf-8')
                 if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
                     self.data = self.preprocessExcel(self.data)
 
                 # Checks non-ascii characters in column names or strings
-                for c in self.data.columns:
-                    c.decode('ascii')
-                    if self.data[c].dtypes == 'object':
-                        for elem in self.data[c]:
-                            elem.decode('ascii')
+                # for c in self.data.columns:
+                #     c.decode('ascii')
+                #     if self.data[c].dtypes == 'object':
+                #         for elem in self.data[c]:
+                #             elem.decode('ascii')
 
             except UnicodeDecodeError:
                 self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
@@ -1195,8 +1194,8 @@ class MainFrame ( wx.Frame ):
 
                 elif type(dataToAnalyse.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):   
                     self.m_dataTable.SetCellValue(row, col, '{:5g}'.format(dataToAnalyse.iloc[row, col]))
-                else:                      
-                    self.m_dataTable.SetCellValue(row, col, str(dataToAnalyse.iloc[row, col]))
+                else:
+                    self.m_dataTable.SetCellValue(row, col, dataToAnalyse.iloc[row, col])
         
         self.controller.detectColumnTypes()
 

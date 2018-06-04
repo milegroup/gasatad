@@ -17,7 +17,6 @@ You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-import sys
 import pandas
 import numpy as np
 
@@ -25,6 +24,7 @@ import sys
 if sys.platform=="darwin":
     import matplotlib
     matplotlib.use('WXAgg')
+
 import matplotlib.pyplot as plt
 
 import copy
@@ -263,14 +263,14 @@ class Controller():
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
 
             for tag in tags:
-                if str(tag) != 'nan':
+                if unicode(tag).encode('utf-8') != 'nan':
                     dataForChart[tag] = []
 
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
             valuesColumn = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
 
             for i in range(len(valuesColumn)):
-                if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
+                if unicode(tagsColumn[i]).encode('utf-8')  != 'nan' and unicode(valuesColumn[i]).encode('utf-8')  != 'nan':
                     dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
@@ -363,8 +363,6 @@ class Controller():
                     ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][i]]
                     m,b = np.polyfit(xdata,ydata,1)
                     plt.plot(xplotdata, m*xplotdata + b, linewidth=2, color=self.colorsLine[i])
-
-
 
 
         plt.xlabel(scatterOptions['xAxisName'])
@@ -527,14 +525,14 @@ class Controller():
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
 
             for tag in tags:
-                if str(tag) != 'nan':
+                if unicode(tag).encode('utf-8') != 'nan':
                     dataForChart[tag] = []
 
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
             valuesColumn = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']]
 
             for i in range(len(valuesColumn)):
-                if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
+                if unicode(tagsColumn[i]).encode('utf-8') != 'nan' and unicode(valuesColumn[i]).encode('utf-8') != 'nan':
                     dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k:v for k,v in dataForChart.items() if len(v) != 0}
