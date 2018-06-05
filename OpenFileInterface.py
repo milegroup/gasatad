@@ -22,15 +22,19 @@ import wx.lib.filebrowsebutton as filebrowse
 
 
 class PageOne(wx.Panel):
-    def __init__(self, parent, dirfrom, CSVSepChar):
+
+    # Panel for csv files
+
+    def __init__(self, parent, dirfrom):
         wx.Panel.__init__(self, parent)
 
         vSizer = wx.BoxSizer(wx.VERTICAL)
 
         self.fileName = None
         self.dirName = None
-        self.sepchar = None
         fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|All files (*.*)|*.*"
+        self.previewNRows = 4
+        self.previewNCols = 6
 
 
         fbb = filebrowse.FileBrowseButton(self, -1, labelText='File: ', fileMask=fileExtensions,
@@ -45,23 +49,58 @@ class PageOne(wx.Panel):
 
         lblList = ['Comma', 'Semicolon', 'Tab']
 
-        self.box = wx.RadioBox(self, label='CSV character separator', pos=(80, 10), choices=lblList, majorDimension=1,
-                               style=wx.RA_SPECIFY_ROWS)
-        vSizer.Add(self.box, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+        self.CSVSepRBBox = wx.RadioBox(self, label='CSV character separator', pos=(80, 10), choices=lblList, majorDimension=1,
+                                       style=wx.RA_SPECIFY_ROWS)
+        vSizer.Add(self.CSVSepRBBox, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
 
-        if CSVSepChar == "Comma":
-            self.box.SetSelection(0)
-        elif CSVSepChar == "Semicolon":
-            self.box.SetSelection(1)
-        elif CSVSepChar == "Tab":
-            self.box.SetSelection(2)
-        self.sepchar = CSVSepChar
-
-
-        vSizer.AddStretchSpacer(1)
-
+        self.CSVSepRBBox.SetSelection(0)
 
         # ---------------------------------------
+
+        # Options
+
+        optionsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.HORIZONTAL)
+
+        self.discardFirstCol = wx.CheckBox(self, wx.ID_ANY, "Discard first column", wx.DefaultPosition, wx.DefaultSize, 0)
+        optionsSizer.Add(self.discardFirstCol, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+
+        vSizer.Add(optionsSizer, flag = wx.EXPAND | wx.ALL, border = 10)
+
+        # ---------------------------------------
+
+        self.provDataTable = wx.grid.Grid(self)
+
+        # Grid
+        self.provDataTable.CreateGrid(self.previewNRows, self.previewNCols)
+        self.provDataTable.EnableEditing(False)
+        self.provDataTable.EnableGridLines(True)
+        self.provDataTable.EnableDragGridSize(False)
+        self.provDataTable.SetMargins(0, 0)
+
+        # Columns
+        self.provDataTable.EnableDragColMove(False)
+        self.provDataTable.EnableDragColSize(False)
+        self.provDataTable.SetColLabelSize(30)
+        self.provDataTable.SetColLabelAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # Rows
+        self.provDataTable.EnableDragRowSize(False)
+        self.provDataTable.SetRowLabelSize(80)
+        self.provDataTable.SetRowLabelAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # Cell Defaults
+        self.provDataTable.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTER)
+
+        dataSizer = wx.BoxSizer(wx.HORIZONTAL)
+        dataSizer.Add(self.provDataTable)
+        self.provDataTable.Enable(False)
+        self.provDataTable.Show(True)
+
+        vSizer.Add(dataSizer, flag = wx.ALL | wx.EXPAND, border=10)
+
+        # ---------------------------------------
+
+        vSizer.AddStretchSpacer(1)
 
         # Ok and Cancel buttons
 
@@ -72,8 +111,7 @@ class PageOne(wx.Panel):
         btns.AddButton(cancel)
         btns.Realize()
 
-        vSizer.Add(btns,  flag=wx.EXPAND | wx.TOP | wx.BOTTOM,
-                     border=10)
+        vSizer.Add(btns,  flag=wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
 
         self.SetSizer(vSizer)
         vSizer.Fit(self)
@@ -82,22 +120,50 @@ class PageOne(wx.Panel):
         self.Centre(wx.BOTH)
 
     def fbbCallback(self, evt):
+        from pandas.io.parsers import read_csv
+        import sys, numpy
         print ('FileBrowseButton: %s\n' % evt.GetString())
         self.fileName = os.path.basename(evt.GetString())
         self.dirName = os.path.dirname(evt.GetString())
-        if self.box.GetSelection() == 0:
-            self.sepchar = 'Comma'
-        elif self.box.GetSelection() == 1:
-            self.sepchar = 'Semicolon'
-        else:
-            self.sepchar = 'Tab'
+        try:
+            self.data = read_csv(evt.GetString(), sep=',', header=0, engine='python', encoding='utf-8')
+            nRows = len(self.data.index)
+            nCols = len(self.data.columns)
+            print "Rows: ", nRows
+            print "Cols: ", nCols
+            for row in range(self.previewNRows):
+                for col in range(self.previewNCols):
+                    if row>=nRows or col>=nCols:
+                        self.provDataTable.SetCellValue(row, col, "")
+                        continue
 
+                    if self.data.iloc[row, col] != self.data.iloc[row, col]:
+                        self.provDataTable.SetCellValue(row, col, "nan")
+                    elif type(self.data.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):
+                        self.provDataTable.SetCellValue(row, col, '{:5g}'.format(self.data.iloc[row, col]))
+                    else:
+                        self.provDataTable.SetCellValue(row, col, self.data.iloc[row, col])
+            self.provDataTable.Enable(True)
+        except:
+            print "Uyyyy"
+            print "Error: ", sys.exc_info()
+            self.provDataTable.Enable(False)
 
     def getOpenFileOptions(self):
-        openFileOptions = dict (
+
+        if self.CSVSepRBBox.GetSelection() == 0:
+            sepchar = 'Comma'
+        elif self.CSVSepRBBox.GetSelection() == 1:
+            sepchar = 'Semicolon'
+        else:
+            sepchar = 'Tab'
+
+        openFileOptions = dict(
+            fileType='csv',
             fileName=self.fileName,
             dirName=self.dirName,
-            sepchar=self.sepchar
+            sepchar=sepchar,
+            discardFirstCol=self.discardFirstCol.IsChecked()
         )
         return openFileOptions
 
@@ -105,14 +171,18 @@ class PageOne(wx.Panel):
 
 
 class PageTwo(wx.Panel):
+
+    # Panel for xls files
+
+
     def __init__(self, parent):
         wx.Panel.__init__(self, parent)
         t = wx.StaticText(self, -1, "This is a PageTwo object", (40, 40))
 
 
 class OpenFileInterface(wx.Dialog):
-    def __init__(self, parent, dirfrom, CSVSepChar):
-        wx.Dialog.__init__(self, None, title="Open file", size=(600, 400), pos = wx.DefaultPosition)
+    def __init__(self, parent, dirfrom):
+        wx.Dialog.__init__(self, None, title="Open file", size=(600, 500), pos = wx.DefaultPosition, style=wx.RESIZE_BORDER)
 
         # Here we create a panel and a notebook on the panel
         p = wx.Panel(self)
@@ -120,7 +190,7 @@ class OpenFileInterface(wx.Dialog):
 
 
         # add the pages to the notebook with the label to show on the tab
-        self.one = PageOne(nb, dirfrom, CSVSepChar)
+        self.one = PageOne(nb, dirfrom)
         page2 = PageTwo(nb)
 
         nb.AddPage(self.one, "CSV")

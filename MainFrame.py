@@ -182,31 +182,6 @@ class MainFrame ( wx.Frame ):
         self.m_editMenu.AppendItem( self.m_deleteColumns )
         self.m_deleteColumns.Enable(False)
 
-        # ------------ Options menu
-
-        self.m_optionsMenu = wx.Menu()
-        
-        self.m_discardColumn = self.m_optionsMenu.Append(100, u"Discard first column in csv files", "", wx.ITEM_CHECK)
-        self.Bind(wx.EVT_MENU_RANGE, self.discardColumnCheckboxChanged, id=100)
-        if self.params['options']['discardfirstcolumn']=="True":
-            self.m_discardColumn.Check()
-
-        self.m_optionsSubMenu = wx.Menu()
-        self.m_CSVSeparator1 = self.m_optionsSubMenu.Append(201, u"Comma", "", wx.ITEM_RADIO)
-        self.m_CSVSeparator2 = self.m_optionsSubMenu.Append(202, u"Semicolon", "", wx.ITEM_RADIO)
-        self.m_CSVSeparator3 = self.m_optionsSubMenu.Append(203, u"Tabulator", "", wx.ITEM_RADIO)
-        self.Bind(wx.EVT_MENU_RANGE, self.CSVCharacterSeparatorChanged, id=201, id2=203)
-        if self.params['options']['sepchar']=="Comma":
-            self.m_CSVSeparator1.Check()
-        elif self.params['options']['sepchar']=="Semicolon":
-            self.m_CSVSeparator2.Check()
-        elif self.params['options']['sepchar']=="Tab":
-            self.m_CSVSeparator3.Check()
-
-        self.m_optionsMenu.AppendMenu(wx.NewId(), u"CSV character separator",self.m_optionsSubMenu)
-
-        self.m_resetOptions = wx.MenuItem( self.m_optionsMenu, wx.ID_ANY, u"Reset options", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_optionsMenu.AppendItem(self.m_resetOptions)
 
         # ------------ About menu
 
@@ -221,7 +196,7 @@ class MainFrame ( wx.Frame ):
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
         self.m_menubar1.Append( self.m_editMenu, u"Edit" )
-        self.m_menubar1.Append( self.m_optionsMenu, u"Options")
+        # self.m_menubar1.Append( self.m_optionsMenu, u"Options")
         self.m_menubar1.Append( self.m_aboutMenu, u"About" )
                 
         self.SetMenuBar( self.m_menubar1 )
@@ -420,7 +395,6 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
         self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
-        self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
         self.Bind(wx.EVT_MENU, self.deleteColumnsByLabels, self.m_deleteColumns)
@@ -955,7 +929,7 @@ class MainFrame ( wx.Frame ):
 
     def createOpenFileInterface(self, event):
         print "Opening with new window"
-        openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'], self.params['options']['sepchar'])
+        openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'])
 
         if openFileInterf.ShowModal() == wx.ID_OK:
             print "User pressed Ok"
@@ -966,10 +940,9 @@ class MainFrame ( wx.Frame ):
 
                 print "File to load: ", openFileOptions['fileName']
                 self.params['options']['dirfrom'] = openFileOptions['dirName']
-                self.params['options']['sepchar'] = openFileOptions['sepchar']
                 readCorrect = True
                 self.data = None
-                discardCol = False
+                discardCol = openFileOptions['discardFirstCol']
                 sepChar = ''
                 if openFileOptions['sepchar'] == "Comma":
                     sepChar = ','
@@ -977,6 +950,7 @@ class MainFrame ( wx.Frame ):
                     sepChar = ';'
                 elif openFileOptions['sepchar'] == "Tab":
                     sepChar = '\t'
+
 
                 try:
                     self.data = read_csv(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']), sep=sepChar, header=0,
@@ -991,7 +965,7 @@ class MainFrame ( wx.Frame ):
                     readCorrect = False
 
                 if readCorrect:
-                    if discardCol and fileType == "csv":
+                    if discardCol:
                         self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
                     self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
 
@@ -1029,8 +1003,6 @@ class MainFrame ( wx.Frame ):
             self.fileExtension = self.filename.rpartition(".")[-1]
 
             discardCol = False
-            if self.params['options']['discardfirstcolumn']=='True':
-                discardCol=True
 
             try:
                 if self.fileExtension.lower() == "csv":
@@ -1107,8 +1079,6 @@ class MainFrame ( wx.Frame ):
             self.fileExtension = self.filename.rpartition(".")[-1]
 
             discardCol = False
-            if self.params['options']['discardfirstcolumn']=='True':
-                discardCol=True
 
             try:
                 if self.fileExtension.lower() == "csv":
@@ -1344,12 +1314,6 @@ class MainFrame ( wx.Frame ):
         self.controller.resetDataToAnalyse()
         self.refreshGUI()
 
-
-    def resetOptions(self,event):
-        for key in self.params['optionsdefault'].keys():
-            self.params['options'][key] = self.params['optionsdefault'][key]
-        self.m_discardColumn.Check()
-        self.m_CSVSeparator1.Check()
 
     def refreshGUI(self, updateDataInfo = True, markNans = True):
         if not self.controller.programState.dataToAnalyse.empty: # data present
@@ -1624,22 +1588,8 @@ class MainFrame ( wx.Frame ):
             
             wx.MessageBox("There are no numerical variables", "ERROR")
 
-    
-    def discardColumnCheckboxChanged(self, event):
-        if self.m_discardColumn.IsChecked():
-            self.params['options']['discardfirstcolumn']='True'
-        else:
-            self.params['options']['discardfirstcolumn']='False'
 
-    def CSVCharacterSeparatorChanged(self, event):
-        if self.m_CSVSeparator1.IsChecked():
-            self.params['options']['sepchar']="Comma"
-        if self.m_CSVSeparator2.IsChecked():
-            self.params['options']['sepchar']="Semicolon"
-        if self.m_CSVSeparator3.IsChecked():
-            self.params['options']['sepchar']="Tab"
-    
-        
+
         
     def showWarning(self):
         
