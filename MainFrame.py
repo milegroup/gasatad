@@ -414,8 +414,8 @@ class MainFrame ( wx.Frame ):
 
         self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
 
-        self.Bind(wx.EVT_MENU, self.CreateOpenFileInterface, self.m_menuNewFile)
-        self.Bind(wx.EVT_BUTTON, self.CreateOpenFileInterface, self.openNewFileBtn)
+        self.Bind(wx.EVT_MENU, self.createOpenFileInterface, self.m_menuNewFile)
+        self.Bind(wx.EVT_BUTTON, self.createOpenFileInterface, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
         self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
@@ -953,13 +953,64 @@ class MainFrame ( wx.Frame ):
 
 
 
-    def CreateOpenFileInterface(self, event):
+    def createOpenFileInterface(self, event):
         print "Opening with new window"
-        openFileInterf = OpenFileInterface(self)
-        if openFileInterf.ShowModal() == wx.ID_CLOSE:
-            openFileInterf.Destroy()
+        openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'], self.params['options']['sepchar'])
 
-        
+        if openFileInterf.ShowModal() == wx.ID_OK:
+            print "User pressed Ok"
+            openFileOptions = openFileInterf.getOpenFileOptions()
+
+
+            if openFileOptions['fileName']:
+
+                print "File to load: ", openFileOptions['fileName']
+                self.params['options']['dirfrom'] = openFileOptions['dirName']
+                self.params['options']['sepchar'] = openFileOptions['sepchar']
+                readCorrect = True
+                self.data = None
+                discardCol = False
+                sepChar = ''
+                if openFileOptions['sepchar'] == "Comma":
+                    sepChar = ','
+                elif openFileOptions['sepchar'] == "Semicolon":
+                    sepChar = ';'
+                elif openFileOptions['sepchar'] == "Tab":
+                    sepChar = '\t'
+
+                try:
+                    self.data = read_csv(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']), sep=sepChar, header=0,
+                                     engine='python', encoding='utf-8')
+                except:
+                    # print "Error: ", sys.exc_info()
+                    type, value, traceback = sys.exc_info()
+                    self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                                "File error", wx.OK | wx.ICON_EXCLAMATION)
+                    if self.dlg.ShowModal() == wx.ID_OK:
+                        self.dlg.Destroy()
+                    readCorrect = False
+
+                if readCorrect:
+                    if discardCol and fileType == "csv":
+                        self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
+                    self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
+
+                    self.controller.OpenFile(self.data)
+
+                    self.refreshGUI()
+
+                    if self.controller.nullValuesInFile(self.data):
+                        self.dlg = wx.MessageDialog(None, "File " + self.filename + " has one or more missing values",
+                                                    "Missing values", wx.OK | wx.ICON_WARNING)
+                        if self.dlg.ShowModal() == wx.ID_OK:
+                            self.dlg.Destroy()
+            else:
+                print "No file selected"
+
+        openFileInterf.Destroy()
+
+
+
 
     def OpenFile(self, event, fileName = None):       
         
