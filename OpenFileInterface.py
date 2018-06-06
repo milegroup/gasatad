@@ -35,6 +35,7 @@ class PageOne(wx.Panel):
         fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|All files (*.*)|*.*"
         self.previewNRows = 4
         self.previewNCols = 6
+        self.colLabelsDefault = ['A','B','C','D','E','F']
 
 
         fbb = filebrowse.FileBrowseButton(self, -1, labelText='File: ', fileMask=fileExtensions,
@@ -52,6 +53,7 @@ class PageOne(wx.Panel):
         self.CSVSepRBBox = wx.RadioBox(self, label='CSV character separator', pos=(80, 10), choices=lblList, majorDimension=1,
                                        style=wx.RA_SPECIFY_ROWS)
         vSizer.Add(self.CSVSepRBBox, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+        self.Bind(wx.EVT_RADIOBOX, self.optionsChanged, self.CSVSepRBBox)
 
         self.CSVSepRBBox.SetSelection(0)
 
@@ -63,6 +65,7 @@ class PageOne(wx.Panel):
 
         self.discardFirstCol = wx.CheckBox(self, wx.ID_ANY, "Discard first column", wx.DefaultPosition, wx.DefaultSize, 0)
         optionsSizer.Add(self.discardFirstCol, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        self.Bind(wx.EVT_CHECKBOX, self.optionsChanged, self.discardFirstCol)
 
         vSizer.Add(optionsSizer, flag = wx.EXPAND | wx.ALL, border = 10)
 
@@ -95,6 +98,7 @@ class PageOne(wx.Panel):
         dataSizer.Add(self.provDataTable)
         self.provDataTable.Enable(False)
         self.provDataTable.Show(True)
+        self.provDataTable.AutoSize()
 
         vSizer.Add(dataSizer, flag = wx.ALL | wx.EXPAND, border=10)
 
@@ -120,20 +124,49 @@ class PageOne(wx.Panel):
         self.Centre(wx.BOTH)
 
     def fbbCallback(self, evt):
-        from pandas.io.parsers import read_csv
-        import sys, numpy
-        print ('FileBrowseButton: %s\n' % evt.GetString())
+        # print ('FileBrowseButton: %s\n' % evt.GetString())
         self.fileName = os.path.basename(evt.GetString())
         self.dirName = os.path.dirname(evt.GetString())
+
+        self.updatePreview()
+
+    def optionsChanged(self, evt):
+        self.updatePreview()
+
+    def updatePreview(self):
+
+        from pandas.io.parsers import read_csv
+        import sys, numpy
+
+
         try:
-            self.data = read_csv(evt.GetString(), sep=',', header=0, engine='python', encoding='utf-8')
+
+            if self.CSVSepRBBox.GetSelection() == 0:
+                sepchar = ','
+            elif self.CSVSepRBBox.GetSelection() == 1:
+                sepchar = ';'
+            else:
+                sepchar = '\t'
+
+            self.data = read_csv(os.path.join(self.dirName, self.fileName), sep=sepchar, header=0, engine='python', encoding='utf-8')
+
+            if self.discardFirstCol.IsChecked():
+                self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
             nRows = len(self.data.index)
             nCols = len(self.data.columns)
-            print "Rows: ", nRows
-            print "Cols: ", nCols
+            # print "Rows: ", nRows
+            # print "Cols: ", nCols
+
+            colLabels = self.data.columns
+            for col in range(self.previewNCols):
+                if col >= nCols:
+                    self.provDataTable.SetColLabelValue(col, self.colLabelsDefault[col])
+                    continue
+                self.provDataTable.SetColLabelValue(col, colLabels[col])
+
             for row in range(self.previewNRows):
                 for col in range(self.previewNCols):
-                    if row>=nRows or col>=nCols:
+                    if row >= nRows or col >= nCols:
                         self.provDataTable.SetCellValue(row, col, "")
                         continue
 
@@ -144,10 +177,21 @@ class PageOne(wx.Panel):
                     else:
                         self.provDataTable.SetCellValue(row, col, self.data.iloc[row, col])
             self.provDataTable.Enable(True)
+            self.provDataTable.AutoSize()
         except:
-            print "Uyyyy"
-            print "Error: ", sys.exc_info()
-            self.provDataTable.Enable(False)
+            # print "Error: ", sys.exc_info()
+            self.cleanPreview()
+
+    def cleanPreview(self):
+        for col in range(self.previewNCols):
+            self.provDataTable.SetColLabelValue(col, self.colLabelsDefault[col])
+            # self.provDataTable.SetColSize(col, self.provDataTable.GetDefaultColSize()-10)
+        for row in range(self.previewNRows):
+            for col in range(self.previewNCols):
+                self.provDataTable.SetCellValue(row, col, "")
+        self.provDataTable.AutoSize()
+        self.provDataTable.Enable(False)
+
 
     def getOpenFileOptions(self):
 

@@ -928,17 +928,17 @@ class MainFrame ( wx.Frame ):
 
 
     def createOpenFileInterface(self, event):
-        print "Opening with new window"
+        # print "Opening with new window"
         openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'])
 
         if openFileInterf.ShowModal() == wx.ID_OK:
-            print "User pressed Ok"
+            # print "User pressed Ok"
             openFileOptions = openFileInterf.getOpenFileOptions()
 
 
             if openFileOptions['fileName']:
 
-                print "File to load: ", openFileOptions['fileName']
+                # print "File to load: ", openFileOptions['fileName']
                 self.params['options']['dirfrom'] = openFileOptions['dirName']
                 readCorrect = True
                 self.data = None
