@@ -21,7 +21,7 @@ import wx
 import wx.lib.filebrowsebutton as filebrowse
 
 
-class PageOne(wx.Panel):
+class CVSPanel(wx.Panel):
 
     # Panel for csv files
 
@@ -61,7 +61,7 @@ class PageOne(wx.Panel):
 
         # Options
 
-        optionsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.HORIZONTAL)
+        optionsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.VERTICAL)
 
         self.discardFirstCol = wx.CheckBox(self, wx.ID_ANY, "Discard first column", wx.DefaultPosition, wx.DefaultSize, 0)
         optionsSizer.Add(self.discardFirstCol, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
@@ -185,7 +185,6 @@ class PageOne(wx.Panel):
     def cleanPreview(self):
         for col in range(self.previewNCols):
             self.provDataTable.SetColLabelValue(col, self.colLabelsDefault[col])
-            # self.provDataTable.SetColSize(col, self.provDataTable.GetDefaultColSize()-10)
         for row in range(self.previewNRows):
             for col in range(self.previewNCols):
                 self.provDataTable.SetCellValue(row, col, "")
@@ -214,14 +213,76 @@ class PageOne(wx.Panel):
 
 
 
-class PageTwo(wx.Panel):
+class XLSPanel(wx.Panel):
 
     # Panel for xls files
 
-
-    def __init__(self, parent):
+    def __init__(self, parent, dirfrom):
         wx.Panel.__init__(self, parent)
-        t = wx.StaticText(self, -1, "This is a PageTwo object", (40, 40))
+
+        vSizer = wx.BoxSizer(wx.VERTICAL)
+
+        self.fileName = None
+        self.dirName = None
+        fileExtensions = "Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX|All files (*.*)|*.*"
+
+        fbb = filebrowse.FileBrowseButton(self, -1, labelText='File: ', fileMask=fileExtensions,
+                                          startDirectory=dirfrom, size=(450, -1),
+                                          changeCallback=self.fbbCallback)
+
+        vSizer.Add(fbb, flag=wx.EXPAND | wx.ALL, border=10)
+
+        # ---------------------------------------
+
+        # Options
+
+        optionsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.VERTICAL)
+
+
+        self.sc = wx.SpinCtrl(self, value='0')
+        self.sc.SetRange(0, 100)
+
+        optionsSizer.Add(self.sc, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+
+        vSizer.Add(optionsSizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+        # ---------------------------------------
+
+        vSizer.AddStretchSpacer(1)
+
+        # Ok and Cancel buttons
+
+        okay = wx.Button(self, wx.ID_OK)
+        cancel = wx.Button(self, wx.ID_CANCEL)
+        btns = wx.StdDialogButtonSizer()
+        btns.AddButton(okay)
+        btns.AddButton(cancel)
+        btns.Realize()
+
+        vSizer.Add(btns, flag=wx.EXPAND | wx.TOP | wx.BOTTOM, border=10)
+
+        self.SetSizer(vSizer)
+        vSizer.Fit(self)
+        self.Layout()
+        self.Fit()
+        self.Centre(wx.BOTH)
+
+    def fbbCallback(self, evt):
+        # print ('FileBrowseButton: %s\n' % evt.GetString())
+        self.fileName = os.path.basename(evt.GetString())
+        self.dirName = os.path.dirname(evt.GetString())
+
+    def getOpenFileOptions(self):
+
+        openFileOptions = dict(
+            fileType='xls',
+            fileName=self.fileName,
+            dirName=self.dirName,
+        )
+        return openFileOptions
+
+
+
 
 
 class OpenFileInterface(wx.Dialog):
@@ -234,11 +295,11 @@ class OpenFileInterface(wx.Dialog):
 
 
         # add the pages to the notebook with the label to show on the tab
-        self.one = PageOne(nb, dirfrom)
-        page2 = PageTwo(nb)
+        self.one = CVSPanel(nb, dirfrom)
+        self.two = XLSPanel(nb, dirfrom)
 
         nb.AddPage(self.one, "CSV")
-        nb.AddPage(page2, "XLS/XLSX")
+        nb.AddPage(self.two, "XLS/XLSX")
         self.Bind(wx.EVT_NOTEBOOK_PAGE_CHANGED, self.OnPageChanged)
         self.activePage = 0
 
@@ -251,12 +312,15 @@ class OpenFileInterface(wx.Dialog):
 
     def OnPageChanged(self, event):
         self.activePage = event.GetSelection()
-        print 'Page changed, new:%d' % (self.activePage)
+        # print 'Page changed, new:%d' % (self.activePage)
         event.Skip()
 
     def getOpenFileOptions(self):
         if self.activePage == 0:
             openFileOptions = self.one.getOpenFileOptions()
+            return openFileOptions
+        elif self.activePage == 1:
+            openFileOptions = self.two.getOpenFileOptions()
             return openFileOptions
         else:
             return None
