@@ -900,13 +900,6 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(fileName, 'rU')            
                 self.data = read_csv(self.Datafile, sep = None, engine = 'python', encoding='utf-8')
 
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
-
                 self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
@@ -932,7 +925,7 @@ class MainFrame ( wx.Frame ):
         openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'])
 
         if openFileInterf.ShowModal() == wx.ID_OK:
-            print "User pressed Ok"
+            # print "User pressed Ok"
             openFileOptions = openFileInterf.getOpenFileOptions()
 
 
@@ -983,11 +976,44 @@ class MainFrame ( wx.Frame ):
 
 
                 if openFileOptions['fileType'] == 'xls':
-                    print "File to load: ", openFileOptions['fileName']
+
+                    # print "File to load: ", openFileOptions['fileName']
+                    self.params['options']['dirfrom'] = openFileOptions['dirName']
+                    readCorrect = True
+                    self.data = None
+                    rowColNames = openFileOptions['rowColNames']
+                    noColsDiscard = openFileOptions['noColsDiscard']
+                    sheetNumber = openFileOptions['sheetNumber']
+
+                    # print "Reading col names from row: ", rowColNames
 
 
-            else:
-                print "No file selected"
+                    try:
+                        self.data = read_excel(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']),
+                                               sheetname=sheetNumber, header=rowColNames,
+                                               index_col=None)
+                        if noColsDiscard != 0:
+                            self.data.drop(self.data.columns[range(noColsDiscard)], axis=1, inplace=True)
+                        # self.data = self.preprocessExcel(self.data)
+                    except:
+                        # print "Error: ", sys.exc_info()
+                        type, value, traceback = sys.exc_info()
+                        self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                                    "File error", wx.OK | wx.ICON_EXCLAMATION)
+                        if self.dlg.ShowModal() == wx.ID_OK:
+                            self.dlg.Destroy()
+                        readCorrect = False
+
+                    if readCorrect:
+                        self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
+                        self.controller.OpenFile(self.data)
+                        self.refreshGUI()
+
+                        if self.controller.nullValuesInFile(self.data):
+                            self.dlg = wx.MessageDialog(None, "File " + openFileOptions['fileName'] + " has one or more missing values",
+                                                        "Missing values", wx.OK | wx.ICON_WARNING)
+                            if self.dlg.ShowModal() == wx.ID_OK:
+                                self.dlg.Destroy()
 
         openFileInterf.Destroy()
 
@@ -1026,13 +1052,6 @@ class MainFrame ( wx.Frame ):
                     fileType = "xls"
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0, index_col=None)
                     self.data = self.preprocessExcel(self.data)
-
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
 
 
             except UnicodeDecodeError:
@@ -1103,12 +1122,6 @@ class MainFrame ( wx.Frame ):
                     self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
                     self.data = self.preprocessExcel(self.data)
 
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
 
             except UnicodeDecodeError:
                 self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
@@ -1461,7 +1474,7 @@ class MainFrame ( wx.Frame ):
             
             for value in self.controller.characterValues:
 
-                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = list(self.controller.programState.dataToAnalyse[value].unique())
                 listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
 
@@ -1491,7 +1504,7 @@ class MainFrame ( wx.Frame ):
             
             for value in self.controller.characterValues:
 
-                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = list(self.controller.programState.dataToAnalyse[value].unique())
                 # listTags = [x for x in listTags if str(x) != 'nan']
                 listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)

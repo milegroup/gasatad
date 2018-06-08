@@ -100,7 +100,7 @@ class CVSPanel(wx.Panel):
         self.provDataTable.Show(True)
         self.provDataTable.AutoSize()
 
-        vSizer.Add(dataSizer, flag = wx.ALL | wx.EXPAND, border=10)
+        vSizer.Add(dataSizer, flag=wx.ALL | wx.EXPAND, border=10)
 
         # ---------------------------------------
 
@@ -225,6 +225,9 @@ class XLSPanel(wx.Panel):
         self.fileName = None
         self.dirName = None
         fileExtensions = "Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX|All files (*.*)|*.*"
+        self.previewNRows = 4
+        self.previewNCols = 6
+        self.colLabelsDefault = ['A', 'B', 'C', 'D', 'E', 'F']
 
         fbb = filebrowse.FileBrowseButton(self, -1, labelText='File: ', fileMask=fileExtensions,
                                           startDirectory=dirfrom, size=(450, -1),
@@ -236,19 +239,72 @@ class XLSPanel(wx.Panel):
 
         # Options
 
-        optionsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.VERTICAL)
+        optionsBoxSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Options"), wx.VERTICAL)
+
+        optionsGridSizer = wx.FlexGridSizer(rows=3, cols=2, vgap=4, hgap=4)
+
+        self.RowWithColNames = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.RowWithColNames.SetRange(0, 100)
+        optionsGridSizer.Add(wx.StaticText(self, label='Row containing col. names:'), 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        optionsGridSizer.Add(self.RowWithColNames, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        self.Bind(wx.EVT_SPINCTRL, self.optionsChanged, self.RowWithColNames)
 
 
-        self.sc = wx.SpinCtrl(self, value='0')
-        self.sc.SetRange(0, 100)
+        self.NoColsDiscard = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.NoColsDiscard.SetRange(0, 100)
+        optionsGridSizer.Add(wx.StaticText(self, label='No. of columns to discard:'), 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        optionsGridSizer.Add(self.NoColsDiscard, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        self.Bind(wx.EVT_SPINCTRL, self.optionsChanged, self.NoColsDiscard)
 
-        optionsSizer.Add(self.sc, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
 
-        vSizer.Add(optionsSizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+        self.sheetNumber = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.sheetNumber.SetRange(0, 10)
+        optionsGridSizer.Add(wx.StaticText(self, label='Sheet number:'), 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        optionsGridSizer.Add(self.sheetNumber, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        self.Bind(wx.EVT_SPINCTRL, self.optionsChanged, self.sheetNumber)
+
+        optionsBoxSizer.Add(optionsGridSizer, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+
+        vSizer.Add(optionsBoxSizer, flag=wx.EXPAND | wx.LEFT | wx.RIGHT, border=10)
+
+        # ---------------------------------------
+
+        self.provDataTable = wx.grid.Grid(self)
+
+        # Grid
+        self.provDataTable.CreateGrid(self.previewNRows, self.previewNCols)
+        self.provDataTable.EnableEditing(False)
+        self.provDataTable.EnableGridLines(True)
+        self.provDataTable.EnableDragGridSize(False)
+        self.provDataTable.SetMargins(0, 0)
+
+        # Columns
+        self.provDataTable.EnableDragColMove(False)
+        self.provDataTable.EnableDragColSize(False)
+        self.provDataTable.SetColLabelSize(30)
+        self.provDataTable.SetColLabelAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # Rows
+        self.provDataTable.EnableDragRowSize(False)
+        self.provDataTable.SetRowLabelSize(80)
+        self.provDataTable.SetRowLabelAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTRE)
+
+        # Cell Defaults
+        self.provDataTable.SetDefaultCellAlignment(wx.ALIGN_CENTRE, wx.ALIGN_CENTER)
+
+        dataSizer = wx.BoxSizer(wx.HORIZONTAL)
+        dataSizer.Add(self.provDataTable)
+        self.provDataTable.Enable(False)
+        self.provDataTable.Show(True)
+        self.provDataTable.AutoSize()
+
+        vSizer.Add(dataSizer, flag=wx.ALL | wx.EXPAND, border=10)
 
         # ---------------------------------------
 
         vSizer.AddStretchSpacer(1)
+
+        # ---------------------------------------
 
         # Ok and Cancel buttons
 
@@ -267,10 +323,89 @@ class XLSPanel(wx.Panel):
         self.Fit()
         self.Centre(wx.BOTH)
 
+
     def fbbCallback(self, evt):
         # print ('FileBrowseButton: %s\n' % evt.GetString())
         self.fileName = os.path.basename(evt.GetString())
         self.dirName = os.path.dirname(evt.GetString())
+        self.updatePreview()
+
+    def optionsChanged(self, evt):
+        self.updatePreview()
+
+
+    def updatePreview(self):
+        # print "Updating preview"
+
+        from pandas.io.excel import read_excel
+        import sys, numpy
+
+        try:
+
+            rowColLabels = self.RowWithColNames.GetValue()
+            numColsDiscard = self.NoColsDiscard.GetValue()
+            sheetNumber = self.sheetNumber.GetValue()
+
+            self.data = read_excel(os.path.join(self.dirName, self.fileName), sheetname=sheetNumber, header=rowColLabels, index_col=None)
+            # self.data = self.preprocessExcel(self.data)
+
+            if numColsDiscard != 0:
+                self.data.drop(self.data.columns[range(numColsDiscard)], axis=1, inplace=True)
+
+            nRows = len(self.data.index)
+            nCols = len(self.data.columns)
+
+            colLabels = self.data.columns
+            for col in range(self.previewNCols):
+                if col >= nCols:
+                    self.provDataTable.SetColLabelValue(col, self.colLabelsDefault[col])
+                    continue
+                self.provDataTable.SetColLabelValue(col, colLabels[col])
+
+            for row in range(self.previewNRows):
+                for col in range(self.previewNCols):
+                    if row >= nRows or col >= nCols:
+                        self.provDataTable.SetCellValue(row, col, "")
+                        continue
+
+                    if self.data.iloc[row, col] != self.data.iloc[row, col]:
+                        self.provDataTable.SetCellValue(row, col, "nan")
+                    elif type(self.data.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):
+                        self.provDataTable.SetCellValue(row, col, '{:5g}'.format(self.data.iloc[row, col]))
+                    else:
+                        self.provDataTable.SetCellValue(row, col, self.data.iloc[row, col])
+            self.provDataTable.Enable(True)
+            self.provDataTable.AutoSize()
+        except:
+            # print "Error: ", sys.exc_info()
+            self.cleanPreview()
+
+    def preprocessExcel(self, data):
+        for row in range(len(data.index)):
+            for col in range(len(data.columns)):
+                if type(data.iloc[row, col]) == unicode or type(data.iloc[row, col]) == str:
+                    if data.iloc[row, col].isspace():
+                        data.iloc[row, col] = numpy.nan
+                if type(data.iloc[row, col]) == int:
+                    data.iloc[row, col] = float(data.iloc[row, col])
+        data.dropna(axis=0, how='all', inplace=True)
+        for col in data.columns:
+            allNumbers = True;
+            for row in data.index:
+                if not isinstance(data.loc[row, col], (int, long, float)):
+                    allNumbers = False;
+            if allNumbers:
+                data[col] = data[col].astype(numpy.float64)
+        return data
+
+    def cleanPreview(self):
+        for col in range(self.previewNCols):
+            self.provDataTable.SetColLabelValue(col, self.colLabelsDefault[col])
+        for row in range(self.previewNRows):
+            for col in range(self.previewNCols):
+                self.provDataTable.SetCellValue(row, col, "")
+        self.provDataTable.AutoSize()
+        self.provDataTable.Enable(False)
 
     def getOpenFileOptions(self):
 
@@ -278,6 +413,9 @@ class XLSPanel(wx.Panel):
             fileType='xls',
             fileName=self.fileName,
             dirName=self.dirName,
+            rowColNames=self.RowWithColNames.GetValue(),
+            noColsDiscard=self.NoColsDiscard.GetValue(),
+            sheetNumber=self.sheetNumber.GetValue()
         )
         return openFileOptions
 

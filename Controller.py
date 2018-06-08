@@ -464,7 +464,7 @@ class Controller():
 
             bplots = result.boxplot(
                 column = boxPlotOptions['selectedCheckBoxes'],
-                by=str(boxPlotOptions['secondVarSelected']),
+                by=boxPlotOptions['secondVarSelected'],
                 rot=45,
                 grid = boxPlotOptions['showGrid'],
                 return_type='dict',
@@ -497,7 +497,7 @@ class Controller():
             elif operation == "Std deviation":
                 dataForChart = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']].std()
 
-            names = [str(barChartOptions['firstVarSelected'])]
+            names = [barChartOptions['firstVarSelected']]
             y_pos = np.arange(len(names))
 
             plt.bar(y_pos, dataForChart, align='center', edgecolor='white', color=self.colorsPatch[0])
