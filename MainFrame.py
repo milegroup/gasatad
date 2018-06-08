@@ -974,7 +974,7 @@ class MainFrame ( wx.Frame ):
                     if additionalFile and readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
                         self.dlg = wx.MessageDialog(None,
                                                     "Number of rows does not match: \n  Loaded data has " + str(
-                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + self.filename + " has " + str(
+                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions['fileName'] + " has " + str(
                                                         len(self.data.index)) + " rows ", "File error",
                                                     wx.OK | wx.ICON_EXCLAMATION)
                         if self.dlg.ShowModal() == wx.ID_OK:
@@ -1041,7 +1041,7 @@ class MainFrame ( wx.Frame ):
                             self.m_dataTable.GetNumberRows() != len(self.data.index)):
                         self.dlg = wx.MessageDialog(None,
                                                     "Number of rows does not match: \n  Loaded data has " + str(
-                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + self.filename + " has " + str(
+                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions['fileName'] + " has " + str(
                                                         len(self.data.index)) + " rows ", "File error",
                                                     wx.OK | wx.ICON_EXCLAMATION)
                         if self.dlg.ShowModal() == wx.ID_OK:
