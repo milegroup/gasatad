@@ -33,6 +33,7 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
 
 from SignificanceTestInterface import SignificanceTestInterface
 from OpenFileInterface import OpenFileInterface
+from SaveFileInterface import SaveFileInterface
 
 
 from Model import OptionsInExportInterface
@@ -393,7 +394,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.openFile, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.addFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.addFile, self.addFileBtn)
-        self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
+        self.Bind(wx.EVT_MENU, self.createSaveFileInterface, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
@@ -410,7 +411,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.saveData, self.exportDataBtn)
+        self.Bind(wx.EVT_BUTTON, self.createSaveFileInterface, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
         self.Bind(wx.EVT_BUTTON, self.createPieChart, self.pieChartBtn)
@@ -1071,6 +1072,20 @@ class MainFrame ( wx.Frame ):
                             self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
 
         openFileInterf.Destroy()
+
+
+
+    def createSaveFileInterface(self,event):
+        saveFileInterf = SaveFileInterface(self, self.params['options']['dirfrom'])
+
+        if saveFileInterf.ShowModal() == wx.ID_OK:
+            print "Now I'm going to save!!!"
+            saveFileOptions = saveFileInterf.getOpenFileOptions()
+
+            print saveFileOptions
+
+        saveFileInterf.Destroy()
+
 
 
 
