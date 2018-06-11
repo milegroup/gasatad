@@ -33,7 +33,6 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
 
 from SignificanceTestInterface import SignificanceTestInterface
 from OpenFileInterface import OpenFileInterface
-from SaveFileInterface import SaveFileInterface
 
 
 from Model import OptionsInExportInterface
@@ -394,7 +393,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.openFile, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.addFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.addFile, self.addFileBtn)
-        self.Bind(wx.EVT_MENU, self.createSaveFileInterface, self.m_menuExportData)
+        self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
@@ -411,7 +410,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.createSaveFileInterface, self.exportDataBtn)
+        self.Bind(wx.EVT_BUTTON, self.saveData, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
         self.Bind(wx.EVT_BUTTON, self.createPieChart, self.pieChartBtn)
@@ -1075,16 +1074,31 @@ class MainFrame ( wx.Frame ):
 
 
 
-    def createSaveFileInterface(self,event):
-        saveFileInterf = SaveFileInterface(self, self.params['options']['dirfrom'])
-
-        if saveFileInterf.ShowModal() == wx.ID_OK:
-            print "Now I'm going to save!!!"
-            saveFileOptions = saveFileInterf.getOpenFileOptions()
-
-            print saveFileOptions
-
-        saveFileInterf.Destroy()
+    # def createSaveFileInterface(self,event):
+    #     saveFileInterf = SaveFileInterface(self, self.params['options']['dirfrom'])
+    #
+    #     if saveFileInterf.ShowModal() == wx.ID_OK:
+    #
+    #         saveFileOptions = saveFileInterf.getOpenFileOptions()
+    #
+    #         if saveFileOptions['file'] != None and saveFileOptions['fileType'] == 'xls':
+    #
+    #             try:
+    #                 self.controller.exportDataExcel(saveFileOptions['file'])
+    #             except:
+    #                 self.dlg = wx.MessageDialog(None, "Error saving to file " + saveFileOptions['file'],
+    #                                             "File error", wx.OK | wx.ICON_EXCLAMATION)
+    #                 if self.dlg.ShowModal() == wx.ID_OK:
+    #                     self.dlg.Destroy()
+    #                 return
+    #             dlg = wx.MessageDialog(None, "Data saved to file: " + saveFileOptions['file'], "File operation",
+    #                                    wx.OK | wx.ICON_INFORMATION)
+    #
+    #             if dlg.ShowModal() == wx.ID_OK:
+    #                 dlg.Destroy()
+    #
+    #
+    #     saveFileInterf.Destroy()
 
 
 
@@ -1196,7 +1210,43 @@ class MainFrame ( wx.Frame ):
 
     
     def saveData(self, event):
-        self.fileExtensions = ".CSV (*.csv*)|*.csv*"
+
+        class AskFileType ( wx.Dialog ):
+            def __init__(self, parent):
+                wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Save as...", size=wx.DefaultSize,
+                                   pos=wx.DefaultPosition)
+
+                vSizer = wx.BoxSizer(wx.VERTICAL)
+
+                saveButtonCSV = wx.Button(self, wx.ID_OK, "Comma Separated Values (.csv)",size=(300,60))
+                vSizer.Add(saveButtonCSV, 1, border=10, flag = wx.ALL)
+
+                saveButtonXLS = wx.Button(self, -1, "Microsoft Excel spreadsheet (.xls|.xlsx)", size=(300, 60))
+                vSizer.Add(saveButtonXLS, 1, border=10, flag=wx.ALL)
+
+                # okay = wx.Button(self, wx.ID_OK)
+                cancel = wx.Button(self, wx.ID_CANCEL)
+                btns = wx.StdDialogButtonSizer()
+                # btns.AddButton(okay)
+                btns.AddButton(cancel)
+                btns.Realize()
+
+                vSizer.Add(btns, flag=wx.ALIGN_RIGHT|wx.BOTTOM, border=10)
+
+                self.SetSizer(vSizer)
+                vSizer.Fit(self)
+
+                self.Layout()
+                self.Fit()
+                self.Centre(wx.BOTH)
+                self.Show(True)
+
+        askFileType = AskFileType(self)
+
+        if askFileType.ShowModal() == wx.ID_CANCEL:
+            print "Cancelado"
+            return
+
         self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
         saveFile = wx.FileDialog(self, message = 'Save file', defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
             
