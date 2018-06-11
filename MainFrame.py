@@ -1218,11 +1218,27 @@ class MainFrame ( wx.Frame ):
 
                 vSizer = wx.BoxSizer(wx.VERTICAL)
 
-                saveButtonCSV = wx.Button(self, wx.ID_OK, "Comma Separated Values (.csv)",size=(300,60))
-                vSizer.Add(saveButtonCSV, 1, border=10, flag = wx.ALL)
+                hSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-                saveButtonXLS = wx.Button(self, -1, "Microsoft Excel spreadsheet (.xls|.xlsx)", size=(300, 60))
-                vSizer.Add(saveButtonXLS, 1, border=10, flag=wx.ALL)
+                cacaBMP = wx.Image(str(os.path.dirname(__file__)) + "/icons/csv.png",
+                                   wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+
+                caca = wx.BitmapButton(self, wx.ID_ANY, cacaBMP, wx.DefaultPosition,
+                                                    wx.Size(100, 100), wx.BU_AUTODRAW)
+
+                hSizer.Add(caca, 0, border=10, flag=wx.ALL)
+
+                caca2BMP = wx.Image(str(os.path.dirname(__file__)) + "/icons/xls.png",
+                                   wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+
+                caca2 = wx.BitmapButton(self, wx.ID_ANY, caca2BMP, wx.DefaultPosition,
+                                       wx.Size(100, 100), wx.BU_AUTODRAW)
+
+                hSizer.Add(caca2, 0, border=10, flag=wx.ALL)
+
+
+                vSizer.Add(hSizer, 0, border=10, flag=wx.ALL)
+
 
                 # okay = wx.Button(self, wx.ID_OK)
                 cancel = wx.Button(self, wx.ID_CANCEL)
