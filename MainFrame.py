@@ -32,11 +32,12 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
 from SignificanceTestInterface import SignificanceTestInterface
-from OpenFileInterface import OpenFileInterface
+from OpenFileInterface import OpenFileInterface, OpenCSVFile
 
 
 from Model import OptionsInExportInterface
 from BasicStatisticsInterface import BasicStatisticsInterface
+from AskFileType import AskFileType
 
 from sys import platform
 
@@ -393,7 +394,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_BUTTON, self.openFile, self.openNewFileBtn)
         self.Bind(wx.EVT_MENU, self.addFile, self.m_menuAddFile)
         self.Bind(wx.EVT_BUTTON, self.addFile, self.addFileBtn)
-        self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
+        self.Bind(wx.EVT_MENU, self.saveFile, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
@@ -410,7 +411,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.saveData, self.exportDataBtn)
+        self.Bind(wx.EVT_BUTTON, self.saveFile, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
         self.Bind(wx.EVT_BUTTON, self.createPieChart, self.pieChartBtn)
@@ -923,8 +924,21 @@ class MainFrame ( wx.Frame ):
     def openFile(self, event):
         self.createOpenFileInterface(additionalFile=False)
 
-    def addFile(self, event):
+    def addFileOld(self, event):
         self.createOpenFileInterface(additionalFile=True)
+
+    def addFile(self, event):
+        askfile = AskFileType(self, -1, "add")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
+
+    def selectCSVtoAdd(self):
+        openFileInterf = OpenCSVFile(self,-1,additionalFile = True, dirfrom=self.params['options']['dirfrom'])
+
+    def AddCSV(self):
+        print "Gonna open CSV file"
+
 
 
     def createOpenFileInterface(self, additionalFile):
@@ -1074,31 +1088,6 @@ class MainFrame ( wx.Frame ):
 
 
 
-    # def createSaveFileInterface(self,event):
-    #     saveFileInterf = SaveFileInterface(self, self.params['options']['dirfrom'])
-    #
-    #     if saveFileInterf.ShowModal() == wx.ID_OK:
-    #
-    #         saveFileOptions = saveFileInterf.getOpenFileOptions()
-    #
-    #         if saveFileOptions['file'] != None and saveFileOptions['fileType'] == 'xls':
-    #
-    #             try:
-    #                 self.controller.exportDataExcel(saveFileOptions['file'])
-    #             except:
-    #                 self.dlg = wx.MessageDialog(None, "Error saving to file " + saveFileOptions['file'],
-    #                                             "File error", wx.OK | wx.ICON_EXCLAMATION)
-    #                 if self.dlg.ShowModal() == wx.ID_OK:
-    #                     self.dlg.Destroy()
-    #                 return
-    #             dlg = wx.MessageDialog(None, "Data saved to file: " + saveFileOptions['file'], "File operation",
-    #                                    wx.OK | wx.ICON_INFORMATION)
-    #
-    #             if dlg.ShowModal() == wx.ID_OK:
-    #                 dlg.Destroy()
-    #
-    #
-    #     saveFileInterf.Destroy()
 
 
 
@@ -1209,61 +1198,8 @@ class MainFrame ( wx.Frame ):
 
 
     
-    def saveData(self, event):
-
-        class AskFileType ( wx.Dialog ):
-            def __init__(self, parent, ID, title, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
-                self.parent = parent
-
-                pre = wx.PreDialog()
-                pre.Create(parent, ID, title, pos, size, style)
-                self.PostCreate(pre)
-
-                vSizer = wx.BoxSizer(wx.VERTICAL)
-
-                hSizer = wx.BoxSizer(wx.HORIZONTAL)
-
-                csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/csv.png",
-                                   wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-                csvButton = wx.BitmapButton(self, wx.ID_ANY, csvIcon, wx.DefaultPosition,
-                                                    wx.Size(100, 100), wx.BU_AUTODRAW)
-                hSizer.Add(csvButton, 0, border=10, flag=wx.ALL)
-                self.Bind(wx.EVT_BUTTON, self.CSVSelected, csvButton)
-
-                xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/xls.png",
-                                   wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-                xlsButton = wx.BitmapButton(self, wx.ID_ANY, xlsIcon, wx.DefaultPosition,
-                                       wx.Size(100, 100), wx.BU_AUTODRAW)
-                hSizer.Add(xlsButton, 0, border=10, flag=wx.ALL)
-                self.Bind(wx.EVT_BUTTON, self.XLSSelected, xlsButton)
-
-                vSizer.Add(hSizer, 1, border=10, flag=wx.TOP|wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND)
-
-                cancel = wx.Button(self, wx.ID_CANCEL, u"Cancel")
-                vSizer.Add(cancel, 0, border=20, flag=wx.RIGHT|wx.BOTTOM|wx.ALIGN_RIGHT)
-
-
-                self.SetSizer(vSizer)
-                vSizer.Fit(self)
-
-                self.Layout()
-                self.Fit()
-                self.Centre(wx.BOTH)
-                self.Show(True)
-
-            def CSVSelected(self,event):
-                self.parent.saveToCSV()
-                self.Close()
-
-            def XLSSelected(self,event):
-                self.parent.saveToXLS()
-                self.Close()
-
-            def CancelSelected(self,event):
-                self.Destroy()
-
-
-        askfile = AskFileType(self, -1, "Save as...")
+    def saveFile(self, event):
+        askfile = AskFileType(self, -1, "save")
         askfile.CenterOnScreen()
         askfile.ShowModal()
         askfile.Destroy()
