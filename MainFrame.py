@@ -1212,42 +1212,36 @@ class MainFrame ( wx.Frame ):
     def saveData(self, event):
 
         class AskFileType ( wx.Dialog ):
-            def __init__(self, parent):
-                wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Save as...", size=wx.DefaultSize,
-                                   pos=wx.DefaultPosition)
+            def __init__(self, parent, ID, title, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+                self.parent = parent
+
+                pre = wx.PreDialog()
+                pre.Create(parent, ID, title, pos, size, style)
+                self.PostCreate(pre)
 
                 vSizer = wx.BoxSizer(wx.VERTICAL)
 
                 hSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-                cacaBMP = wx.Image(str(os.path.dirname(__file__)) + "/icons/csv.png",
+                csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/csv.png",
                                    wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-
-                caca = wx.BitmapButton(self, wx.ID_ANY, cacaBMP, wx.DefaultPosition,
+                csvButton = wx.BitmapButton(self, wx.ID_ANY, csvIcon, wx.DefaultPosition,
                                                     wx.Size(100, 100), wx.BU_AUTODRAW)
+                hSizer.Add(csvButton, 0, border=10, flag=wx.ALL)
+                self.Bind(wx.EVT_BUTTON, self.CSVSelected, csvButton)
 
-                hSizer.Add(caca, 0, border=10, flag=wx.ALL)
-
-                caca2BMP = wx.Image(str(os.path.dirname(__file__)) + "/icons/xls.png",
+                xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/xls.png",
                                    wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-
-                caca2 = wx.BitmapButton(self, wx.ID_ANY, caca2BMP, wx.DefaultPosition,
+                xlsButton = wx.BitmapButton(self, wx.ID_ANY, xlsIcon, wx.DefaultPosition,
                                        wx.Size(100, 100), wx.BU_AUTODRAW)
+                hSizer.Add(xlsButton, 0, border=10, flag=wx.ALL)
+                self.Bind(wx.EVT_BUTTON, self.XLSSelected, xlsButton)
 
-                hSizer.Add(caca2, 0, border=10, flag=wx.ALL)
+                vSizer.Add(hSizer, 1, border=10, flag=wx.TOP|wx.LEFT|wx.RIGHT|wx.BOTTOM|wx.EXPAND)
 
+                cancel = wx.Button(self, wx.ID_CANCEL, u"Cancel")
+                vSizer.Add(cancel, 0, border=20, flag=wx.RIGHT|wx.BOTTOM|wx.ALIGN_RIGHT)
 
-                vSizer.Add(hSizer, 0, border=10, flag=wx.ALL)
-
-
-                # okay = wx.Button(self, wx.ID_OK)
-                cancel = wx.Button(self, wx.ID_CANCEL)
-                btns = wx.StdDialogButtonSizer()
-                # btns.AddButton(okay)
-                btns.AddButton(cancel)
-                btns.Realize()
-
-                vSizer.Add(btns, flag=wx.ALIGN_RIGHT|wx.BOTTOM, border=10)
 
                 self.SetSizer(vSizer)
                 vSizer.Fit(self)
@@ -1257,48 +1251,48 @@ class MainFrame ( wx.Frame ):
                 self.Centre(wx.BOTH)
                 self.Show(True)
 
-        askFileType = AskFileType(self)
+            def CSVSelected(self,event):
+                self.parent.saveToCSV()
+                self.Close()
 
-        if askFileType.ShowModal() == wx.ID_CANCEL:
-            print "Cancelado"
-            return
+            def XLSSelected(self,event):
+                self.parent.saveToXLS()
+                self.Close()
 
-        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
-        saveFile = wx.FileDialog(self, message = 'Save file', defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
-            
+            def CancelSelected(self,event):
+                self.Destroy()
+
+
+        askfile = AskFileType(self, -1, "Save as...")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
+
+
+    def saveToCSV(self):
+
+        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|All files (*.*)|*.*"
+        saveFile = wx.FileDialog(self, message='Save file', defaultDir=self.params['options']['dirfrom'], defaultFile='untitled.csv', wildcard=self.fileExtensions,
+                                 style=wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+
         if saveFile.ShowModal() == wx.ID_OK:
             self.filename = saveFile.GetFilename()
             self.directory = saveFile.GetDirectory()
 
             fileExtension = self.filename.rpartition(".")[-1]
-            if fileExtension.lower()  not in ["csv","xls","xlsx"]:
-                self.dlg = wx.MessageDialog(None, "Error exporting file "+self.filename+"\nFile extension (.csv|.xlsx) is required", "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if fileExtension.lower() != "csv":
+                self.dlg = wx.MessageDialog(None,
+                                            "Error exporting file " + self.filename + "\nFile extension (.csv) is required",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
                 if self.dlg.ShowModal() == wx.ID_OK:
                     self.dlg.Destroy()
             else:
-                if fileExtension.lower() == "csv" :
-                    path = self.directory + "/" + self.filename
-                    exportCsv = ExportCsvOptions(self)
-                    
-                    if exportCsv.ShowModal() == wx.ID_OK:
-                        try:
-                            self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
-                        except:
-                            self.dlg = wx.MessageDialog(None,"Error saving to file " + self.filename,
-                                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
-                            if self.dlg.ShowModal() == wx.ID_OK:
-                                self.dlg.Destroy()
-                            return
-                        dlg = wx.MessageDialog(None, "Data saved to file: "+self.filename, "File operation",
-                                               wx.OK | wx.ICON_INFORMATION)
+                path = os.path.join(self.directory,self.filename)
+                exportCsv = ExportCsvOptions(self)
 
-                        if dlg.ShowModal() == wx.ID_OK:
-                            dlg.Destroy()
-
-                else:
-                    path = self.directory + "/" + self.filename
+                if exportCsv.ShowModal() == wx.ID_OK:
                     try:
-                        self.controller.exportDataExcel(path)
+                        self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
                     except:
                         self.dlg = wx.MessageDialog(None, "Error saving to file " + self.filename,
                                                     "File error", wx.OK | wx.ICON_EXCLAMATION)
@@ -1307,12 +1301,47 @@ class MainFrame ( wx.Frame ):
                         return
                     dlg = wx.MessageDialog(None, "Data saved to file: " + self.filename, "File operation",
                                            wx.OK | wx.ICON_INFORMATION)
+                    self.params['options']['dirfrom'] = self.directory
 
                     if dlg.ShowModal() == wx.ID_OK:
                         dlg.Destroy()
 
+    def saveToXLS(self):
 
-    
+        self.fileExtensions = "Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX|All files (*.*)|*.*"
+        saveFile = wx.FileDialog(self, message='Save file', defaultDir=self.params['options']['dirfrom'], defaultFile='untitled.xlsx',
+                                 wildcard=self.fileExtensions, style=wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+
+        if saveFile.ShowModal() == wx.ID_OK:
+            self.filename = saveFile.GetFilename()
+            self.directory = saveFile.GetDirectory()
+
+            fileExtension = self.filename.rpartition(".")[-1]
+            if fileExtension.lower() not in ["xls", "xlsx"]:
+                self.dlg = wx.MessageDialog(None,
+                                            "Error exporting file " + self.filename + "\nFile extension (.xls|.xlsx) is required",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+
+            else:
+                path = os.path.join(self.directory,self.filename)
+                try:
+                    self.controller.exportDataExcel(path)
+                except:
+                    self.dlg = wx.MessageDialog(None, "Error saving to file " + self.filename,
+                                                "File error", wx.OK | wx.ICON_EXCLAMATION)
+                    if self.dlg.ShowModal() == wx.ID_OK:
+                        self.dlg.Destroy()
+                    return
+                dlg = wx.MessageDialog(None, "Data saved to file: " + self.filename, "File operation",
+                                       wx.OK | wx.ICON_INFORMATION)
+                self.params['options']['dirfrom'] = self.directory
+
+                if dlg.ShowModal() == wx.ID_OK:
+                    dlg.Destroy()
+
+
     def resetData(self, event):
         self.controller.storeData()
         self.m_undo.SetText("Undo close data")
