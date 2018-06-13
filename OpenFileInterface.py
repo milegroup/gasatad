@@ -421,8 +421,6 @@ class XLSPanel(wx.Panel):
 
 
 
-
-
 class OpenFileInterface(wx.Dialog):
     def __init__(self, parent, dirfrom):
         wx.Dialog.__init__(self, None, title="Open file", size=(600, 500), pos = wx.DefaultPosition, style=wx.RESIZE_BORDER)
@@ -463,6 +461,9 @@ class OpenFileInterface(wx.Dialog):
         else:
             return None
 
+
+
+
 class OpenCSVFile(wx.Dialog):
     def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
         self.parent = parent
@@ -471,6 +472,8 @@ class OpenCSVFile(wx.Dialog):
 
         if self.additionalFile == True:
             title = "Add CSV file"
+        else:
+            title = "Open CSV file"
 
 
         pre = wx.PreDialog()
@@ -647,7 +650,6 @@ class OpenCSVFile(wx.Dialog):
         self.provDataTable.Enable(False)
 
     def OkSelected(self, event):
-        print "Ok selected"
         if self.CSVSepRBBox.GetSelection() == 0:
             sepchar = 'Comma'
         elif self.CSVSepRBBox.GetSelection() == 1:
@@ -662,8 +664,7 @@ class OpenCSVFile(wx.Dialog):
             sepchar=sepchar,
             discardFirstCol=self.discardFirstCol.IsChecked()
         )
-        print openFileOptions
-        self.parent.AddCSV()
+        self.parent.OpenAddCSV(openFileOptions)
         self.Close()
 
 

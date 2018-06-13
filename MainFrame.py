@@ -921,11 +921,15 @@ class MainFrame ( wx.Frame ):
 
 
 
-    def openFile(self, event):
+    def openFileOld(self, event):
         self.createOpenFileInterface(additionalFile=False)
 
-    def addFileOld(self, event):
-        self.createOpenFileInterface(additionalFile=True)
+    def openFile(self, event):
+        askfile = AskFileType(self, -1, "open")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
+
 
     def addFile(self, event):
         askfile = AskFileType(self, -1, "add")
@@ -933,11 +937,76 @@ class MainFrame ( wx.Frame ):
         askfile.ShowModal()
         askfile.Destroy()
 
-    def selectCSVtoAdd(self):
-        openFileInterf = OpenCSVFile(self,-1,additionalFile = True, dirfrom=self.params['options']['dirfrom'])
+    def selectCSV(self, additionalFile):
+        openFileInterf = OpenCSVFile(self,-1,additionalFile = additionalFile, dirfrom=self.params['options']['dirfrom'])
 
-    def AddCSV(self):
-        print "Gonna open CSV file"
+    def OpenAddCSV(self, openFileOptions):
+        # print "Gonna open CSV file"
+        # print openFileOptions
+
+        self.params['options']['dirfrom'] = openFileOptions['dirName']
+        readCorrect = True
+        self.data = None
+        discardCol = openFileOptions['discardFirstCol']
+        sepChar = ''
+        if openFileOptions['sepchar'] == "Comma":
+            sepChar = ','
+        elif openFileOptions['sepchar'] == "Semicolon":
+            sepChar = ';'
+        elif openFileOptions['sepchar'] == "Tab":
+            sepChar = '\t'
+
+        try:
+            self.data = read_csv(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']), sep=sepChar,
+                                 header=0,
+                                 engine='python', encoding='utf-8')
+        except:
+            # print "Error: ", sys.exc_info()
+            type, value, traceback = sys.exc_info()
+            self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
+
+        if readCorrect:
+            if discardCol:
+                self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
+            self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
+
+        if openFileOptions['additionalFile'] and readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
+            self.dlg = wx.MessageDialog(None,
+                                        "Number of rows does not match: \n  Loaded data has " + str(
+                                            self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions[
+                                            'fileName'] + " has " + str(
+                                            len(self.data.index)) + " rows ", "File error",
+                                        wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
+
+        if readCorrect:
+
+            if openFileOptions['additionalFile']:
+                self.controller.storeData()
+                self.m_undo.SetText("Undo add file")
+                self.m_undo.Enable()
+                self.controller.OpenAdditionalFile(self.data)
+            else:
+                self.controller.OpenFile(self.data)
+
+            self.refreshGUI()
+
+            if self.controller.nullValuesInFile(self.data):
+                self.dlg = wx.MessageDialog(None, "File " + self.filename + " has one or more missing values",
+                                            "Missing values", wx.OK | wx.ICON_WARNING)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+
+            if openFileOptions['additionalFile']:
+                # Move the view of the table to the last column
+                self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
+                self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
 
 
 

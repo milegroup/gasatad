@@ -30,9 +30,11 @@ class AskFileType(wx.Dialog):
 
 
         if self.function=="save":
-            title = "Save file"
+            title = "Save data to file"
+        elif self.function == "open":
+            title = "Open new file"
         elif self.function=="add":
-            title = "Add file"
+            title = "Add file to data"
 
         pre = wx.PreDialog()
         pre.Create(parent, ID, title, pos, size, style)
@@ -72,8 +74,10 @@ class AskFileType(wx.Dialog):
     def CSVSelected(self, event):
         if self.function=='save':
             self.parent.saveToCSV()
+        elif self.function == "open":
+            self.parent.selectCSV(additionalFile=False)
         elif self.function == "add":
-            self.parent.selectCSVtoAdd()
+            self.parent.selectCSV(additionalFile=True)
         self.Close()
 
     def XLSSelected(self, event):
