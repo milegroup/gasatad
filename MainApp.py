@@ -44,8 +44,6 @@ MainFrame.params['availableVersionToUpgrade'] = ""
 
 MainFrame.params['optionsdefault'] = {}  
 MainFrame.params['optionsdefault']['dirfrom'] = os.getcwd()
-MainFrame.params['optionsdefault']['discardfirstcolumn'] = "True"
-MainFrame.params['optionsdefault']['sepchar'] = "Comma"
 
 MainFrame.params['options'] = {}  
 for key in MainFrame.params['optionsdefault'].keys():

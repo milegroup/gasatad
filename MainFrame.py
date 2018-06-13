@@ -32,10 +32,12 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
 from SignificanceTestInterface import SignificanceTestInterface
+from OpenFileInterface import OpenCSVFile, OpenXLSFile
 
 
 from Model import OptionsInExportInterface
 from BasicStatisticsInterface import BasicStatisticsInterface
+from AskFileType import AskFileType
 
 from sys import platform
 
@@ -181,31 +183,6 @@ class MainFrame ( wx.Frame ):
         self.m_editMenu.AppendItem( self.m_deleteColumns )
         self.m_deleteColumns.Enable(False)
 
-        # ------------ Options menu
-
-        self.m_optionsMenu = wx.Menu()
-        
-        self.m_discardColumn = self.m_optionsMenu.Append(100, u"Discard first column in csv files", "", wx.ITEM_CHECK)
-        self.Bind(wx.EVT_MENU_RANGE, self.discardColumnCheckboxChanged, id=100)
-        if self.params['options']['discardfirstcolumn']=="True":
-            self.m_discardColumn.Check()
-
-        self.m_optionsSubMenu = wx.Menu()
-        self.m_CSVSeparator1 = self.m_optionsSubMenu.Append(201, u"Comma", "", wx.ITEM_RADIO)
-        self.m_CSVSeparator2 = self.m_optionsSubMenu.Append(202, u"Semicolon", "", wx.ITEM_RADIO)
-        self.m_CSVSeparator3 = self.m_optionsSubMenu.Append(203, u"Tabulator", "", wx.ITEM_RADIO)
-        self.Bind(wx.EVT_MENU_RANGE, self.CSVCharacterSeparatorChanged, id=201, id2=203)
-        if self.params['options']['sepchar']=="Comma":
-            self.m_CSVSeparator1.Check()
-        elif self.params['options']['sepchar']=="Semicolon":
-            self.m_CSVSeparator2.Check()
-        elif self.params['options']['sepchar']=="Tab":
-            self.m_CSVSeparator3.Check()
-
-        self.m_optionsMenu.AppendMenu(wx.NewId(), u"CSV character separator",self.m_optionsSubMenu)
-
-        self.m_resetOptions = wx.MenuItem( self.m_optionsMenu, wx.ID_ANY, u"Reset options", wx.EmptyString, wx.ITEM_NORMAL )
-        self.m_optionsMenu.AppendItem(self.m_resetOptions)
 
         # ------------ About menu
 
@@ -220,7 +197,7 @@ class MainFrame ( wx.Frame ):
         
         self.m_menubar1.Append( self.m_fileMenu, u"File" )
         self.m_menubar1.Append( self.m_editMenu, u"Edit" )
-        self.m_menubar1.Append( self.m_optionsMenu, u"Options")
+        # self.m_menubar1.Append( self.m_optionsMenu, u"Options")
         self.m_menubar1.Append( self.m_aboutMenu, u"About" )
                 
         self.SetMenuBar( self.m_menubar1 )
@@ -413,13 +390,12 @@ class MainFrame ( wx.Frame ):
 
         self.Bind(wx.EVT_CLOSE, self.closeApp) # Close window
 
-        self.Bind(wx.EVT_MENU, self.OpenFile, self.m_menuNewFile)
-        self.Bind(wx.EVT_BUTTON, self.OpenFile, self.openNewFileBtn)
-        self.Bind(wx.EVT_MENU, self.OpenAdditionalFile, self.m_menuAddFile)
-        self.Bind(wx.EVT_BUTTON, self.OpenAdditionalFile, self.addFileBtn)
-        self.Bind(wx.EVT_MENU, self.saveData, self.m_menuExportData)
+        self.Bind(wx.EVT_MENU, self.openFile, self.m_menuNewFile)
+        self.Bind(wx.EVT_BUTTON, self.openFile, self.openNewFileBtn)
+        self.Bind(wx.EVT_MENU, self.addFile, self.m_menuAddFile)
+        self.Bind(wx.EVT_BUTTON, self.addFile, self.addFileBtn)
+        self.Bind(wx.EVT_MENU, self.saveFile, self.m_menuExportData)
         self.Bind(wx.EVT_MENU, self.resetData, self.m_menuResetData)
-        self.Bind(wx.EVT_MENU, self.resetOptions, self.m_resetOptions)
         self.Bind(wx.EVT_MENU, self.undo, self.m_undo)
         self.Bind(wx.EVT_MENU, self.createNewColumn, self.m_addNewColumn)
         self.Bind(wx.EVT_MENU, self.deleteColumnsByLabels, self.m_deleteColumns)
@@ -435,7 +411,7 @@ class MainFrame ( wx.Frame ):
         self.Bind(wx.EVT_MENU, self.closeApp, self.m_menuQuit)
         self.Bind(wx.EVT_BUTTON, self.createBasicStatisticsInterface, self.descriptiveStatsBtn)
         self.Bind(wx.EVT_BUTTON, self.resetData, self.resetDataBtn)
-        self.Bind(wx.EVT_BUTTON, self.saveData, self.exportDataBtn)
+        self.Bind(wx.EVT_BUTTON, self.saveFile, self.exportDataBtn)
         self.Bind(wx.EVT_BUTTON, self.createHistogram, self.histogramBtn)
         self.Bind(wx.EVT_BUTTON, self.createScatterPlot, self.scatterPlotBtn)
         self.Bind(wx.EVT_BUTTON, self.createPieChart, self.pieChartBtn)
@@ -925,13 +901,6 @@ class MainFrame ( wx.Frame ):
                 self.Datafile = open(fileName, 'rU')            
                 self.data = read_csv(self.Datafile, sep = None, engine = 'python', encoding='utf-8')
 
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
-
                 self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
                 self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
                 
@@ -950,174 +919,158 @@ class MainFrame ( wx.Frame ):
 
         print "File: "+fileName+" loaded"
 
-        
+    def openFile(self, event):
+        askfile = AskFileType(self, -1, "open")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
 
-    def OpenFile(self, event, fileName = None):       
-        
+
+    def addFile(self, event):
+        askfile = AskFileType(self, -1, "add")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
+
+    def selectCSV(self, additionalFile):
+        openFileInterf = OpenCSVFile(self,-1,additionalFile = additionalFile, dirfrom=self.params['options']['dirfrom'])
+
+    def selectXLS(self, additionalFile):
+        openFileInterf = OpenXLSFile(self,-1,additionalFile = additionalFile, dirfrom=self.params['options']['dirfrom'])
+
+    def OpenAddCSV(self, openFileOptions):
+        # print "Gonna open CSV file"
+        # print openFileOptions
+
+        self.params['options']['dirfrom'] = openFileOptions['dirName']
         readCorrect = True
-        fileType = "csv"
         self.data = None
-            
-        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
-        
-        wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard = self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
-        
-        if wOpenFile.ShowModal() == wx.ID_OK:
-            self.filename = wOpenFile.GetFilename()
-            self.directory = wOpenFile.GetDirectory()
-            self.params['options']['dirfrom'] = self.directory
-            self.fileExtension = self.filename.rpartition(".")[-1]
+        discardCol = openFileOptions['discardFirstCol']
+        sepChar = ''
+        if openFileOptions['sepchar'] == "Comma":
+            sepChar = ','
+        elif openFileOptions['sepchar'] == "Semicolon":
+            sepChar = ';'
+        elif openFileOptions['sepchar'] == "Tab":
+            sepChar = '\t'
 
-            discardCol = False
-            if self.params['options']['discardfirstcolumn']=='True':
-                discardCol=True
+        try:
+            self.data = read_csv(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']), sep=sepChar,
+                                 header=0,
+                                 engine='python', encoding='utf-8')
+        except:
+            # print "Error: ", sys.exc_info()
+            type, value, traceback = sys.exc_info()
+            self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
 
-            try:
-                if self.fileExtension.lower() == "csv":
-                    sepChar = ''
-                    if self.params['options']['sepchar']=="Comma":
-                        sepChar=','
-                    elif self.params['options']['sepchar']=="Semicolon":
-                        sepChar=';'
-                    elif self.params['options']['sepchar']=="Tab":
-                        sepChar='\t'
-                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python', encoding='utf-8')
-                if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
-                    fileType = "xls"
-                    self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0, index_col=None)
-                    self.data = self.preprocessExcel(self.data)
+        if readCorrect:
+            if discardCol:
+                self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
+            self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
 
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
+        if openFileOptions['additionalFile'] and readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
+            self.dlg = wx.MessageDialog(None,
+                                        "Number of rows does not match: \n  Loaded data has " + str(
+                                            self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions[
+                                            'fileName'] + " has " + str(
+                                            len(self.data.index)) + " rows ", "File error",
+                                        wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
 
+        if readCorrect:
 
-            except UnicodeDecodeError:
-                self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
-                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
-                if self.dlg.ShowModal() == wx.ID_OK:
-                    self.dlg.Destroy()
-                readCorrect = False
-
-            except:
-                # print "Error: ", sys.exc_info()
-                type, value, traceback = sys.exc_info()
-                self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
-                if self.dlg.ShowModal() == wx.ID_OK:
-                    self.dlg.Destroy()
-                readCorrect = False
-            
-            wOpenFile.Destroy()
-
-            if readCorrect:
-                if discardCol and fileType=="csv":
-                    self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
-                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-            
-                self.controller.OpenFile(self.data)
-                
-                self.refreshGUI()
-
-                if self.controller.nullValuesInFile(self.data):
-                    self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
-                    if self.dlg.ShowModal() == wx.ID_OK:
-                        self.dlg.Destroy()
-            
-
-                
-
-                
-    def OpenAdditionalFile(self, *events):       
-        
-        readCorrect = True
-        fileType = "csv"
-        self.data = None
-            
-        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
-            
-        wOpenFile = wx.FileDialog(self, message = 'Open file',defaultDir = self.params['options']['dirfrom'], defaultFile = '', wildcard=self.fileExtensions, style = wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR)
-        
-        if wOpenFile.ShowModal() == wx.ID_OK:
-            self.filename = wOpenFile.GetFilename()
-            self.directory = wOpenFile.GetDirectory()
-            self.params['options']['dirfrom'] = self.directory
-            self.fileExtension = self.filename.rpartition(".")[-1]
-
-            discardCol = False
-            if self.params['options']['discardfirstcolumn']=='True':
-                discardCol=True
-
-            try:
-                if self.fileExtension.lower() == "csv":
-                    sepChar = ''
-                    if self.params['options']['sepchar']=="Comma":
-                        sepChar=','
-                    elif self.params['options']['sepchar']=="Semicolon":
-                        sepChar=';'
-                    elif self.params['options']['sepchar']=="Tab":
-                        sepChar='\t'
-                    self.data = read_csv(os.path.join(self.directory, self.filename), sep = sepChar, header=0, engine = 'python', encoding='utf-8')
-                if self.fileExtension.lower() == "xlsx" or self.fileExtension.lower() == "xls":
-                    fileType = "xls"
-                    self.data = read_excel(os.path.join(self.directory, self.filename), sheetname=0, header = 0)
-                    self.data = self.preprocessExcel(self.data)
-
-                # Checks non-ascii characters in column names or strings
-                # for c in self.data.columns:
-                #     c.decode('ascii')
-                #     if self.data[c].dtypes == 'object':
-                #         for elem in self.data[c]:
-                #             elem.decode('ascii')
-
-            except UnicodeDecodeError:
-                self.dlg = wx.MessageDialog(None, "Error reading file " + self.filename + "\n" + "Non-ascii characters",
-                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
-                if self.dlg.ShowModal() == wx.ID_OK:
-                    self.dlg.Destroy()
-                readCorrect = False
-
-            except:
-                # print "Error: ", sys.exc_info()
-                type, value, traceback = sys.exc_info()
-                self.dlg = wx.MessageDialog(None, "Error reading file "+self.filename+"\n"+str(value), "File error", wx.OK | wx.ICON_EXCLAMATION)
-                if self.dlg.ShowModal() == wx.ID_OK:
-                    self.dlg.Destroy()
-                readCorrect = False
-
-            
-
-            if readCorrect:
-                if discardCol and fileType=="csv":
-                    self.data.drop(self.data.columns[[0]],axis=1,inplace=True)
-                self.data.rename(columns={'Unnamed: 0':'NoTag'}, inplace=True)
-
-            if readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
-                self.dlg = wx.MessageDialog(None, "Number of rows does not match: \n  Loaded data has "+str(self.m_dataTable.GetNumberRows())+" rows \n  File "+self.filename+" has "+str(len(self.data.index))+" rows ", "File error", wx.OK | wx.ICON_EXCLAMATION)
-                if self.dlg.ShowModal() == wx.ID_OK:
-                    self.dlg.Destroy()
-                readCorrect = False
-
-            if readCorrect:
-
+            if openFileOptions['additionalFile']:
                 self.controller.storeData()
                 self.m_undo.SetText("Undo add file")
                 self.m_undo.Enable()
-
                 self.controller.OpenAdditionalFile(self.data)
+            else:
+                self.controller.OpenFile(self.data)
 
-                self.refreshGUI()
-               
-                if self.controller.nullValuesInFile(self.data):
-                    self.dlg = wx.MessageDialog(None, "File "+self.filename+" has one or more missing values", "Missing values", wx.OK | wx.ICON_WARNING)
-                    if self.dlg.ShowModal() == wx.ID_OK:
-                        self.dlg.Destroy()
+            self.refreshGUI()
 
+            if self.controller.nullValuesInFile(self.data):
+                self.dlg = wx.MessageDialog(None, "File " + self.filename + " has one or more missing values",
+                                            "Missing values", wx.OK | wx.ICON_WARNING)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+
+            if openFileOptions['additionalFile']:
                 # Move the view of the table to the last column
-                self.m_dataTable.SetGridCursor(0,self.controller.getNumberOfColumns()-1)
-                self.m_dataTable.MakeCellVisible(0,self.controller.getNumberOfColumns()-1)
+                self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
+                self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
+
+    def OpenAddXLS(self,openFileOptions):
+        # print "File to load: ", openFileOptions['fileName']
+        self.params['options']['dirfrom'] = openFileOptions['dirName']
+        readCorrect = True
+        self.data = None
+        rowColNames = openFileOptions['rowColNames']
+        noColsDiscard = openFileOptions['noColsDiscard']
+        sheetNumber = openFileOptions['sheetNumber']
+
+        # print "Reading col names from row: ", rowColNames
+
+        try:
+            self.data = read_excel(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']),
+                                   sheetname=sheetNumber, header=rowColNames,
+                                   index_col=None)
+            if noColsDiscard != 0:
+                self.data.drop(self.data.columns[range(noColsDiscard)], axis=1, inplace=True)
+            # self.data = self.preprocessExcel(self.data)
+        except:
+            # print "Error: ", sys.exc_info()
+            type, value, traceback = sys.exc_info()
+            self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
+
+        if readCorrect:
+            self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
+
+        if openFileOptions['additionalFile'] and readCorrect and (
+                self.m_dataTable.GetNumberRows() != len(self.data.index)):
+            self.dlg = wx.MessageDialog(None,
+                                        "Number of rows does not match: \n  Loaded data has " + str(
+                                            self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions[
+                                            'fileName'] + " has " + str(
+                                            len(self.data.index)) + " rows ", "File error",
+                                        wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
+
+        if readCorrect:
+            if openFileOptions['additionalFile']:
+                self.controller.storeData()
+                self.m_undo.SetText("Undo add file")
+                self.m_undo.Enable()
+                self.controller.OpenAdditionalFile(self.data)
+            else:
+                self.controller.OpenFile(self.data)
+
+            self.refreshGUI()
+
+            if self.controller.nullValuesInFile(self.data):
+                self.dlg = wx.MessageDialog(None,
+                                            "File " + openFileOptions['fileName'] + " has one or more missing values",
+                                            "Missing values", wx.OK | wx.ICON_WARNING)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+
+            if openFileOptions['additionalFile']:
+                # Move the view of the table to the last column
+                self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
+                self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
+
 
     def preprocessExcel(self, data):
         for row in range(len(data.index)):
@@ -1224,44 +1177,37 @@ class MainFrame ( wx.Frame ):
 
 
     
-    def saveData(self, event):
-        self.fileExtensions = ".CSV (*.csv*)|*.csv*"
-        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX"
-        saveFile = wx.FileDialog(self, message = 'Save file', defaultDir = '', defaultFile = '', wildcard = self.fileExtensions, style = wx.SAVE | wx.FD_OVERWRITE_PROMPT)
-            
+    def saveFile(self, event):
+        askfile = AskFileType(self, -1, "save")
+        askfile.CenterOnScreen()
+        askfile.ShowModal()
+        askfile.Destroy()
+
+
+    def saveToCSV(self):
+
+        self.fileExtensions = "CSV files (*.csv)|*.csv;*.CSV|All files (*.*)|*.*"
+        saveFile = wx.FileDialog(self, message='Save file', defaultDir=self.params['options']['dirfrom'], defaultFile='untitled.csv', wildcard=self.fileExtensions,
+                                 style=wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+
         if saveFile.ShowModal() == wx.ID_OK:
             self.filename = saveFile.GetFilename()
             self.directory = saveFile.GetDirectory()
 
             fileExtension = self.filename.rpartition(".")[-1]
-            if fileExtension.lower()  not in ["csv","xls","xlsx"]:
-                self.dlg = wx.MessageDialog(None, "Error exporting file "+self.filename+"\nFile extension (.csv|.xlsx) is required", "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if fileExtension.lower() != "csv":
+                self.dlg = wx.MessageDialog(None,
+                                            "Error exporting file " + self.filename + "\nFile extension (.csv) is required",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
                 if self.dlg.ShowModal() == wx.ID_OK:
                     self.dlg.Destroy()
             else:
-                if fileExtension.lower() == "csv" :
-                    path = self.directory + "/" + self.filename
-                    exportCsv = ExportCsvOptions(self)
-                    
-                    if exportCsv.ShowModal() == wx.ID_OK:
-                        try:
-                            self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
-                        except:
-                            self.dlg = wx.MessageDialog(None,"Error saving to file " + self.filename,
-                                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
-                            if self.dlg.ShowModal() == wx.ID_OK:
-                                self.dlg.Destroy()
-                            return
-                        dlg = wx.MessageDialog(None, "Data saved to file: "+self.filename, "File operation",
-                                               wx.OK | wx.ICON_INFORMATION)
+                path = os.path.join(self.directory,self.filename)
+                exportCsv = ExportCsvOptions(self)
 
-                        if dlg.ShowModal() == wx.ID_OK:
-                            dlg.Destroy()
-
-                else:
-                    path = self.directory + "/" + self.filename
+                if exportCsv.ShowModal() == wx.ID_OK:
                     try:
-                        self.controller.exportDataExcel(path)
+                        self.controller.exportDataCSV(path, exportCsv.getSelectedExportOptions())
                     except:
                         self.dlg = wx.MessageDialog(None, "Error saving to file " + self.filename,
                                                     "File error", wx.OK | wx.ICON_EXCLAMATION)
@@ -1270,12 +1216,47 @@ class MainFrame ( wx.Frame ):
                         return
                     dlg = wx.MessageDialog(None, "Data saved to file: " + self.filename, "File operation",
                                            wx.OK | wx.ICON_INFORMATION)
+                    self.params['options']['dirfrom'] = self.directory
 
                     if dlg.ShowModal() == wx.ID_OK:
                         dlg.Destroy()
 
+    def saveToXLS(self):
 
-    
+        self.fileExtensions = "Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX|All files (*.*)|*.*"
+        saveFile = wx.FileDialog(self, message='Save file', defaultDir=self.params['options']['dirfrom'], defaultFile='untitled.xlsx',
+                                 wildcard=self.fileExtensions, style=wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+
+        if saveFile.ShowModal() == wx.ID_OK:
+            self.filename = saveFile.GetFilename()
+            self.directory = saveFile.GetDirectory()
+
+            fileExtension = self.filename.rpartition(".")[-1]
+            if fileExtension.lower() not in ["xls", "xlsx"]:
+                self.dlg = wx.MessageDialog(None,
+                                            "Error exporting file " + self.filename + "\nFile extension (.xls|.xlsx) is required",
+                                            "File error", wx.OK | wx.ICON_EXCLAMATION)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
+
+            else:
+                path = os.path.join(self.directory,self.filename)
+                try:
+                    self.controller.exportDataExcel(path)
+                except:
+                    self.dlg = wx.MessageDialog(None, "Error saving to file " + self.filename,
+                                                "File error", wx.OK | wx.ICON_EXCLAMATION)
+                    if self.dlg.ShowModal() == wx.ID_OK:
+                        self.dlg.Destroy()
+                    return
+                dlg = wx.MessageDialog(None, "Data saved to file: " + self.filename, "File operation",
+                                       wx.OK | wx.ICON_INFORMATION)
+                self.params['options']['dirfrom'] = self.directory
+
+                if dlg.ShowModal() == wx.ID_OK:
+                    dlg.Destroy()
+
+
     def resetData(self, event):
         self.controller.storeData()
         self.m_undo.SetText("Undo close data")
@@ -1284,12 +1265,6 @@ class MainFrame ( wx.Frame ):
         self.controller.resetDataToAnalyse()
         self.refreshGUI()
 
-
-    def resetOptions(self,event):
-        for key in self.params['optionsdefault'].keys():
-            self.params['options'][key] = self.params['optionsdefault'][key]
-        self.m_discardColumn.Check()
-        self.m_CSVSeparator1.Check()
 
     def refreshGUI(self, updateDataInfo = True, markNans = True):
         if not self.controller.programState.dataToAnalyse.empty: # data present
@@ -1429,7 +1404,7 @@ class MainFrame ( wx.Frame ):
             
             for value in self.controller.characterValues:
 
-                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = list(self.controller.programState.dataToAnalyse[value].unique())
                 listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
 
@@ -1459,7 +1434,7 @@ class MainFrame ( wx.Frame ):
             
             for value in self.controller.characterValues:
 
-                listTags = list(self.controller.programState.dataToAnalyse[str(value)].unique())
+                listTags = list(self.controller.programState.dataToAnalyse[value].unique())
                 # listTags = [x for x in listTags if str(x) != 'nan']
                 listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
@@ -1564,22 +1539,8 @@ class MainFrame ( wx.Frame ):
             
             wx.MessageBox("There are no numerical variables", "ERROR")
 
-    
-    def discardColumnCheckboxChanged(self, event):
-        if self.m_discardColumn.IsChecked():
-            self.params['options']['discardfirstcolumn']='True'
-        else:
-            self.params['options']['discardfirstcolumn']='False'
 
-    def CSVCharacterSeparatorChanged(self, event):
-        if self.m_CSVSeparator1.IsChecked():
-            self.params['options']['sepchar']="Comma"
-        if self.m_CSVSeparator2.IsChecked():
-            self.params['options']['sepchar']="Semicolon"
-        if self.m_CSVSeparator3.IsChecked():
-            self.params['options']['sepchar']="Tab"
-    
-        
+
         
     def showWarning(self):
         

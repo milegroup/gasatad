@@ -114,17 +114,16 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             #self.checkBoxTagLeft.append(SelectedValuesOfTag(tag, values))
             
-            sbSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, str(tag) ), wx.VERTICAL )
+            sbSizer = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, tag), wx.VERTICAL )
             
             for j in values:
                 
                 self.m_checkBox = wx.CheckBox(parent=self.scrolledPanel, id=wx.ID_ANY, label=j,
-                                              pos=wx.DefaultPosition, size=wx.DefaultSize, name=str(tag))
+                                              pos=wx.DefaultPosition, size=wx.DefaultSize, name=tag)
                 sbSizer.Add( self.m_checkBox, 0, wx.EXPAND, 5 )
                 self.Bind(wx.EVT_CHECKBOX, self.changeValueTagCheckBoxLeft, self.m_checkBox)
-                
-                
-            tagsSizer.Add( sbSizer, 0, wx.EXPAND | wx.ALL, 5 )
+
+            tagsSizer.Add( sbSizer, 0, wx.EXPAND | wx.ALL, 5)
         
         
         
@@ -142,7 +141,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 minimum = int(min(self.dataToAnalyse[i]))
                 maximum = int(max(self.dataToAnalyse[i]))
             
-                self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+                self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_checkBox.SetFont( wx.Font( 10, wx.DEFAULT, wx.NORMAL, wx.BOLD, False, wx.EmptyString ) )
                 self.Bind(wx.EVT_CHECKBOX, self.changeStatusSpinCtrlLeft, self.m_checkBox)
                 
@@ -153,7 +152,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText11.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, str(i) + "-LimitInf")
+                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, i + "-LimitInf")
                 auxSizer2.Add( self.m_spinCtrl11, 0, wx.ALL, 5 )
                 self.m_spinCtrl11.Enable(False)
             
@@ -161,7 +160,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText21.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, str(i) + "-LimitSup")
+                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, i + "-LimitSup")
                 auxSizer2.Add( self.m_spinCtrl21, 0, wx.ALL, 5 )
                 self.m_spinCtrl21.Enable(False) 
                 
@@ -210,11 +209,11 @@ class SignificanceTestInterface ( wx.Dialog ):
             
             #self.checkBoxTagRight.append(SelectedValuesOfTag(tag, values))
             
-            sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, str(tag) ), wx.VERTICAL )
+            sbSizer2 = wx.StaticBoxSizer( wx.StaticBox( self.scrolledPanel, wx.ID_ANY, tag), wx.VERTICAL )
             
             for j in values:
                 
-                self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = j, pos = wx.DefaultPosition, size = wx.DefaultSize, name = str(tag) )
+                self.m_checkBox = wx.CheckBox(parent = self.scrolledPanel, id = wx.ID_ANY, label = j, pos = wx.DefaultPosition, size = wx.DefaultSize, name = tag)
                 sbSizer2.Add( self.m_checkBox, 0, wx.EXPAND, 5 )
                 self.Bind(wx.EVT_CHECKBOX, self.changeValueTagCheckBoxRight, self.m_checkBox)
                 
@@ -239,7 +238,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 minimum = int(min(self.dataToAnalyse[i]))
                 maximum = int(max(self.dataToAnalyse[i]))
             
-                self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, str(i), wx.DefaultPosition, wx.DefaultSize, 0 )
+                self.m_checkBox = wx.CheckBox( self.scrolledPanel, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0 )
                 self.m_checkBox.SetFont( wx.Font( 10, wx.DEFAULT, wx.NORMAL, wx.BOLD, False, wx.EmptyString ) )
                 self.Bind(wx.EVT_CHECKBOX, self.changeStatusSpinCtrlRight, self.m_checkBox)
                 
@@ -250,7 +249,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText11.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText11, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, str(i) + "-LimitInf")
+                self.m_spinCtrl11 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, minimum, 1, i + "-LimitInf")
                 auxSizer2.Add( self.m_spinCtrl11, 0, wx.ALL, 5 )
                 self.m_spinCtrl11.Enable(False)                
                 
@@ -258,7 +257,7 @@ class SignificanceTestInterface ( wx.Dialog ):
                 self.m_staticText21.Wrap( -1 )
                 auxSizer2.Add( self.m_staticText21, 0, wx.ALIGN_CENTER_VERTICAL|wx.ALIGN_RIGHT|wx.ALL, 5 )
             
-                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, str(i) + "-LimitSup")
+                self.m_spinCtrl21 = wx.SpinCtrlDouble( self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition, wx.Size( 65,-1 ), wx.SP_ARROW_KEYS | wx.ALIGN_RIGHT, minimum, maximum, maximum, 1, i + "-LimitSup")
                 auxSizer2.Add( self.m_spinCtrl21, 0, wx.ALL, 5 )
                 self.m_spinCtrl21.Enable(False)
                 
