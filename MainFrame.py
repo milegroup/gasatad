@@ -32,7 +32,7 @@ from GraphsInterface import HistogramInterface, ScatterPlotInterface,\
     PieChartInterface, BoxPlotInterface, BarChartInterface
 
 from SignificanceTestInterface import SignificanceTestInterface
-from OpenFileInterface import OpenFileInterface, OpenCSVFile
+from OpenFileInterface import OpenCSVFile, OpenXLSFile
 
 
 from Model import OptionsInExportInterface
@@ -919,11 +919,6 @@ class MainFrame ( wx.Frame ):
 
         print "File: "+fileName+" loaded"
 
-
-
-    def openFileOld(self, event):
-        self.createOpenFileInterface(additionalFile=False)
-
     def openFile(self, event):
         askfile = AskFileType(self, -1, "open")
         askfile.CenterOnScreen()
@@ -939,6 +934,9 @@ class MainFrame ( wx.Frame ):
 
     def selectCSV(self, additionalFile):
         openFileInterf = OpenCSVFile(self,-1,additionalFile = additionalFile, dirfrom=self.params['options']['dirfrom'])
+
+    def selectXLS(self, additionalFile):
+        openFileInterf = OpenXLSFile(self,-1,additionalFile = additionalFile, dirfrom=self.params['options']['dirfrom'])
 
     def OpenAddCSV(self, openFileOptions):
         # print "Gonna open CSV file"
@@ -1008,158 +1006,70 @@ class MainFrame ( wx.Frame ):
                 self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
                 self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
 
+    def OpenAddXLS(self,openFileOptions):
+        # print "File to load: ", openFileOptions['fileName']
+        self.params['options']['dirfrom'] = openFileOptions['dirName']
+        readCorrect = True
+        self.data = None
+        rowColNames = openFileOptions['rowColNames']
+        noColsDiscard = openFileOptions['noColsDiscard']
+        sheetNumber = openFileOptions['sheetNumber']
 
+        # print "Reading col names from row: ", rowColNames
 
-    def createOpenFileInterface(self, additionalFile):
-        # print "Opening with new window"
-        openFileInterf = OpenFileInterface(self, self.params['options']['dirfrom'])
+        try:
+            self.data = read_excel(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']),
+                                   sheetname=sheetNumber, header=rowColNames,
+                                   index_col=None)
+            if noColsDiscard != 0:
+                self.data.drop(self.data.columns[range(noColsDiscard)], axis=1, inplace=True)
+            # self.data = self.preprocessExcel(self.data)
+        except:
+            # print "Error: ", sys.exc_info()
+            type, value, traceback = sys.exc_info()
+            self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
+                                        "File error", wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
 
-        if openFileInterf.ShowModal() == wx.ID_OK:
-            # print "User pressed Ok"
-            openFileOptions = openFileInterf.getOpenFileOptions()
+        if readCorrect:
+            self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
 
+        if openFileOptions['additionalFile'] and readCorrect and (
+                self.m_dataTable.GetNumberRows() != len(self.data.index)):
+            self.dlg = wx.MessageDialog(None,
+                                        "Number of rows does not match: \n  Loaded data has " + str(
+                                            self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions[
+                                            'fileName'] + " has " + str(
+                                            len(self.data.index)) + " rows ", "File error",
+                                        wx.OK | wx.ICON_EXCLAMATION)
+            if self.dlg.ShowModal() == wx.ID_OK:
+                self.dlg.Destroy()
+            readCorrect = False
 
-            if openFileOptions['fileName']:
+        if readCorrect:
+            if openFileOptions['additionalFile']:
+                self.controller.storeData()
+                self.m_undo.SetText("Undo add file")
+                self.m_undo.Enable()
+                self.controller.OpenAdditionalFile(self.data)
+            else:
+                self.controller.OpenFile(self.data)
 
-                if openFileOptions['fileType'] == 'csv':
+            self.refreshGUI()
 
-                    # print "File to load: ", openFileOptions['fileName']
-                    self.params['options']['dirfrom'] = openFileOptions['dirName']
-                    readCorrect = True
-                    self.data = None
-                    discardCol = openFileOptions['discardFirstCol']
-                    sepChar = ''
-                    if openFileOptions['sepchar'] == "Comma":
-                        sepChar = ','
-                    elif openFileOptions['sepchar'] == "Semicolon":
-                        sepChar = ';'
-                    elif openFileOptions['sepchar'] == "Tab":
-                        sepChar = '\t'
+            if self.controller.nullValuesInFile(self.data):
+                self.dlg = wx.MessageDialog(None,
+                                            "File " + openFileOptions['fileName'] + " has one or more missing values",
+                                            "Missing values", wx.OK | wx.ICON_WARNING)
+                if self.dlg.ShowModal() == wx.ID_OK:
+                    self.dlg.Destroy()
 
-
-                    try:
-                        self.data = read_csv(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']), sep=sepChar, header=0,
-                                         engine='python', encoding='utf-8')
-                    except:
-                        # print "Error: ", sys.exc_info()
-                        type, value, traceback = sys.exc_info()
-                        self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
-                                                    "File error", wx.OK | wx.ICON_EXCLAMATION)
-                        if self.dlg.ShowModal() == wx.ID_OK:
-                            self.dlg.Destroy()
-                        readCorrect = False
-
-                    if readCorrect:
-                        if discardCol:
-                            self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
-                        self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
-
-                    if additionalFile and readCorrect and (self.m_dataTable.GetNumberRows() != len(self.data.index)):
-                        self.dlg = wx.MessageDialog(None,
-                                                    "Number of rows does not match: \n  Loaded data has " + str(
-                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions['fileName'] + " has " + str(
-                                                        len(self.data.index)) + " rows ", "File error",
-                                                    wx.OK | wx.ICON_EXCLAMATION)
-                        if self.dlg.ShowModal() == wx.ID_OK:
-                            self.dlg.Destroy()
-                        readCorrect = False
-
-                    if readCorrect:
-
-                        if additionalFile:
-                            self.controller.storeData()
-                            self.m_undo.SetText("Undo add file")
-                            self.m_undo.Enable()
-                            self.controller.OpenAdditionalFile(self.data)
-                        else:
-                            self.controller.OpenFile(self.data)
-
-                        self.refreshGUI()
-
-                        if self.controller.nullValuesInFile(self.data):
-                            self.dlg = wx.MessageDialog(None, "File " + self.filename + " has one or more missing values",
-                                                        "Missing values", wx.OK | wx.ICON_WARNING)
-                            if self.dlg.ShowModal() == wx.ID_OK:
-                                self.dlg.Destroy()
-
-                        if additionalFile:
-                            # Move the view of the table to the last column
-                            self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
-                            self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
-
-
-                if openFileOptions['fileType'] == 'xls':
-
-                    # print "File to load: ", openFileOptions['fileName']
-                    self.params['options']['dirfrom'] = openFileOptions['dirName']
-                    readCorrect = True
-                    self.data = None
-                    rowColNames = openFileOptions['rowColNames']
-                    noColsDiscard = openFileOptions['noColsDiscard']
-                    sheetNumber = openFileOptions['sheetNumber']
-
-                    # print "Reading col names from row: ", rowColNames
-
-
-                    try:
-                        self.data = read_excel(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']),
-                                               sheetname=sheetNumber, header=rowColNames,
-                                               index_col=None)
-                        if noColsDiscard != 0:
-                            self.data.drop(self.data.columns[range(noColsDiscard)], axis=1, inplace=True)
-                        # self.data = self.preprocessExcel(self.data)
-                    except:
-                        # print "Error: ", sys.exc_info()
-                        type, value, traceback = sys.exc_info()
-                        self.dlg = wx.MessageDialog(None, "Error reading file " + openFileOptions['fileName'] + "\n" + str(value),
-                                                    "File error", wx.OK | wx.ICON_EXCLAMATION)
-                        if self.dlg.ShowModal() == wx.ID_OK:
-                            self.dlg.Destroy()
-                        readCorrect = False
-
-                    if readCorrect:
-                        self.data.rename(columns={'Unnamed: 0': 'NoTag'}, inplace=True)
-
-                    if additionalFile and readCorrect and (
-                            self.m_dataTable.GetNumberRows() != len(self.data.index)):
-                        self.dlg = wx.MessageDialog(None,
-                                                    "Number of rows does not match: \n  Loaded data has " + str(
-                                                        self.m_dataTable.GetNumberRows()) + " rows \n  File " + openFileOptions['fileName'] + " has " + str(
-                                                        len(self.data.index)) + " rows ", "File error",
-                                                    wx.OK | wx.ICON_EXCLAMATION)
-                        if self.dlg.ShowModal() == wx.ID_OK:
-                            self.dlg.Destroy()
-                        readCorrect = False
-
-                    if readCorrect:
-                        if additionalFile:
-                            self.controller.storeData()
-                            self.m_undo.SetText("Undo add file")
-                            self.m_undo.Enable()
-                            self.controller.OpenAdditionalFile(self.data)
-                        else:
-                            self.controller.OpenFile(self.data)
-
-                        self.refreshGUI()
-
-                        if self.controller.nullValuesInFile(self.data):
-                            self.dlg = wx.MessageDialog(None, "File " + openFileOptions['fileName'] + " has one or more missing values",
-                                                        "Missing values", wx.OK | wx.ICON_WARNING)
-                            if self.dlg.ShowModal() == wx.ID_OK:
-                                self.dlg.Destroy()
-
-                        if additionalFile:
-                            # Move the view of the table to the last column
-                            self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
-                            self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
-
-        openFileInterf.Destroy()
-
-
-
-
-
-
+            if openFileOptions['additionalFile']:
+                # Move the view of the table to the last column
+                self.m_dataTable.SetGridCursor(0, self.controller.getNumberOfColumns() - 1)
+                self.m_dataTable.MakeCellVisible(0, self.controller.getNumberOfColumns() - 1)
 
 
     def preprocessExcel(self, data):

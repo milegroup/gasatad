@@ -83,5 +83,9 @@ class AskFileType(wx.Dialog):
     def XLSSelected(self, event):
         if self.function == 'save':
             self.parent.saveToXLS()
+        elif self.function == "open":
+            self.parent.selectXLS(additionalFile=False)
+        elif self.function == "add":
+            self.parent.selectXLS(additionalFile=True)
         self.Close()
 
