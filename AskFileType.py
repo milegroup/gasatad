@@ -44,14 +44,22 @@ class AskFileType(wx.Dialog):
 
         hSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/csv.png",
+        if self.function=="open" or self.function=="add":
+            csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/FromCSV.png",
                            wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        else:
+            csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/ToCSV.png",
+                               wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         csvButton = wx.BitmapButton(self, wx.ID_ANY, csvIcon, wx.DefaultPosition,
                                     wx.Size(100, 100), wx.BU_AUTODRAW)
         hSizer.Add(csvButton, 0, border=10, flag=wx.ALL)
         self.Bind(wx.EVT_BUTTON, self.CSVSelected, csvButton)
 
-        xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/xls.png",
+        if self.function == "open" or self.function == "add":
+            xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/FromXLS.png",
+                           wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+        else:
+            xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/ToXLS.png",
                            wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         xlsButton = wx.BitmapButton(self, wx.ID_ANY, xlsIcon, wx.DefaultPosition,
                                     wx.Size(100, 100), wx.BU_AUTODRAW)
