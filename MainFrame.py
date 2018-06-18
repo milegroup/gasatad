@@ -53,7 +53,7 @@ class MainFrame ( wx.Frame ):
     def __init__( self, parent ):
 
 
-        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.51.png").ConvertToBitmap()
+        bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.6.png").ConvertToBitmap()
         splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
 
         wx.Yield()

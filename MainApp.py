@@ -24,7 +24,7 @@ import sys
 from MainFrame import MainFrame
 
 MainFrame.params = {}
-MainFrame.params['version'] = 1.51
+MainFrame.params['version'] = 1.6
 MainFrame.params['noOfNulls'] = 0
 #MainFrame.params['configDir'] = os.path.expanduser('~')+os.sep+'.gasatad'
 MainFrame.params['configDir'] = os.path.join(os.path.expanduser('~'),'.gasatad')
