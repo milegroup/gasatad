@@ -20,47 +20,51 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 import wx
 import os
 
+
 class AskFileType(wx.Dialog):
-    def __init__(self, parent, ID, function, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, ID, function, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE,
+                 *args, **kw):
+
+        wx.Dialog.__init__(self)
+
         self.parent = parent
         self.function = function
         # function = "save" for saving files
         # function = "open" for opening new files
         # function = "add" for adding files to the data
 
-
-        if self.function=="save":
+        if self.function == "save":
             title = "Save data to file"
         elif self.function == "open":
             title = "Open new file"
-        elif self.function=="add":
+        elif self.function == "add":
             title = "Add file to data"
 
-        pre = wx.PreDialog()
-        pre.Create(parent, ID, title, pos, size, style)
-        self.PostCreate(pre)
+        self.Create(parent, ID, title, pos, size, style)
 
         vSizer = wx.BoxSizer(wx.VERTICAL)
 
         hSizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        if self.function=="open" or self.function=="add":
+
+        if self.function == "open" or self.function == "add":
             csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/FromCSV.png",
-                           wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                               wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         else:
             csvIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/ToCSV.png",
                                wx.BITMAP_TYPE_ANY).ConvertToBitmap()
-        csvButton = wx.BitmapButton(self, wx.ID_ANY, csvIcon, wx.DefaultPosition,
-                                    wx.Size(100, 100), wx.BU_AUTODRAW)
+
+        csvButton = wx.BitmapButton(self, wx.ID_ANY, csvIcon, wx.DefaultPosition, wx.Size(100, 100), wx.BU_AUTODRAW)
         hSizer.Add(csvButton, 0, border=10, flag=wx.ALL)
         self.Bind(wx.EVT_BUTTON, self.CSVSelected, csvButton)
 
+
         if self.function == "open" or self.function == "add":
             xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/FromXLS.png",
-                           wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                               wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         else:
             xlsIcon = wx.Image(str(os.path.dirname(__file__)) + "/icons/ToXLS.png",
-                           wx.BITMAP_TYPE_ANY).ConvertToBitmap()
+                               wx.BITMAP_TYPE_ANY).ConvertToBitmap()
         xlsButton = wx.BitmapButton(self, wx.ID_ANY, xlsIcon, wx.DefaultPosition,
                                     wx.Size(100, 100), wx.BU_AUTODRAW)
         hSizer.Add(xlsButton, 0, border=10, flag=wx.ALL)
@@ -80,7 +84,7 @@ class AskFileType(wx.Dialog):
         self.Show(True)
 
     def CSVSelected(self, event):
-        if self.function=='save':
+        if self.function == 'save':
             self.parent.saveToCSV()
         elif self.function == "open":
             self.parent.selectCSV(additionalFile=False)
@@ -96,4 +100,3 @@ class AskFileType(wx.Dialog):
         elif self.function == "add":
             self.parent.selectXLS(additionalFile=True)
         self.Close()
-

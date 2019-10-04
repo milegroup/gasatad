@@ -20,21 +20,20 @@ import os
 import wx
 import wx.lib.filebrowsebutton as filebrowse
 
+
 class OpenCSVFile(wx.Dialog):
-    def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition,
+                 style=wx.DEFAULT_DIALOG_STYLE):
+        wx.Dialog.__init__(self)
         self.parent = parent
         self.additionalFile = additionalFile
 
-
-        if self.additionalFile == True:
+        if self.additionalFile is True:
             title = "Add CSV file"
         else:
             title = "Open CSV file"
 
-
-        pre = wx.PreDialog()
-        pre.Create(parent, ID, title, pos, size, style)
-        self.PostCreate(pre)
+        self.Create(parent, ID, title, pos, size, style)
 
         vSizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -121,11 +120,9 @@ class OpenCSVFile(wx.Dialog):
         okay = wx.Button(self, wx.ID_OK)
         cancel = wx.Button(self, wx.ID_CANCEL)
         buttonsSizer = wx.BoxSizer(wx.HORIZONTAL)
-        buttonsSizer.Add(cancel, flag=wx.RIGHT, border = 10)
+        buttonsSizer.Add(cancel, flag=wx.RIGHT, border=10)
         buttonsSizer.Add(okay)
         self.Bind(wx.EVT_BUTTON, self.OkSelected, okay)
-
-
 
         vSizer.Add(buttonsSizer, flag=wx.TOP | wx.BOTTOM | wx.RIGHT | wx.ALIGN_RIGHT, border=10)
 
@@ -152,7 +149,6 @@ class OpenCSVFile(wx.Dialog):
         from pandas.io.parsers import read_csv
         import sys, numpy
 
-
         try:
 
             if self.CSVSepRBBox.GetSelection() == 0:
@@ -162,7 +158,8 @@ class OpenCSVFile(wx.Dialog):
             else:
                 sepchar = '\t'
 
-            self.data = read_csv(os.path.join(self.dirName, self.fileName), sep=sepchar, header=0, engine='python', encoding='utf-8')
+            self.data = read_csv(os.path.join(self.dirName, self.fileName), sep=sepchar, header=0, engine='python',
+                                 encoding='utf-8')
 
             if self.discardFirstCol.IsChecked():
                 self.data.drop(self.data.columns[[0]], axis=1, inplace=True)
@@ -214,7 +211,7 @@ class OpenCSVFile(wx.Dialog):
             sepchar = 'Tab'
 
         openFileOptions = dict(
-            additionalFile = self.additionalFile,
+            additionalFile=self.additionalFile,
             fileName=self.fileName,
             dirName=self.dirName,
             sepchar=sepchar,
@@ -225,16 +222,15 @@ class OpenCSVFile(wx.Dialog):
 
 
 class OpenXLSFile(wx.Dialog):
-    def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition, style=wx.DEFAULT_DIALOG_STYLE):
+    def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition,
+                 style=wx.DEFAULT_DIALOG_STYLE):
         self.parent = parent
         self.additionalFile = additionalFile
-
 
         if self.additionalFile == True:
             title = "Add XLS/XLSX file"
         else:
             title = "Open XLS/XLSX file"
-
 
         pre = wx.PreDialog()
         pre.Create(parent, ID, title, pos, size, style)
@@ -420,5 +416,3 @@ class OpenXLSFile(wx.Dialog):
         )
         self.parent.OpenAddXLS(openFileOptions)
         self.Close()
-
-
