@@ -19,6 +19,7 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 
 import wx
 import wx.grid
+import wx.adv
 import os
 import sys
 from pandas import to_numeric
@@ -54,7 +55,7 @@ class MainFrame ( wx.Frame ):
 
 
         bmp = wx.Image(str(os.path.dirname(__file__))+"/icons/SplashScreen1.6.png").ConvertToBitmap()
-        splash = wx.SplashScreen(bmp, wx.SPLASH_CENTRE_ON_SCREEN | wx.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
+        splash = wx.adv.SplashScreen(bmp, wx.adv.SPLASH_CENTRE_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000, None, style=wx.STAY_ON_TOP|wx.FRAME_NO_TASKBAR)  # msec. of splash
 
         wx.Yield()
 
@@ -441,20 +442,20 @@ class MainFrame ( wx.Frame ):
             for argument in arguments:
                 if argument[0] == '-':
                     if argument not in possibleArguments:
-                        print "\n** ERROR: command '"+argument+"' not recognized **\n"
-                        print "** GASATaD terminal mode commands:"
-                        print HelpString
+                        print("\n** ERROR: command '" + argument + "' not recognized **\n")
+                        print("** GASATaD terminal mode commands:")
+                        print(HelpString)
                         sys.exit(0)
             
             if "-help" in arguments:
-                print ("\n** GASATaD: terminal mode **\n")
-                print HelpString
+                print("\n** GASATaD: terminal mode **\n")
+                print(HelpString)
                 sys.exit(0)
 
             else:
                 if "-loadCSV" in arguments:
                     CSVFileName = arguments[arguments.index("-loadCSV")+1]
-                    print "Loading CSV file: "+CSVFileName
+                    print("Loading CSV file: " + CSVFileName)
                     self.OpenCSVFileNoGUI(CSVFileName)
 
     def undo(self,event):
@@ -831,7 +832,7 @@ class MainFrame ( wx.Frame ):
 
     def CheckUpdates(self):
         from sys import argv
-        import urllib2
+        import urllib.request, urllib.error
         import os, sys
 
         remoteVersion = ""
@@ -852,17 +853,17 @@ class MainFrame ( wx.Frame ):
 
         try:
             if platform != "darwin":
-                remoteFile = urllib2.urlopen(remoteVersionFile)
+                remoteFile = urllib.request.urlopen(remoteVersionFile)
                 remoteVersion=remoteFile.readline().strip()
                 remoteFile.close()
             else:
                 import ssl
                 context = ssl._create_unverified_context()
-                remoteFile = urllib2.urlopen(remoteVersionFile, context=context)
+                remoteFile = urllib.request.urlopen(remoteVersionFile, context=context)
                 remoteVersion = remoteFile.readline().strip()
                 remoteFile.close()
             # print "# Version available in GASATaD web page: ", remoteVersion
-        except urllib2.URLError:
+        except urllib.error.URLError:
             # print "# I couldn't check for updates"
             None
 
@@ -907,17 +908,17 @@ class MainFrame ( wx.Frame ):
                 self.controller.OpenFile(self.data)
 
         except UnicodeDecodeError:
-            print "Error: non ascii files in file"
+            print("Error: non ascii files in file")
             return
                     
         except:
-            print "Error: ", sys.exc_info()[0]
-            print "There was some problem with the file"
-            return 
+            print("Error: ", sys.exc_info()[0])
+            print("There was some problem with the file")
+            return
 
         self.refreshGUI()
 
-        print "File: "+fileName+" loaded"
+        print("File: " + fileName + " loaded")
 
     def openFile(self, event):
         askfile = AskFileType(self, -1, "open")
@@ -1599,8 +1600,6 @@ class MainFrame ( wx.Frame ):
     def configInit(self):
         """If config dir and file does not exist, it is created
         If config file exists, it is loaded"""
-        
-        from ConfigParser import SafeConfigParser
 
         # print "Intializing configuration"
         
@@ -1618,8 +1617,11 @@ class MainFrame ( wx.Frame ):
     def configSave(self):
         """ Saves configuration file"""
         try:
-            from ConfigParser import SafeConfigParser
-            options = SafeConfigParser()
+            # from ConfigParser import SafeConfigParser
+            # options = SafeConfigParser()
+
+            import configparser
+            options = configParser.ConfigParser()
 
             options.add_section('gasatad')
 

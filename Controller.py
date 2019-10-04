@@ -86,7 +86,7 @@ class Controller():
                 self.recalculateRowsIndexes()
             return sameNumberRows
         except:
-            print "Error: ", sys.exc_info()
+            print("Error: ", sys.exc_info())
 
     def getDataToAnalyse(self):
         return self.programState.dataToAnalyse
