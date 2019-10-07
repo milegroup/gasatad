@@ -208,6 +208,7 @@ class AddColumnInterface(wx.Dialog):
         else:
 
             self.indiceSpinCtrl += 1
+            print("******", self.indiceSpinCtrl)
 
             fgSizer = wx.FlexGridSizer(0, 8, 0, 0)
             fgSizer.SetFlexibleDirection(wx.BOTH)
@@ -280,13 +281,13 @@ class AddColumnInterface(wx.Dialog):
 
         if self.indiceSpinCtrl is 1:
 
-            self.showWarning()
+            self.showWarningNonDeleted()
 
         else:
 
             self.indiceSpinCtrl -= 1
-
-            self.sizerList.pop().DeleteWindows()
+            print("******",len(self.sizerList))
+            self.sizerList.pop()
             self.fgSizer9.Layout()
             del self.spinControlList[(len(self.spinControlList) - 2):]
             self.textControlList.pop()
@@ -351,6 +352,13 @@ class AddColumnInterface(wx.Dialog):
     def showWarningTooManyIntervals(self):
 
         dlg = wx.MessageDialog(self, "You can not create more Intervals", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
+
+        if dlg.ShowModal() == wx.ID_OK:
+            dlg.Destroy()
+
+    def showWarningNonDeleted(self):
+
+        dlg = wx.MessageDialog(self, "The interval could not be deleted", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
 
         if dlg.ShowModal() == wx.ID_OK:
             dlg.Destroy()
