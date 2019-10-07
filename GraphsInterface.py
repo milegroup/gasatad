@@ -103,7 +103,7 @@ class HistogramInterface(wx.Dialog):
 
         self.histLegendPosDefault = wx.RadioButton(self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize,
                                                    wx.RB_GROUP)
-        fgLegendSizer.Add(self.histLegendPosDefault, 0, wx.ALL, 0)
+        fgLegendSizer.Add(self.histLegendPosDefault, 0, wx.ALL, 1)
         self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.histLegendPosDefault)
         self.histLegendPosDefault.Enable(False)
 
@@ -111,7 +111,7 @@ class HistogramInterface(wx.Dialog):
 
         for position in positions:
             histLegendPosOtherTmp = wx.RadioButton(self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgLegendSizer.Add(histLegendPosOtherTmp, 0, wx.ALL, 0)
+            fgLegendSizer.Add(histLegendPosOtherTmp, 0, wx.ALL, 1)
             histLegendPosOtherTmp.Enable(False)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, histLegendPosOtherTmp)
             self.histLegendPosOther.append(histLegendPosOtherTmp)
@@ -139,11 +139,11 @@ class HistogramInterface(wx.Dialog):
             # First element
             if i == listOfVariables[0]:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 0)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
             else:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 0)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
 
         fgSizer6 = wx.FlexGridSizer(0, 2, 0, 0)
@@ -152,12 +152,12 @@ class HistogramInterface(wx.Dialog):
 
         # Not use a label (for example in Level: High, Low)
         self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 0)
+        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
         self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
 
         for i in listOfTags:
             self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 0)
+            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
 
         # As a default the name of the axis are the selected variables
@@ -325,7 +325,7 @@ class ScatterPlotInterface(wx.Dialog):
 
         self.scatterLegendPosDefault = wx.RadioButton(self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize,
                                                       wx.RB_GROUP)
-        fgLegendSizer.Add(self.scatterLegendPosDefault, 0, wx.ALL, 5)
+        fgLegendSizer.Add(self.scatterLegendPosDefault, 0, wx.ALL, 1)
         self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.scatterLegendPosDefault)
         self.scatterLegendPosDefault.Enable(False)
 
@@ -333,7 +333,7 @@ class ScatterPlotInterface(wx.Dialog):
 
         for position in positions:
             scatterLegendPosOtherTmp = wx.RadioButton(self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgLegendSizer.Add(scatterLegendPosOtherTmp, 0, wx.ALL, 5)
+            fgLegendSizer.Add(scatterLegendPosOtherTmp, 0, wx.ALL, 1)
             scatterLegendPosOtherTmp.Enable(False)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, scatterLegendPosOtherTmp)
             self.scatterLegendPosOther.append(scatterLegendPosOtherTmp)
@@ -358,11 +358,11 @@ class ScatterPlotInterface(wx.Dialog):
             # First element
             if i == listOfVariables[0]:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
             else:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
 
         fgScatterPlotYVar = wx.FlexGridSizer(0, 2, 0, 0)
@@ -375,12 +375,12 @@ class ScatterPlotInterface(wx.Dialog):
             if i == listOfVariables[0]:
 
                 self.m_checkBox16 = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 5)
+                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
 
             else:
                 self.m_checkBox16 = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 5)
+                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
 
         # The name of the axis by default
@@ -539,7 +539,7 @@ class PieChartInterface(wx.Dialog):
         displayGridsSizer.Add(
             wx.StaticText(self, wx.ID_ANY, u"No. of slices (0=all):", wx.DefaultPosition, wx.DefaultSize, 0), 0,
             wx.CENTER, 5)
-        self.numOfSlices = wx.SpinCtrl(self, wx.ID_ANY, value='0', size=(70, -1))
+        self.numOfSlices = wx.SpinCtrl(self, wx.ID_ANY, value='0', size=(130, -1))
         self.numOfSlices.SetRange(0, 20)
         displayGridsSizer.Add(self.numOfSlices, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
 
@@ -561,13 +561,13 @@ class PieChartInterface(wx.Dialog):
         legendPosSizer.Add(fgLegendSizer, 1, wx.EXPAND, 5)
 
         self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgLegendSizer.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+        fgLegendSizer.Add(self.m_radioBtn15, 0, wx.ALL, 1)
 
         self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn15)
 
         for position in positions:
             self.m_radioBtn = wx.RadioButton(self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgLegendSizer.Add(self.m_radioBtn, 0, wx.ALL, 5)
+            fgLegendSizer.Add(self.m_radioBtn, 0, wx.ALL, 1)
 
             self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)
 
@@ -593,11 +593,11 @@ class PieChartInterface(wx.Dialog):
             # First one
             if i == listOfTags[0]:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
             else:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
 
         sbSizer1.Add(fgSizer5, 1, wx.EXPAND, 5)
@@ -717,7 +717,7 @@ class BoxPlotInterface(wx.Dialog):
         # Here the checkboxes are created
         for i in listOfVariables:
             self.m_checkBox = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer5.Add(self.m_checkBox, 0, wx.ALL | wx.EXPAND, 5)
+            fgSizer5.Add(self.m_checkBox, 0, wx.ALL | wx.EXPAND, 1)
 
             self.Bind(wx.EVT_CHECKBOX, self.updateSelectedCheckBoxes, self.m_checkBox)
 
@@ -740,7 +740,7 @@ class BoxPlotInterface(wx.Dialog):
         groupbySizer.Add(fgGroupbySizer, 1, wx.EXPAND, 5)
 
         self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgGroupbySizer.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+        fgGroupbySizer.Add(self.m_radioBtn15, 0, wx.ALL, 1)
 
         self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.m_radioBtn15)
 
@@ -749,7 +749,7 @@ class BoxPlotInterface(wx.Dialog):
 
         for value in listOfCharacterValues:
             self.m_radioBtn = wx.RadioButton(self, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgGroupbySizer.Add(self.m_radioBtn, 0, wx.ALL, 5)
+            fgGroupbySizer.Add(self.m_radioBtn, 0, wx.ALL, 1)
 
             self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.m_radioBtn)
 
