@@ -189,6 +189,7 @@ class Controller():
                 arrayToInsert.append(item)
             else:
                 for factor in dictKeys:
+                    print("****"+str(factor))
 
                     if ((item >= factorsFromInterface[factor][0]) and (item <= factorsFromInterface[factor][1])):
 
@@ -197,7 +198,7 @@ class Controller():
                         self.itemAdded = True
 
                     else:
-                        if ((factor == dictKeys[-1]) and (self.isInRange == False) and (self.itemAdded == False)):
+                        if ((factor == list(dictKeys)[-1]) and (self.isInRange == False) and (self.itemAdded == False)):
                             arrayToInsert.append(tagRestValues)
                     self.isInRange = False
 
