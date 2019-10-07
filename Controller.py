@@ -507,15 +507,14 @@ class Controller():
             tags = self.programState.dataToAnalyse[selectedCategory].unique()
 
             for tag in tags:
-                if unicode(tag).encode('utf-8') != 'nan':
+                if str(tag) != 'nan':
                     dataForChart[tag] = []
 
             tagsColumn = self.programState.dataToAnalyse[selectedCategory]
             valuesColumn = self.programState.dataToAnalyse[barChartOptions['firstVarSelected']]
 
             for i in range(len(valuesColumn)):
-                if unicode(tagsColumn[i]).encode('utf-8') != 'nan' and unicode(valuesColumn[i]).encode(
-                        'utf-8') != 'nan':
+                if str(tagsColumn[i]) != 'nan' and str(valuesColumn[i]) != 'nan':
                     dataForChart[tagsColumn[i]].append(valuesColumn[i])
 
             dataForChart = {k: v for k, v in dataForChart.items() if len(v) != 0}

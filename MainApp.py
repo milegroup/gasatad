@@ -17,6 +17,10 @@ You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+
+# TODO: reading and writing excel data files
+# TODO: adding new text columns
+
 import wx
 import os
 import sys

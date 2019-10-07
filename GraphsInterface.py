@@ -913,11 +913,11 @@ class BarChartInterface(wx.Dialog):
             # First element
             if i == listOfVariables[0]:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
             else:
                 self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 5)
+                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
 
         fgSizer6 = wx.FlexGridSizer(0, 2, 0, 0)
@@ -926,12 +926,12 @@ class BarChartInterface(wx.Dialog):
 
         # Not use a label (for example in Level: High, Low)
         self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 5)
+        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
         self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
 
         for i in listOfTags:
             self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 5)
+            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
 
         # As a default the name of the axis are the selected variables
@@ -952,12 +952,12 @@ class BarChartInterface(wx.Dialog):
             if i == listOperations[0]:
 
                 self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 5)
+                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.m_radioBtn16)
 
             else:
                 self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 5)
+                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 1)
                 self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.m_radioBtn16)
 
         sbBarChartVarsSizer.Add(fgSizer5, 1, wx.EXPAND, 5)
