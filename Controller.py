@@ -189,7 +189,6 @@ class Controller():
                 arrayToInsert.append(item)
             else:
                 for factor in dictKeys:
-                    print("****"+str(factor))
 
                     if ((item >= factorsFromInterface[factor][0]) and (item <= factorsFromInterface[factor][1])):
 

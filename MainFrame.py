@@ -1654,13 +1654,13 @@ class ReplaceInColInterface(wx.Dialog):
 
         leftSizer = wx.BoxSizer(wx.VERTICAL)
         leftSizer.Add(wx.StaticText(self, -1, "Old value:"))
-        self.cb = wx.ComboBox(self, choices=listOfTags, value=listOfTags[0])
+        self.cb = wx.ComboBox(self, choices=listOfTags, value=listOfTags[0], size=(160,-1))
         leftSizer.Add(self.cb, 0, wx.TOP | wx.LEFT, 5)
         topSizer.Add(leftSizer, 0, wx.ALL, 10)
 
         rightSizer = wx.BoxSizer(wx.VERTICAL)
         rightSizer.Add(wx.StaticText(self, -1, "New value (empty for 'null'):"))
-        self.tc = wx.TextCtrl(self)
+        self.tc = wx.TextCtrl(self, size=(160,-1))
         rightSizer.Add(self.tc, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
         topSizer.Add(rightSizer, 0, wx.ALL, 10)
 
