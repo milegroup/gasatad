@@ -183,14 +183,14 @@ class OpenCSVFile(wx.Dialog):
 
                     if self.data.iloc[row, col] != self.data.iloc[row, col]:
                         self.provDataTable.SetCellValue(row, col, "nan")
-                    elif type(self.data.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):
+                    elif type(self.data.iloc[row, col]) in (int, float, complex, numpy.float64, numpy.int64):
                         self.provDataTable.SetCellValue(row, col, '{:5g}'.format(self.data.iloc[row, col]))
                     else:
                         self.provDataTable.SetCellValue(row, col, self.data.iloc[row, col])
             self.provDataTable.Enable(True)
             self.provDataTable.AutoSize()
         except:
-            # print "Error: ", sys.exc_info()
+            # print("Error: ", sys.exc_info())
             self.cleanPreview()
 
     def cleanPreview(self):
@@ -386,7 +386,7 @@ class OpenXLSFile(wx.Dialog):
 
                     if self.data.iloc[row, col] != self.data.iloc[row, col]:
                         self.provDataTable.SetCellValue(row, col, "nan")
-                    elif type(self.data.iloc[row, col]) in (int, float, long, complex, numpy.float64, numpy.int64):
+                    elif type(self.data.iloc[row, col]) in (int, float, complex, numpy.float64, numpy.int64):
                         self.provDataTable.SetCellValue(row, col, '{:5g}'.format(self.data.iloc[row, col]))
                     else:
                         self.provDataTable.SetCellValue(row, col, self.data.iloc[row, col])

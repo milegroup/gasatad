@@ -86,7 +86,7 @@ class MainFrame(wx.Frame):
         # ------------ File menu
 
         self.m_fileMenu = wx.Menu()
-        if sys.platform == "linux2":
+        if sys.platform == "linux":
             self.m_menuNewFile = wx.MenuItem(self.m_fileMenu, wx.ID_NEW, u"Open new file...", wx.EmptyString,
                                              wx.ITEM_NORMAL)
             self.m_menuAddFile = wx.MenuItem(self.m_fileMenu, wx.ID_OPEN, u"Add file...", wx.EmptyString,
@@ -102,7 +102,7 @@ class MainFrame(wx.Frame):
         self.m_menuAddFile.Enable(False)
 
         self.m_fileMenu.AppendSeparator()
-        if sys.platform == "linux2":
+        if sys.platform == "linux":
             self.m_menuExportData = wx.MenuItem(self.m_fileMenu, wx.ID_SAVE, u"Save data...", wx.EmptyString,
                                                 wx.ITEM_NORMAL)
         else:
@@ -114,7 +114,7 @@ class MainFrame(wx.Frame):
 
         self.m_fileMenu.AppendSeparator()
 
-        if sys.platform == "linux2":
+        if sys.platform == "linux":
             self.m_menuResetData = wx.MenuItem(self.m_fileMenu, wx.ID_CLOSE, u"Close data", wx.EmptyString,
                                                wx.ITEM_NORMAL)
             self.m_menuQuit = wx.MenuItem(self.m_fileMenu, wx.ID_EXIT, u"Quit", wx.EmptyString, wx.ITEM_NORMAL)
@@ -455,7 +455,7 @@ class MainFrame(wx.Frame):
             "      -loadCSV fileName: loads CSV file (full path is required)\n"
         )
 
-        if (len(sys.argv) != 1 and (sys.platform == 'linux2' or sys.platform == 'darwin')):
+        if (len(sys.argv) != 1 and (sys.platform == 'linux' or sys.platform == 'darwin')):
             arguments = sys.argv[1:]
             possibleArguments = ['-help', '-loadCSV']
 
@@ -850,7 +850,7 @@ class MainFrame(wx.Frame):
         remoteVersion = ""
         remoteVersionFile = ""
 
-        if platform == "linux2" and argv[0] == "/usr/share/gasatad/MainApp.py":
+        if platform == "linux" and argv[0] == "/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/deb.txt"
 
         elif platform == "darwin" and (os.path.realpath(
@@ -1403,7 +1403,8 @@ class MainFrame(wx.Frame):
 
             for value in self.controller.characterValues:
                 listTags = list(self.controller.programState.dataToAnalyse[value].unique())
-                listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
+                # listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
+                listTags = [x for x in listTags if str(x) != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
 
                 # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
@@ -1430,8 +1431,8 @@ class MainFrame(wx.Frame):
 
             for value in self.controller.characterValues:
                 listTags = list(self.controller.programState.dataToAnalyse[value].unique())
-                # listTags = [x for x in listTags if str(x) != 'nan']
-                listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
+                listTags = [x for x in listTags if str(x) != 'nan']
+                # listTags = [x for x in listTags if unicode(x).encode('utf-8') != 'nan']
                 self.tagsAndValues[value] = numpy.asarray(listTags)
 
                 # self.tagsAndValues[value] = self.controller.programState.dataToAnalyse[str(value)].unique()
