@@ -304,31 +304,31 @@ class MainFrame(wx.Frame):
         self.barChartBmp = wx.Image(str(os.path.dirname(__file__)) + "/icons/barChart1.png",
                                     wx.BITMAP_TYPE_ANY).ConvertToBitmap()
 
-        self.histogramBtn = wx.BitmapButton(self, wx.ID_ANY, self.histogramBmp, wx.DefaultPosition, wx.Size(75, 75),
+        self.histogramBtn = wx.BitmapButton(self, wx.ID_ANY, self.histogramBmp, wx.DefaultPosition, wx.Size(80, 80),
                                             wx.BU_AUTODRAW)
         gSizerChart.Add(self.histogramBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         self.histogramBtn.Enable(False)
         self.histogramBtn.SetToolTip(wx.ToolTip("Histogram"))
 
         self.scatterPlotBtn = wx.BitmapButton(self, wx.ID_ANY, self.scatterPlotmBmp, wx.DefaultPosition,
-                                              wx.Size(75, 75), wx.BU_AUTODRAW)
+                                              wx.Size(80, 80), wx.BU_AUTODRAW)
         gSizerChart.Add(self.scatterPlotBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         self.scatterPlotBtn.Enable(False)
         self.scatterPlotBtn.SetToolTip(wx.ToolTip("Scatter Plot"))
 
-        self.pieChartBtn = wx.BitmapButton(self, wx.ID_ANY, self.pieChartmBmp, wx.DefaultPosition, wx.Size(75, 75),
+        self.pieChartBtn = wx.BitmapButton(self, wx.ID_ANY, self.pieChartmBmp, wx.DefaultPosition, wx.Size(80, 80),
                                            wx.BU_AUTODRAW)
         gSizerChart.Add(self.pieChartBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         self.pieChartBtn.Enable(False)
         self.pieChartBtn.SetToolTip(wx.ToolTip("Pie Chart"))
 
-        self.boxPlotBtn = wx.BitmapButton(self, wx.ID_ANY, self.boxPlotBmp, wx.DefaultPosition, wx.Size(75, 75),
+        self.boxPlotBtn = wx.BitmapButton(self, wx.ID_ANY, self.boxPlotBmp, wx.DefaultPosition, wx.Size(80, 80),
                                           wx.BU_AUTODRAW)
         gSizerChart.Add(self.boxPlotBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         self.boxPlotBtn.Enable(False)
         self.boxPlotBtn.SetToolTip(wx.ToolTip("Box Plot"))
 
-        self.barChartBtn = wx.BitmapButton(self, wx.ID_ANY, self.barChartBmp, wx.DefaultPosition, wx.Size(75, 75),
+        self.barChartBtn = wx.BitmapButton(self, wx.ID_ANY, self.barChartBmp, wx.DefaultPosition, wx.Size(80, 80),
                                            wx.BU_AUTODRAW)
         gSizerChart.Add(self.barChartBtn, 0, wx.ALIGN_CENTER | wx.ALL, 5)
         self.barChartBtn.Enable(False)
