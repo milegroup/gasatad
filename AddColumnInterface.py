@@ -208,7 +208,6 @@ class AddColumnInterface(wx.Dialog):
         else:
 
             self.indiceSpinCtrl += 1
-            print("******", self.indiceSpinCtrl)
 
             fgSizer = wx.FlexGridSizer(0, 8, 0, 0)
             fgSizer.SetFlexibleDirection(wx.BOTH)
@@ -286,8 +285,7 @@ class AddColumnInterface(wx.Dialog):
         else:
 
             self.indiceSpinCtrl -= 1
-            print("******",len(self.sizerList))
-            self.sizerList.pop()
+            self.sizerList.pop().Clear(True)
             self.fgSizer9.Layout()
             del self.spinControlList[(len(self.spinControlList) - 2):]
             self.textControlList.pop()

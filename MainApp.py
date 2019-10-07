@@ -19,7 +19,6 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 
 
 # TODO: reading and writing excel data files
-# TODO: adding new text columns (removing new intervals)
 
 import wx
 import os
