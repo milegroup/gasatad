@@ -343,13 +343,12 @@ class MainFrame(wx.Frame):
 
             leftSizer.AddStretchSpacer(1)
             # self.upgradeButton = wx.Button( self, wx.ID_ANY, u"* New version: "+self.params['availableVersionToUpgrade']+" *", wx.DefaultPosition, wx.DefaultSize, 0 )
-            self.upgradeButton = GB.GradientButton(self, label="New version available: " + self.params[
-                'availableVersionToUpgrade'])
+            self.upgradeButton = GB.GradientButton(self, label="New version available: " + (self.params['availableVersionToUpgrade'].decode('utf-8')))
             self.upgradeButton.SetBaseColours(startcolour=wx.TheColourDatabase.Find('PALE GREEN'),
                                               foregroundcolour=wx.BLACK)
             self.upgradeButton.SetPressedBottomColour(wx.TheColourDatabase.Find('LIGHT GREY'))
             self.upgradeButton.SetPressedTopColour(wx.TheColourDatabase.Find('LIGHT GREY'))
-            boldFont = wx.SystemSettings_GetFont(wx.SYS_DEFAULT_GUI_FONT)
+            boldFont = wx.SystemSettings.GetFont(wx.SYS_DEFAULT_GUI_FONT)
             boldFont.SetWeight(wx.BOLD)
             self.upgradeButton.SetFont(boldFont)
             self.Bind(wx.EVT_BUTTON, self.openBrowserDownload, id=self.upgradeButton.GetId())
@@ -1033,7 +1032,7 @@ class MainFrame(wx.Frame):
 
         try:
             self.data = read_excel(os.path.join(openFileOptions['dirName'], openFileOptions['fileName']),
-                                   sheetname=sheetNumber, header=rowColNames,
+                                   sheet_name=sheetNumber, header=rowColNames,
                                    index_col=None)
             if noColsDiscard != 0:
                 self.data.drop(self.data.columns[range(noColsDiscard)], axis=1, inplace=True)
@@ -1231,7 +1230,7 @@ class MainFrame(wx.Frame):
         self.fileExtensions = "Excel files (*.xls;*.xlsx)|*.xls;*.xlsx;*.XLS;*.XLSX|All files (*.*)|*.*"
         saveFile = wx.FileDialog(self, message='Save file', defaultDir=self.params['options']['dirfrom'],
                                  defaultFile='untitled.xlsx',
-                                 wildcard=self.fileExtensions, style=wx.SAVE | wx.FD_OVERWRITE_PROMPT)
+                                 wildcard=self.fileExtensions, style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
         if saveFile.ShowModal() == wx.ID_OK:
             self.filename = saveFile.GetFilename()

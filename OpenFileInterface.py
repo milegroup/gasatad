@@ -22,7 +22,10 @@ import wx.lib.filebrowsebutton as filebrowse
 
 
 class OpenCSVFile(wx.Dialog):
-    def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition,
+    def __init__(self, parent, ID, additionalFile, dirfrom,
+                 size=wx.DefaultSize,
+                 # size=wx.Size(1800,1200),
+                 pos=wx.DefaultPosition,
                  style=wx.DEFAULT_DIALOG_STYLE):
         wx.Dialog.__init__(self)
         self.parent = parent
@@ -224,6 +227,7 @@ class OpenCSVFile(wx.Dialog):
 class OpenXLSFile(wx.Dialog):
     def __init__(self, parent, ID, additionalFile, dirfrom, size=wx.DefaultSize, pos=wx.DefaultPosition,
                  style=wx.DEFAULT_DIALOG_STYLE):
+        wx.Dialog.__init__(self)
         self.parent = parent
         self.additionalFile = additionalFile
 
@@ -232,9 +236,7 @@ class OpenXLSFile(wx.Dialog):
         else:
             title = "Open XLS/XLSX file"
 
-        pre = wx.PreDialog()
-        pre.Create(parent, ID, title, pos, size, style)
-        self.PostCreate(pre)
+        self.Create(parent, ID, title, pos, size, style)
 
         vSizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -246,7 +248,7 @@ class OpenXLSFile(wx.Dialog):
         self.colLabelsDefault = ['A', 'B', 'C', 'D', 'E', 'F']
 
         fbb = filebrowse.FileBrowseButton(self, -1, labelText='File: ', fileMask=fileExtensions,
-                                          startDirectory=dirfrom, size=(450, -1),
+                                          startDirectory=dirfrom, size=(600, -1),
                                           changeCallback=self.fbbCallback)
 
         vSizer.Add(fbb, flag=wx.EXPAND | wx.ALL, border=10)
@@ -259,21 +261,21 @@ class OpenXLSFile(wx.Dialog):
 
         optionsGridSizer = wx.FlexGridSizer(rows=3, cols=2, vgap=4, hgap=4)
 
-        self.RowWithColNames = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.RowWithColNames = wx.SpinCtrl(self, value='0', size=(160, -1))
         self.RowWithColNames.SetRange(0, 100)
         optionsGridSizer.Add(wx.StaticText(self, label='Row containing col. names:'), 0,
                              wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         optionsGridSizer.Add(self.RowWithColNames, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         self.Bind(wx.EVT_SPINCTRL, self.optionsChanged, self.RowWithColNames)
 
-        self.NoColsDiscard = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.NoColsDiscard = wx.SpinCtrl(self, value='0', size=(160, -1))
         self.NoColsDiscard.SetRange(0, 100)
         optionsGridSizer.Add(wx.StaticText(self, label='No. of columns to discard:'), 0,
                              wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         optionsGridSizer.Add(self.NoColsDiscard, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         self.Bind(wx.EVT_SPINCTRL, self.optionsChanged, self.NoColsDiscard)
 
-        self.sheetNumber = wx.SpinCtrl(self, value='0', size=(80, -1))
+        self.sheetNumber = wx.SpinCtrl(self, value='0', size=(160, -1))
         self.sheetNumber.SetRange(0, 10)
         optionsGridSizer.Add(wx.StaticText(self, label='Sheet number:'), 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         optionsGridSizer.Add(self.sheetNumber, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
@@ -361,9 +363,8 @@ class OpenXLSFile(wx.Dialog):
             numColsDiscard = self.NoColsDiscard.GetValue()
             sheetNumber = self.sheetNumber.GetValue()
 
-            self.data = read_excel(os.path.join(self.dirName, self.fileName), sheetname=sheetNumber,
+            self.data = read_excel(os.path.join(self.dirName, self.fileName), sheet_name=sheetNumber,
                                    header=rowColLabels, index_col=None)
-            # self.data = self.preprocessExcel(self.data)
 
             if numColsDiscard != 0:
                 self.data.drop(self.data.columns[range(numColsDiscard)], axis=1, inplace=True)
@@ -393,7 +394,7 @@ class OpenXLSFile(wx.Dialog):
             self.provDataTable.Enable(True)
             self.provDataTable.AutoSize()
         except:
-            # print "Error: ", sys.exc_info()
+            print("Error: ", sys.exc_info())
             self.cleanPreview()
 
     def cleanPreview(self):
