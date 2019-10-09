@@ -22,11 +22,7 @@ import wx.xrc
 import wx.richtext as rt
 import wx.lib.scrolledpanel
 
-from pandas.core.config import set_option
 from pandas.core.frame import DataFrame
-
-# To modify how to show the Dataframe's data
-set_option('expand_frame_repr', False)
 
 
 class BasicStatisticsInterface(wx.Dialog):

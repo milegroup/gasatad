@@ -28,13 +28,13 @@ MainFrame.params = {'version': 1.7,
 
 MainFrame.params['configFile'] = os.path.join(MainFrame.params['configDir'], "gasatad.cfg")
 
-
-if sys.platform == 'win32':
-    import locale
-
-    loc = locale.getdefaultlocale()
-    if loc[1]:
-        MainFrame.params['configFile'] = MainFrame.params['configFile'].decode(loc[1], "ignore")
+# This was necessary in python2
+# if sys.platform == 'win32':
+#     import locale
+#
+#     loc = locale.getdefaultlocale()
+#     if loc[1]:
+#         MainFrame.params['configFile'] = MainFrame.params['configFile'].decode(loc[1], "ignore")
 
 MainFrame.params['upgradable'] = False
 MainFrame.params['availableVersionToUpgrade'] = ""
