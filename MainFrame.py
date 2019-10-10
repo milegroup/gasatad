@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-'''
+"""
 This file is part of GASATaD.
 
 GASATaD is free software: you can redistribute it and/or modify
@@ -15,31 +13,29 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
-import wx
-import wx.grid
-import wx.adv
 import os
 import sys
-from pandas import to_numeric
-from pandas.io.parsers import read_csv
-from pandas.io.excel import read_excel
+from sys import platform
+
 import numpy
-import csv
-from Controller import Controller
+import wx
+import wx.adv
+import wx.grid
+from pandas import to_numeric
+from pandas.io.excel import read_excel
+from pandas.io.parsers import read_csv
+
 from AddColumnInterface import AddColumnInterface
+from AskFileType import AskFileType
+from BasicStatisticsInterface import BasicStatisticsInterface
+from Controller import Controller
 from GraphsInterface import HistogramInterface, ScatterPlotInterface, \
     PieChartInterface, BoxPlotInterface, BarChartInterface
-
-from SignificanceTestInterface import SignificanceTestInterface
-from OpenFileInterface import OpenCSVFile, OpenXLSFile
-
 from Model import OptionsInExportInterface
-from BasicStatisticsInterface import BasicStatisticsInterface
-from AskFileType import AskFileType
-
-from sys import platform
+from OpenFileInterface import OpenCSVFile, OpenXLSFile
+from SignificanceTestInterface import SignificanceTestInterface
 
 
 ###########################################################################
@@ -343,7 +339,8 @@ class MainFrame(wx.Frame):
 
             leftSizer.AddStretchSpacer(1)
             # self.upgradeButton = wx.Button( self, wx.ID_ANY, u"* New version: "+self.params['availableVersionToUpgrade']+" *", wx.DefaultPosition, wx.DefaultSize, 0 )
-            self.upgradeButton = GB.GradientButton(self, label="New version available: " + (self.params['availableVersionToUpgrade'].decode('utf-8')))
+            self.upgradeButton = GB.GradientButton(self, label="New version available: " + (
+                self.params['availableVersionToUpgrade'].decode('utf-8')))
             self.upgradeButton.SetBaseColours(startcolour=wx.TheColourDatabase.Find('PALE GREEN'),
                                               foregroundcolour=wx.BLACK)
             self.upgradeButton.SetPressedBottomColour(wx.TheColourDatabase.Find('LIGHT GREY'))
@@ -844,7 +841,7 @@ class MainFrame(wx.Frame):
     def CheckUpdates(self):
         from sys import argv
         import urllib.request, urllib.error
-        import os, sys
+        import os
 
         remoteVersion = ""
         remoteVersionFile = ""
@@ -852,9 +849,7 @@ class MainFrame(wx.Frame):
         if platform == "linux" and argv[0] == "/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/deb.txt"
 
-        elif platform == "darwin" \
-                and (os.path.realpath(__file__) == "/Applications/GASATaD.app/Contents/MacOS/MainFrame.py"
-                     or os.path.realpath(__file__) == "/Applications/GASATaD.app/Contents/MacOS/MainFrame.pyc"):
+        elif (platform == "darwin") and ("GASATaD.app" in os.path.realpath(__file__)):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/mac.txt"
 
         elif platform == "win32" and argv[0].endswith(".exe"):
@@ -864,21 +859,22 @@ class MainFrame(wx.Frame):
             # print "# Running GASATaD from source"
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/src.txt"
 
-        try:
-            if platform != "darwin":
-                remoteFile = urllib.request.urlopen(remoteVersionFile)
-                remoteVersion = remoteFile.readline().strip()
-                remoteFile.close()
-            else:
-                import ssl
-                context = ssl._create_unverified_context()
-                remoteFile = urllib.request.urlopen(remoteVersionFile, context=context)
-                remoteVersion = remoteFile.readline().strip()
-                remoteFile.close()
-            # print "# Version available in GASATaD web page: ", remoteVersion
-        except urllib.error.URLError:
-            # print "# I couldn't check for updates"
-            None
+        if remoteVersionFile:
+            try:
+                if platform != "darwin":
+                    remoteFile = urllib.request.urlopen(remoteVersionFile)
+                    remoteVersion = remoteFile.readline().strip()
+                    remoteFile.close()
+                else:
+                    import ssl
+                    context = ssl._create_unverified_context()
+                    remoteFile = urllib.request.urlopen(remoteVersionFile, context=context)
+                    remoteVersion = remoteFile.readline().strip()
+                    remoteFile.close()
+                # print "# Version available in GASATaD web page: ", remoteVersion
+            except urllib.error.URLError:
+                # print "# I couldn't check for updates"
+                None
 
         if remoteVersion:
             # print "# Version file exists"
@@ -1653,13 +1649,13 @@ class ReplaceInColInterface(wx.Dialog):
 
         leftSizer = wx.BoxSizer(wx.VERTICAL)
         leftSizer.Add(wx.StaticText(self, -1, "Old value:"))
-        self.cb = wx.ComboBox(self, choices=listOfTags, value=listOfTags[0], size=(160,-1))
+        self.cb = wx.ComboBox(self, choices=listOfTags, value=listOfTags[0], size=(160, -1))
         leftSizer.Add(self.cb, 0, wx.TOP | wx.LEFT, 5)
         topSizer.Add(leftSizer, 0, wx.ALL, 10)
 
         rightSizer = wx.BoxSizer(wx.VERTICAL)
         rightSizer.Add(wx.StaticText(self, -1, "New value (empty for 'null'):"))
-        self.tc = wx.TextCtrl(self, size=(160,-1))
+        self.tc = wx.TextCtrl(self, size=(160, -1))
         rightSizer.Add(self.tc, 0, wx.TOP | wx.LEFT | wx.EXPAND, 5)
         topSizer.Add(rightSizer, 0, wx.ALL, 10)
 
