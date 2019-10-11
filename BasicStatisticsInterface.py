@@ -23,6 +23,7 @@ import wx.richtext as rt
 import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame
+from scipy.stats import shapiro
 
 
 class BasicStatisticsInterface(wx.Dialog):
@@ -422,12 +423,26 @@ class BasicStatisticsInterface(wx.Dialog):
 
             self.writeParam("Correlation (Pearson)")
             self.writeNum(data.corr(method='pearson'))
+            print("****************")
+            print(data.corr(method='pearson'))
 
             self.writeParam("Kurtosis")
             self.writeNum(data.kurtosis())
 
             self.writeParam("Skew")
             self.writeNum(data.skew())
+
+
+            self.writeParam("Shapiro-Wilk")
+            for k in data.columns:
+                ll = data[k].tolist()
+                print("---")
+                print(k)
+                print()
+                print(shapiro(ll))
+            self.writeNum("1\t2\t3")
+            # print(data.columns)
+            # print(data)
 
             font = self.textResultsWindow.GetFont()
             font = wx.Font(font.GetPointSize(), wx.MODERN,
