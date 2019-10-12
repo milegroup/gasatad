@@ -33,6 +33,7 @@ def setFont(results_window):
                    font.GetWeight(), font.GetUnderlined())
     results_window.SetFont(font)
 
+
 def writeTitle(results_window, string_text):
     results_window.BeginBold()
     results_window.BeginFontSize(title_font_size)
@@ -68,7 +69,6 @@ def writeParam(results_window, string_text):
 def writeResults(results_window, results):
     if type(results) == DataFrame:
         results_window.WriteText(results.to_string(col_space=8, na_rep='--', float_format='%7.3g', justify='right'))
-    else:
-        results_window.WriteText(results.to_string(na_rep='--', float_format='%7.3g'))
+    else:  # Pandas series
+        results_window.WriteText(results.to_string(na_rep='--', float_format=lambda x: '%7.3g' % x))
     results_window.Newline()
-

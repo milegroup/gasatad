@@ -18,6 +18,8 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 import wx.lib.scrolledpanel
 from scipy.stats.stats import ks_2samp, ranksums, ttest_ind
 import wx.richtext as rt
+from pandas.core.frame import Series
+
 import Tools
 
 
@@ -538,59 +540,41 @@ class SignificanceTestInterface(wx.Dialog):
 
         if dataSelectedLP.count() > 0 and dataSelectedRP.count() > 0:
 
+            Tools.setFont(self.textResultsWindow)
+
             Tools.writeTitle(self.textResultsWindow, "SIGNIFICANCE TEST")
 
             Tools.writeSubTitle(self.textResultsWindow,
                                 self.clickedRadiobuttonLeft + ' vs. ' + self.clickedRadiobuttonRight)
 
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.WriteText("\nNo. of values\n")
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText(
-                '  ' + self.clickedRadiobuttonLeft + ': ' + str(dataSelectedLP.count()) + '\n')
-            self.textResultsWindow.WriteText(
-                '  ' + self.clickedRadiobuttonRight + ': ' + str(dataSelectedRP.count()) + '\n\n')
+            Tools.writeParam(self.textResultsWindow, "No. of values")
+            series_data = Series([dataSelectedLP.count(), dataSelectedRP.count()],
+                                 index=[self.clickedRadiobuttonLeft, self.clickedRadiobuttonRight])
+            Tools.writeResults(self.textResultsWindow, series_data)
 
+            Tools.writeParam(self.textResultsWindow, "Standard t-test (equal variances)")
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, nan_policy='omit')
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.WriteText("\nStandard t-test (equal variances)\n")
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
 
+            Tools.writeParam(self.textResultsWindow, "Welch's unequal variances t-test)")
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var=False, nan_policy='omit')
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.WriteText("\nWelch's unequal variances t-test\n")
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
 
+            Tools.writeParam(self.textResultsWindow, "Kolmogorov-Smirnov test)")
             temp1, temp2 = ks_2samp(dataSelectedLP, dataSelectedRP)
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.WriteText('\nKolmogorov-Smirnov test\n')
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
 
+            Tools.writeParam(self.textResultsWindow, "Wilcoxon rank-sum test)")
             temp1, temp2 = ranksums(dataSelectedLP, dataSelectedRP)
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.WriteText('\nWilcoxon rank-sum test\n')
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.WriteText('  Statistic: {0:.5g}\n  p-value: {1:.5g}\n\n'.format(temp1, temp2))
-
-            font = self.textResultsWindow.GetFont()
-            font = wx.Font(font.GetPointSize(), wx.MODERN,
-                           font.GetStyle(), font.GetWeight(),
-                           font.GetUnderlined())
-            self.textResultsWindow.SetFont(font)
-
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
 
         else:
 

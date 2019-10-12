@@ -44,6 +44,7 @@ from SignificanceTestInterface import SignificanceTestInterface
 
 class MainFrame(wx.Frame):
     tagsAndValues = {}
+    scatterPlotOptions = {}
 
     def __init__(self, parent):
 
@@ -1266,6 +1267,9 @@ class MainFrame(wx.Frame):
         self.refreshGUI()
 
     def refreshGUI(self, updateDataInfo=True, markNans=True):
+
+        self.scatterPlotOptions = {}  # Reset plot options
+
         if not self.controller.programState.dataToAnalyse.empty:  # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
             self.m_dataTable.AutoSize()
@@ -1465,11 +1469,12 @@ class MainFrame(wx.Frame):
 
         if (len(self.controller.integerValues + self.controller.floatValues) != 0):
 
-            scatterFrame = ScatterPlotInterface(self, self.controller.floatValues + self.controller.integerValues)
+            scatterFrame = ScatterPlotInterface(self, self.controller.floatValues + self.controller.integerValues,
+                                                self.scatterPlotOptions)
 
             if scatterFrame.ShowModal() == wx.ID_OK:
-                scatterOptions = scatterFrame.getScatterPlotOptions()
-                self.controller.createScatterPlot(scatterOptions)
+                self.scatterPlotOptions = scatterFrame.getScatterPlotOptions()
+                self.controller.createScatterPlot(self.scatterPlotOptions)
         else:
 
             wx.MessageBox("There are no numerical values", "Attention")

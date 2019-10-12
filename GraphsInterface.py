@@ -246,7 +246,7 @@ class HistogramInterface(wx.Dialog):
 
 class ScatterPlotInterface(wx.Dialog):
 
-    def __init__(self, parent, listOfVariables):
+    def __init__(self, parent, listOfVariables, scatterPlotOptions):
 
         self.selectedCheckBoxes = []
         self.position = 'default'
@@ -350,36 +350,46 @@ class ScatterPlotInterface(wx.Dialog):
         fgSizer5.SetFlexibleDirection(wx.BOTH)
         fgSizer5.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        # Here the RadioButtons are created
-        for i in listOfVariables:
+        # Variable in X axis
+
+        self.radioBtnsXVariable = []
+
+        for i in range(len(listOfVariables)):
 
             # First element
-            if i == listOfVariables[0]:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+            if i == 0:
+                self.radioBtnsXVariable.append(
+                    wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize,
+                                   wx.RB_GROUP))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
             else:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+                self.radioBtnsXVariable.append(
+                    wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize, 0))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
 
         fgScatterPlotYVar = wx.FlexGridSizer(0, 2, 0, 0)
         fgScatterPlotYVar.SetFlexibleDirection(wx.BOTH)
         fgScatterPlotYVar.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        for i in listOfVariables:
+        # Variables in Y axis
+
+        self.checkboxesYVariables = []
+
+        for i in range(len(listOfVariables)):
 
             # First element
-            if i == listOfVariables[0]:
-
-                self.m_checkBox16 = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
-
+            if i == 0:
+                self.checkboxesYVariables.append(
+                    wx.CheckBox(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP))
+                fgScatterPlotYVar.Add(self.checkboxesYVariables[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.checkboxesYVariables[i])
             else:
-                self.m_checkBox16 = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgScatterPlotYVar.Add(self.m_checkBox16, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.m_checkBox16)
+                self.checkboxesYVariables.append(
+                    wx.CheckBox(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize, 0))
+                fgScatterPlotYVar.Add(self.checkboxesYVariables[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_CHECKBOX, self.updateSelectedTagsCheckBox, self.checkboxesYVariables[i])
 
         # The name of the axis by default
         self.xAxisNameTextCtrl.SetValue(listOfVariables[0])
@@ -411,14 +421,18 @@ class ScatterPlotInterface(wx.Dialog):
         self.Fit()
         self.Centre(wx.BOTH)
 
-        # Radiobutton selected a the beginning
+        # Radiobutton selected at the beginning
         self.selectedRadioButtonVariables = listOfVariables[0]
         self.selectedCheckBoxes = []
+
+        if scatterPlotOptions:
+            self.setScatterPlotOptions(scatterPlotOptions)
 
         self.Fit()
         self.Show(True)
 
     def updateSelectedVariablesRadioButton(self, event):
+        # X Variable
         radioButton = event.GetEventObject()
         self.selectedRadioButtonVariables = radioButton.GetLabelText()
         self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
@@ -452,20 +466,46 @@ class ScatterPlotInterface(wx.Dialog):
         self.position = radioButton.GetLabelText()
 
     def getScatterPlotOptions(self):
-
         scatterOptions = dict(
             title=self.scatterNameTextCtrl.GetValue(),
             xAxisName=self.xAxisNameTextCtrl.GetValue(),
             yAxisName=self.yAxisNameTextCtrl.GetValue(),
-            showGrid=False,
             xAxisGrid=self.xAxischeckBox.IsChecked(),
             yAxisGrid=self.yAxischeckBox.IsChecked(),
+            linearFit=self.LFcheckBox.IsChecked(),
+            xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
+            yVariables=[self.checkboxesYVariables[i].GetValue() for i in range(len(self.checkboxesYVariables))],
+            legendIsEnabled=self.scatterLegendPosText.IsEnabled(),
+            defaultLegend=self.scatterLegendPosDefault.GetValue(),
+            otherLegends=[self.scatterLegendPosOther[i].GetValue() for i in range(len(self.scatterLegendPosOther))],
+
             firstVarSelected=self.selectedRadioButtonVariables,
             legendPosition=self.position.lower(),
-            selectedCheckBoxes=self.selectedCheckBoxes,
-            linearFit=self.LFcheckBox.IsChecked())
-
+            selectedCheckBoxes=self.selectedCheckBoxes
+        )
         return scatterOptions
+
+    def setScatterPlotOptions(self, scatterPlotOptions):
+        self.scatterNameTextCtrl.SetValue(scatterPlotOptions['title'])
+        self.xAxisNameTextCtrl.SetValue(scatterPlotOptions['xAxisName'])
+        self.yAxisNameTextCtrl.SetValue(scatterPlotOptions['yAxisName'])
+        self.xAxischeckBox.SetValue(scatterPlotOptions['xAxisGrid'])
+        self.yAxischeckBox.SetValue(scatterPlotOptions['yAxisGrid'])
+        self.LFcheckBox.SetValue(scatterPlotOptions['linearFit'])
+        for i in range(len(scatterPlotOptions['xVariable'])):
+            self.radioBtnsXVariable[i].SetValue(scatterPlotOptions['xVariable'][i])
+        for i in range(len(scatterPlotOptions['yVariables'])):
+            self.checkboxesYVariables[i].SetValue(scatterPlotOptions['yVariables'][i])
+            if scatterPlotOptions['yVariables'][i]:
+                self.selectedCheckBoxes.append(self.checkboxesYVariables[i].GetLabel())
+        self.scatterLegendPosDefault.SetValue(scatterPlotOptions['defaultLegend'])
+        for i in range(len(scatterPlotOptions['otherLegends'])):
+            self.scatterLegendPosOther[i].SetValue(scatterPlotOptions['otherLegends'][i])
+        if scatterPlotOptions['legendIsEnabled']:
+            self.scatterLegendPosText.Enable()
+            self.scatterLegendPosDefault.Enable()
+            for buttonLegend in self.scatterLegendPosOther:
+                buttonLegend.Enable()
 
 
 class ValidatorForScatter(wx.Validator):
