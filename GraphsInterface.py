@@ -506,6 +506,7 @@ class ScatterPlotInterface(wx.Dialog):
             self.scatterLegendPosDefault.Enable()
             for buttonLegend in self.scatterLegendPosOther:
                 buttonLegend.Enable()
+        self.position = scatterPlotOptions['legendPosition']
 
 
 class ValidatorForScatter(wx.Validator):
