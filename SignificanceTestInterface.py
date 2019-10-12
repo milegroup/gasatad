@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-'''
+"""
 This file is part of GASATaD.
 
 GASATaD is free software: you can redistribute it and/or modify
@@ -15,11 +13,12 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import wx.lib.scrolledpanel
 from scipy.stats.stats import ks_2samp, ranksums, ttest_ind
 import wx.richtext as rt
+import Tools
 
 
 class SignificanceTestInterface(wx.Dialog):
@@ -537,32 +536,12 @@ class SignificanceTestInterface(wx.Dialog):
         # RP means Right Panel
         dataSelectedRP = self.dataToAnalyse.loc[listIndex2, self.clickedRadiobuttonRight]
 
-        # print "# dataLP"
-        # print dataSelectedLP
-        # print "# dataRP"
-        # print dataSelectedRP
-        # print dataSelectedRP.count()
+        if dataSelectedLP.count() > 0 and dataSelectedRP.count() > 0:
 
-        if (dataSelectedLP.count() > 0 and dataSelectedRP.count() > 0):
+            Tools.writeTitle(self.textResultsWindow, "SIGNIFICANCE TEST")
 
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginFontSize(12)
-            self.textResultsWindow.WriteText('SIGNIFICANCE TEST')
-            self.textResultsWindow.EndFontSize()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.Newline()
-
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginItalic()
-            self.textResultsWindow.BeginFontSize(11)
-            self.textResultsWindow.WriteText(self.clickedRadiobuttonLeft + ' vs. ' + self.clickedRadiobuttonRight)
-            self.textResultsWindow.EndFontSize()
-            self.textResultsWindow.EndItalic()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.Newline()
-
-            # print "# d1:\n",dataSelectedLP
-            # print "# d2:\n",dataSelectedRP
+            Tools.writeSubTitle(self.textResultsWindow,
+                                self.clickedRadiobuttonLeft + ' vs. ' + self.clickedRadiobuttonRight)
 
             self.textResultsWindow.BeginBold()
             self.textResultsWindow.BeginItalic()

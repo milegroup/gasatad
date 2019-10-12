@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-'''
+"""
 This file is part of GASATaD.
 
 GASATaD is free software: you can redistribute it and/or modify
@@ -15,7 +13,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
-'''
+"""
 
 import wx
 import wx.xrc
@@ -24,6 +22,9 @@ import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame
 from scipy.stats import shapiro
+
+import Tools
+from numpy import nan as NaN
 
 
 class BasicStatisticsInterface(wx.Dialog):
@@ -378,98 +379,70 @@ class BasicStatisticsInterface(wx.Dialog):
         data = self.getSelectedData()
 
         if not data.empty:
-            self.textResultsWindow.BeginBold()
-            self.textResultsWindow.BeginFontSize(12)
-            self.textResultsWindow.WriteText('BASIC STATISTICS')
-            self.textResultsWindow.EndFontSize()
-            self.textResultsWindow.EndBold()
-            self.textResultsWindow.Newline()
 
-            self.writeParam("No. of values")
-            self.writeNum(data.count())
+            Tools.setFont(self.textResultsWindow)
 
-            self.writeParam("Minimum")
-            self.writeNum(data.min())
+            Tools.writeTitle(self.textResultsWindow, "BASIC STATISTICS")
 
-            self.writeParam("Maximum")
-            self.writeNum(data.max())
+            Tools.writeParam(self.textResultsWindow, "No. of values")
+            Tools.writeResults(self.textResultsWindow, data.count())
 
-            self.writeParam("Mean")
-            self.writeNum(data.mean())
+            Tools.writeParam(self.textResultsWindow, "Minimum")
+            Tools.writeResults(self.textResultsWindow, data.min())
 
-            self.writeParam("Median")
-            self.writeNum(data.median())
+            Tools.writeParam(self.textResultsWindow, "Maximum")
+            Tools.writeResults(self.textResultsWindow, data.max())
 
-            self.writeParam("Mode")
-            self.writeNum(data.mode())
+            Tools.writeParam(self.textResultsWindow, "Mean")
+            Tools.writeResults(self.textResultsWindow, data.mean())
 
-            self.writeParam("Std Deviation")
-            self.writeNum(data.std())
+            Tools.writeParam(self.textResultsWindow, "Median")
+            Tools.writeResults(self.textResultsWindow, data.median())
 
-            self.writeParam("Variance")
-            self.writeNum(data.var())
+            Tools.writeParam(self.textResultsWindow, "Mode")
+            Tools.writeResults(self.textResultsWindow, data.mode())
 
-            self.writeParam("Covariance")
-            self.writeNum(data.cov())
+            Tools.writeParam(self.textResultsWindow, "Std Deviation")
+            Tools.writeResults(self.textResultsWindow, data.std())
 
-            self.writeParam("Quantile 25%")
-            self.writeNum(data.quantile(q=0.25))
+            Tools.writeParam(self.textResultsWindow, "Variance")
+            Tools.writeResults(self.textResultsWindow, data.var())
 
-            self.writeParam("Quantile 50%")
-            self.writeNum(data.quantile(q=0.5))
+            Tools.writeParam(self.textResultsWindow, "Covariance")
+            Tools.writeResults(self.textResultsWindow, data.cov())
 
-            self.writeParam("Quantile 75%")
-            self.writeNum(data.quantile(q=0.75))
+            Tools.writeParam(self.textResultsWindow, "Quantile 25%")
+            Tools.writeResults(self.textResultsWindow, data.quantile(q=0.25))
 
-            self.writeParam("Correlation (Pearson)")
-            self.writeNum(data.corr(method='pearson'))
-            print("****************")
-            print(data.corr(method='pearson'))
+            Tools.writeParam(self.textResultsWindow, "Quantile 50%")
+            Tools.writeResults(self.textResultsWindow, data.quantile(q=0.5))
 
-            self.writeParam("Kurtosis")
-            self.writeNum(data.kurtosis())
+            Tools.writeParam(self.textResultsWindow, "Quantile 75%")
+            Tools.writeResults(self.textResultsWindow, data.quantile(q=0.75))
 
-            self.writeParam("Skew")
-            self.writeNum(data.skew())
+            Tools.writeParam(self.textResultsWindow, "Correlation (Pearson)")
+            Tools.writeResults(self.textResultsWindow, data.corr(method='pearson'))
+            # print(data.corr(method='pearson'))
 
+            Tools.writeParam(self.textResultsWindow, "Kurtosis")
+            Tools.writeResults(self.textResultsWindow, data.kurtosis())
 
-            self.writeParam("Shapiro-Wilk")
-            for k in data.columns:
-                ll = data[k].tolist()
-                print("---")
-                print(k)
-                print()
-                print(shapiro(ll))
-            self.writeNum("1\t2\t3")
-            # print(data.columns)
-            # print(data)
+            Tools.writeParam(self.textResultsWindow, "Skew")
+            Tools.writeResults(self.textResultsWindow, data.skew())
 
-            font = self.textResultsWindow.GetFont()
-            font = wx.Font(font.GetPointSize(), wx.MODERN,
-                           font.GetStyle(),
-                           font.GetWeight(), font.GetUnderlined())
-            self.textResultsWindow.SetFont(font)
-
-            # self.textResultsWindow.SetFont(wx.Font(10, wx.DEFAULT, wx.NORMAL, wx.NORMAL, False, u'Consolas'))
+            Tools.writeParam(self.textResultsWindow, "Shapiro-Wilk")
+            df_aux = DataFrame(columns=['statistic', 'p-value'])
+            for key in data.columns:
+                try:
+                    ss = shapiro(data[key].tolist())
+                    df_aux.loc[key] = [ss[0], ss[1]]
+                except ValueError:
+                    df_aux.loc[key] = [NaN, NaN]
+            Tools.writeResults(self.textResultsWindow, df_aux)
 
         # else:
         #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
 
-    def writeParam(self, text):
-        self.textResultsWindow.BeginBold()
-        self.textResultsWindow.BeginItalic()
-        self.textResultsWindow.WriteText("\n" + text + "\n")
-        self.textResultsWindow.EndItalic()
-        self.textResultsWindow.EndBold()
-
-    def writeNum(self, data, nodec=3):
-        if type(data) == DataFrame:
-            self.textResultsWindow.WriteText(data.round(nodec).to_string(col_space=10) + "\n")
-        else:
-            self.textResultsWindow.WriteText(data.round(nodec).to_string() + "\n")
-
-    def writeNumInt(self, data):
-        self.textResultsWindow.WriteText(data.to_string() + "\n")
 
     def noCheckBoxSelectedWarning(self):
 
