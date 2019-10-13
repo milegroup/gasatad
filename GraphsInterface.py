@@ -691,7 +691,7 @@ class PieChartInterface(wx.Dialog):
 
 class BoxPlotInterface(wx.Dialog):
 
-    def __init__(self, parent, listOfVariables, listOfCharacterValues):
+    def __init__(self, parent, listOfVariables, listOfCharacterValues, boxPlotOptions):
 
         self.selectedCheckBoxes = []
 
@@ -725,52 +725,42 @@ class BoxPlotInterface(wx.Dialog):
 
         displayGridsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Display settings"), wx.HORIZONTAL)
 
-        self.showGridRadioButton = wx.RadioButton(self, wx.ID_ANY, "Show grid", wx.DefaultPosition, wx.DefaultSize,
-                                                  wx.RB_GROUP)
-        displayGridsSizer.Add(self.showGridRadioButton, 0, wx.ALL, 10)
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateShowGrid, self.showGridRadioButton)
-
-        self.hideGridRadioButton = wx.RadioButton(self, wx.ID_ANY, "Hide grid", wx.DefaultPosition, wx.DefaultSize)
-        displayGridsSizer.Add(self.hideGridRadioButton, 0, wx.ALL, 10)
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateShowGrid, self.hideGridRadioButton)
-
-        # By Default, grid is shown
-        self.showGrid = True
+        self.showGridCheckBox = wx.CheckBox(self, wx.ID_ANY, "Show grid", wx.DefaultPosition, wx.DefaultSize, 0)
+        displayGridsSizer.Add(self.showGridCheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
 
         gbSizer1.Add(displayGridsSizer, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
+
+        self.showGridCheckBox.SetValue(True)
 
         # -----------------------
 
         # Variables
 
-        sbSizer1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Variables"), wx.VERTICAL)
+        self.checkBoxesVariables = []
 
-        fgSizer3 = wx.FlexGridSizer(1, 0, 0, 0)
-        fgSizer3.SetFlexibleDirection(wx.BOTH)
-        fgSizer3.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
+        sbSizer1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Variables"), wx.VERTICAL)
 
         fgSizer5 = wx.FlexGridSizer(0, 3, 0, 0)
         fgSizer5.SetFlexibleDirection(wx.BOTH)
         fgSizer5.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
         # Here the checkboxes are created
-        for i in listOfVariables:
-            self.m_checkBox = wx.CheckBox(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer5.Add(self.m_checkBox, 0, wx.ALL | wx.EXPAND, 1)
+        for i in range(len(listOfVariables)):
+            self.checkBoxesVariables.append(
+                wx.CheckBox(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize, 0))
+            fgSizer5.Add(self.checkBoxesVariables[i], 0, wx.ALL | wx.EXPAND, 1)
 
-            self.Bind(wx.EVT_CHECKBOX, self.updateSelectedCheckBoxes, self.m_checkBox)
+            self.Bind(wx.EVT_CHECKBOX, self.updateSelectedCheckBoxes, self.checkBoxesVariables[i])
 
         sbSizer1.Add(fgSizer5, 1, wx.EXPAND, 0)
 
-        fgSizer3.Add(sbSizer1, 1, wx.EXPAND | wx.ALL, 0)
-
-        gbSizer1.Add(fgSizer3, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.ALL, 10)
+        gbSizer1.Add(sbSizer1, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.ALL, 10)
 
         # -----------------------
 
         # Group By
 
-        groupbySizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Group by:"), wx.HORIZONTAL)
+        groupbySizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Group by"), wx.HORIZONTAL)
 
         fgGroupbySizer = wx.FlexGridSizer(0, 3, 0, 0)
         fgGroupbySizer.SetFlexibleDirection(wx.BOTH)
@@ -778,19 +768,20 @@ class BoxPlotInterface(wx.Dialog):
 
         groupbySizer.Add(fgGroupbySizer, 1, wx.EXPAND, 5)
 
-        self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgGroupbySizer.Add(self.m_radioBtn15, 0, wx.ALL, 1)
+        self.radioBTNoGroup = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
+        fgGroupbySizer.Add(self.radioBTNoGroup, 0, wx.ALL, 1)
 
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.m_radioBtn15)
+        self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.radioBTNoGroup)
 
         # Variable to group BoxPlot
         self.groupByOption = 'None'
 
-        for value in listOfCharacterValues:
-            self.m_radioBtn = wx.RadioButton(self, wx.ID_ANY, value, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgGroupbySizer.Add(self.m_radioBtn, 0, wx.ALL, 1)
+        self.radioBTsGroupBy = []
 
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.m_radioBtn)
+        for i in range(len(listOfCharacterValues)):
+            self.radioBTsGroupBy.append(wx.RadioButton(self, wx.ID_ANY, listOfCharacterValues[i], wx.DefaultPosition, wx.DefaultSize, 0))
+            fgGroupbySizer.Add(self.radioBTsGroupBy[i], 0, wx.ALL, 1)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.radioBTsGroupBy[i])
 
         gbSizer1.Add(groupbySizer, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT, 10)
 
@@ -813,6 +804,9 @@ class BoxPlotInterface(wx.Dialog):
         self.Fit()
         self.Centre(wx.BOTH)
 
+        if boxPlotOptions:
+            self.setBoxPlotOptions(boxPlotOptions)
+
         self.Fit()
         self.Show(True)
 
@@ -827,21 +821,30 @@ class BoxPlotInterface(wx.Dialog):
         else:
             self.selectedCheckBoxes.remove(checkBox.GetLabel())
 
-    def updateShowGrid(self, event):
-        radioButton = event.GetEventObject()
-        if radioButton.GetLabelText() == "Show Grid":
-            self.showGrid = True
-        else:
-            self.showGrid = False
-
     def getBoxPlotOptions(self):
         boxPlotOptions = dict(
             title=self.histogramNameTextCtrl.GetValue(),
-            showGrid=self.showGrid,
+            showGrid=self.showGridCheckBox.GetValue(),
+            selectedCheckBoxes=self.selectedCheckBoxes,
+            variables=[self.checkBoxesVariables[i].GetValue() for i in range(len(self.checkBoxesVariables))],
             secondVarSelected=self.groupByOption,
-            selectedCheckBoxes=self.selectedCheckBoxes
+            noGroupBy=self.radioBTNoGroup.GetValue(),
+            groupBys = [self.radioBTsGroupBy[i].GetValue() for i in range(len(self.radioBTsGroupBy))]
+
         )
         return boxPlotOptions
+
+    def setBoxPlotOptions(self, boxPlotOptions):
+        self.histogramNameTextCtrl.SetValue(boxPlotOptions['title'])
+        self.showGridCheckBox.SetValue(boxPlotOptions['showGrid'])
+        for i in range(len(boxPlotOptions['variables'])):
+            self.checkBoxesVariables[i].SetValue(boxPlotOptions['variables'][i])
+            if boxPlotOptions['variables'][i]:
+                self.selectedCheckBoxes.append(self.checkBoxesVariables[i].GetLabel())
+        self.radioBTNoGroup.SetValue(boxPlotOptions['noGroupBy'])
+        for i in range(len(boxPlotOptions['groupBys'])):
+            self.radioBTsGroupBy[i].SetValue(boxPlotOptions['groupBys'][i])
+        self.groupByOption = boxPlotOptions['secondVarSelected']
 
 
 class ValidatorForBoxplot(wx.Validator):

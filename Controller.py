@@ -413,7 +413,6 @@ class Controller():
 
         # Set aspect ratio to be equal so that pie is drawn as a circle.
         plt.axis('equal')
-        plt.tight_layout()
         plt.title(pieChartOptions['title'], fontsize=18)
         plt.tight_layout()
         plt.show()
@@ -421,6 +420,9 @@ class Controller():
     def createBoxPlot(self, boxPlotOptions):
 
         flierprops = dict(marker='o', markerfacecolor='white', markersize=8, linestyle='none')
+        boxprops = dict(linewidth=2, color='black')
+        medianprops = dict(linestyle='-', linewidth=2.5, color='black')
+        whiskerprops = dict(linestyle='-', linewidth=2.0, color='black')
         # No categorical variable was selected
         if boxPlotOptions['secondVarSelected'] == 'None':
 
@@ -430,7 +432,10 @@ class Controller():
                 grid=boxPlotOptions['showGrid'],
                 return_type='dict',
                 patch_artist=True,
-                flierprops=flierprops
+                flierprops=flierprops,
+                boxprops=boxprops,
+                medianprops=medianprops,
+                whiskerprops=whiskerprops
             )
 
             for patch, color in zip(bplot['boxes'], self.colorsPatch):
@@ -449,15 +454,22 @@ class Controller():
                 grid=boxPlotOptions['showGrid'],
                 return_type='dict',
                 patch_artist=True,
-                flierprops=flierprops
+                flierprops=flierprops,
+                boxprops=boxprops,
+                medianprops=medianprops,
+                whiskerprops=whiskerprops
             )
 
             for key in bplots.keys():
                 for patch, color in zip(bplots[key]['boxes'], self.colorsPatch):
                     patch.set_facecolor(color)
-
-        plt.suptitle(boxPlotOptions['title'], fontsize=18)
-        # plt.tight_layout()
+        if boxPlotOptions['title']:
+            plt.suptitle(boxPlotOptions['title'], fontsize=18)
+        else:
+            plt.suptitle('')
+        plt.tight_layout()
+        if boxPlotOptions['title']:
+            plt.subplots_adjust(top=0.85)
         plt.show()
 
     def createBarChart(self, barChartOptions):

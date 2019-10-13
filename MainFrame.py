@@ -45,6 +45,7 @@ from SignificanceTestInterface import SignificanceTestInterface
 class MainFrame(wx.Frame):
     tagsAndValues = {}
     scatterPlotOptions = {}
+    boxPlotOptions = {}
 
     def __init__(self, parent):
 
@@ -1268,7 +1269,9 @@ class MainFrame(wx.Frame):
 
     def refreshGUI(self, updateDataInfo=True, markNans=True):
 
-        self.scatterPlotOptions = {}  # Reset plot options
+        # Reset plots options
+        self.scatterPlotOptions = {}
+        self.boxPlotOptions = {}
 
         if not self.controller.programState.dataToAnalyse.empty:  # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
@@ -1499,12 +1502,11 @@ class MainFrame(wx.Frame):
         if (len(self.controller.integerValues + self.controller.floatValues) != 0):
 
             boxPlotFrame = BoxPlotInterface(self, self.controller.floatValues + self.controller.integerValues,
-                                            self.controller.characterValues)
+                                            self.controller.characterValues, self.boxPlotOptions)
 
             if boxPlotFrame.ShowModal() == wx.ID_OK:
-                boxPlotOptions = boxPlotFrame.getBoxPlotOptions()
-
-                self.controller.createBoxPlot(boxPlotOptions)
+                self.boxPlotOptions = boxPlotFrame.getBoxPlotOptions()
+                self.controller.createBoxPlot(self.boxPlotOptions)
         else:
 
             wx.MessageBox("There are no numerical variables", "ERROR")
