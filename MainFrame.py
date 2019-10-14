@@ -44,6 +44,7 @@ from SignificanceTestInterface import SignificanceTestInterface
 
 class MainFrame(wx.Frame):
     tagsAndValues = {}
+    histogramOptions = {}
     scatterPlotOptions = {}
     boxPlotOptions = {}
 
@@ -1270,6 +1271,7 @@ class MainFrame(wx.Frame):
     def refreshGUI(self, updateDataInfo=True, markNans=True):
 
         # Reset plots options
+        self.histogramOptions = {}
         self.scatterPlotOptions = {}
         self.boxPlotOptions = {}
 
@@ -1458,12 +1460,12 @@ class MainFrame(wx.Frame):
         if (len(self.controller.integerValues + self.controller.floatValues) != 0):
 
             histogramFrame = HistogramInterface(self, self.controller.floatValues + self.controller.integerValues,
-                                                self.controller.characterValues)
+                                                self.controller.characterValues, self.histogramOptions)
 
             if histogramFrame.ShowModal() == wx.ID_OK:
-                histogramOptions = histogramFrame.getHistogramOptions()
+                self.histogramOptions = histogramFrame.getHistogramOptions()
 
-                self.controller.createHistogram(histogramOptions)
+                self.controller.createHistogram(self.histogramOptions)
         else:
 
             wx.MessageBox("There are no numerical values", "ERROR")

@@ -23,7 +23,9 @@ import wx
 class HistogramInterface(wx.Dialog):
     legendPosition = 'default'
 
-    def __init__(self, parent, listOfVariables, listOfTags):
+    def __init__(self, parent, listOfVariables, listOfTags, histogramOptions):
+
+        self.listOfVariables = listOfVariables
 
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Histogram", size=wx.DefaultSize, pos=wx.DefaultPosition)
 
@@ -107,12 +109,12 @@ class HistogramInterface(wx.Dialog):
 
         self.histLegendPosOther = []
 
-        for position in positions:
-            histLegendPosOtherTmp = wx.RadioButton(self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgLegendSizer.Add(histLegendPosOtherTmp, 0, wx.ALL, 1)
-            histLegendPosOtherTmp.Enable(False)
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, histLegendPosOtherTmp)
-            self.histLegendPosOther.append(histLegendPosOtherTmp)
+        for i in range(len(positions)):
+            self.histLegendPosOther.append(
+                wx.RadioButton(self, wx.ID_ANY, positions[i], wx.DefaultPosition, wx.DefaultSize))
+            fgLegendSizer.Add(self.histLegendPosOther[i], 0, wx.ALL, 1)
+            self.histLegendPosOther[i].Enable(False)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.histLegendPosOther[i])
 
         gbSizer1.Add(legendPosSizer, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT | wx.TOP, 10)
 
@@ -120,52 +122,58 @@ class HistogramInterface(wx.Dialog):
 
         # Variables
 
-        sbSizer1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"X variable"), wx.VERTICAL)
+        sbSizerXVariable = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"X variable"), wx.VERTICAL)
         sbHistTag = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Tag"), wx.VERTICAL)
 
         fgSizer3 = wx.FlexGridSizer(1, 0, 0, 0)
         fgSizer3.SetFlexibleDirection(wx.BOTH)
         fgSizer3.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
+        # xVariable
         fgSizer5 = wx.FlexGridSizer(0, 2, 0, 0)
         fgSizer5.SetFlexibleDirection(wx.BOTH)
         fgSizer5.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        # Here the RadioButtons are created
-        for i in listOfVariables:
-
+        self.radioBtnsXVariable = []
+        for i in range(len(listOfVariables)):
             # First element
-            if i == listOfVariables[0]:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+            if i == 0:
+                self.radioBtnsXVariable.append(
+                    wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize,
+                                   wx.RB_GROUP))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
             else:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+                self.radioBtnsXVariable.append(
+                    wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
 
+        # Tags
         fgSizer6 = wx.FlexGridSizer(0, 2, 0, 0)
         fgSizer6.SetFlexibleDirection(wx.BOTH)
         fgSizer6.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        # Not use a label (for example in Level: High, Low)
-        self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+        self.radioBtnDefaultTag = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize,
+                                                 wx.RB_GROUP)
+        fgSizer6.Add(self.radioBtnDefaultTag, 0, wx.ALL, 1)
+        self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.radioBtnDefaultTag)
 
-        for i in listOfTags:
-            self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+        self.radioBtnsOtherTags = []
+        for i in range(len(listOfTags)):
+            self.radioBtnsOtherTags.append(
+                wx.RadioButton(self, wx.ID_ANY, listOfTags[i], wx.DefaultPosition, wx.DefaultSize))
+            fgSizer6.Add(self.radioBtnsOtherTags[i], 0, wx.ALL, 1)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.radioBtnsOtherTags[i])
 
         # As a default the name of the axis are the selected variables
         self.xAxisNameTextCtrl.SetValue(listOfVariables[0])
         self.yAxisNameTextCtrl.SetValue('No. of elements')
 
-        sbSizer1.Add(fgSizer5, 1, wx.EXPAND, 5)
+        sbSizerXVariable.Add(fgSizer5, 1, wx.EXPAND, 5)
         sbHistTag.Add(fgSizer6, 1, wx.EXPAND, 5)
 
-        fgSizer3.Add(sbSizer1, 1, wx.EXPAND | wx.ALL, 5)
+        fgSizer3.Add(sbSizerXVariable, 1, wx.EXPAND | wx.ALL, 5)
         fgSizer3.Add(sbHistTag, 1, wx.EXPAND | wx.ALL, 5)
 
         gbSizer1.Add(fgSizer3, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.ALIGN_RIGHT | wx.EXPAND | wx.ALL, 5)
@@ -193,18 +201,23 @@ class HistogramInterface(wx.Dialog):
         self.selectedRadioButtonVariables = listOfVariables[0]
         self.selectedRadioButtonTags = 'None'
 
+        if histogramOptions:
+            self.setHistogramOptions(histogramOptions)
+
         self.Fit()
         self.Show(True)
 
-    def updateSelectedVariablesRadioButton(self, event):
+    def updateLegendPosition(self, event):
+        radioButton = event.GetEventObject()
+        self.legendPosition = radioButton.GetLabelText()
 
+    def updateSelectedVariablesRadioButton(self, event):
         radioButton = event.GetEventObject()
 
         self.selectedRadioButtonVariables = radioButton.GetLabelText()
         self.xAxisNameTextCtrl.SetValue(radioButton.GetLabelText())
 
     def updateSelectedTagsRadioButton(self, event):
-
         radioButton = event.GetEventObject()
         selectedRadioButton = radioButton.GetLabelText()
         self.selectedRadioButtonTags = radioButton.GetLabelText()
@@ -221,32 +234,67 @@ class HistogramInterface(wx.Dialog):
             for otherRadioButton in self.histLegendPosOther:
                 otherRadioButton.Enable()
 
-    def updateLegendPosition(self, event):
-        radioButton = event.GetEventObject()
-        self.legendPosition = radioButton.GetLabelText()
-
     def getHistogramOptions(self):
-
         histogramOptions = dict(
             title=self.histogramNameTextCtrl.GetValue(),
             xAxisName=self.xAxisNameTextCtrl.GetValue(),
             yAxisName=self.yAxisNameTextCtrl.GetValue(),
-            showGrid=False,
             xAxisGrid=self.xAxischeckBox.IsChecked(),
             yAxisGrid=self.yAxischeckBox.IsChecked(),
+            numOfBins=self.numOfBins.GetValue(),
+
+            legendIsEnabled=self.histLegendPosText.IsEnabled(),
+            defaultLegend=self.histLegendPosDefault.GetValue(),
+            otherLegends=[self.histLegendPosOther[i].GetValue() for i in range(len(self.histLegendPosOther))],
+
+            xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
+
+            otherTags=[self.radioBtnsOtherTags[i].GetValue() for i in range(len(self.radioBtnsOtherTags))],
+
             firstVarSelected=self.selectedRadioButtonVariables,
             secondVarSelected=self.selectedRadioButtonTags,
             legendPosition=self.legendPosition.lower(),
-            selectedCheckBoxes=[],
-            numOfBins=self.numOfBins.GetValue()
+            selectedCheckBoxes=[]
         )
 
         return histogramOptions
+
+    def setHistogramOptions(self, histogramOptions):
+        self.histogramNameTextCtrl.SetValue(histogramOptions['title'])
+        self.xAxisNameTextCtrl.SetValue(histogramOptions['xAxisName'])
+        self.yAxisNameTextCtrl.SetValue(histogramOptions['yAxisName'])
+        self.xAxischeckBox.SetValue(histogramOptions['xAxisGrid'])
+        self.yAxischeckBox.SetValue(histogramOptions['yAxisGrid'])
+        self.numOfBins.SetValue(histogramOptions['numOfBins'])
+
+        self.histLegendPosDefault.SetValue(histogramOptions['defaultLegend'])
+        for i in range(len(histogramOptions['otherLegends'])):
+            self.histLegendPosOther[i].SetValue(histogramOptions['otherLegends'][i])
+        if histogramOptions['legendIsEnabled']:
+            self.histLegendPosText.Enable()
+            self.histLegendPosDefault.Enable()
+            for buttonLegend in self.histLegendPosOther:
+                buttonLegend.Enable()
+        self.legendPosition = histogramOptions['legendPosition']
+
+        for i in range(len(histogramOptions['xVariable'])):
+            self.radioBtnsXVariable[i].SetValue(histogramOptions['xVariable'][i])
+            if histogramOptions['xVariable'][i]:
+                self.selectedRadioButtonVariables = self.listOfVariables[i]
+
+        self.radioBtnDefaultTag.SetValue(True)
+        self.selectedRadioButtonTags = 'None'
+        for i in range(len(histogramOptions['otherTags'])):
+            self.radioBtnsOtherTags[i].SetValue(histogramOptions['otherTags'][i])
+            if histogramOptions['otherTags'][i]:
+                self.selectedRadioButtonTags = self.radioBtnsOtherTags[i].GetLabelText()
 
 
 class ScatterPlotInterface(wx.Dialog):
 
     def __init__(self, parent, listOfVariables, scatterPlotOptions):
+
+        self.listOfVariables = listOfVariables
 
         self.selectedCheckBoxes = []
         self.position = 'default'
@@ -475,6 +523,7 @@ class ScatterPlotInterface(wx.Dialog):
             linearFit=self.LFcheckBox.IsChecked(),
             xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
             yVariables=[self.checkboxesYVariables[i].GetValue() for i in range(len(self.checkboxesYVariables))],
+
             legendIsEnabled=self.scatterLegendPosText.IsEnabled(),
             defaultLegend=self.scatterLegendPosDefault.GetValue(),
             otherLegends=[self.scatterLegendPosOther[i].GetValue() for i in range(len(self.scatterLegendPosOther))],
@@ -494,10 +543,13 @@ class ScatterPlotInterface(wx.Dialog):
         self.LFcheckBox.SetValue(scatterPlotOptions['linearFit'])
         for i in range(len(scatterPlotOptions['xVariable'])):
             self.radioBtnsXVariable[i].SetValue(scatterPlotOptions['xVariable'][i])
+            if scatterPlotOptions['xVariable'][i]:
+                self.selectedRadioButtonVariables = self.listOfVariables[i]
         for i in range(len(scatterPlotOptions['yVariables'])):
             self.checkboxesYVariables[i].SetValue(scatterPlotOptions['yVariables'][i])
             if scatterPlotOptions['yVariables'][i]:
                 self.selectedCheckBoxes.append(self.checkboxesYVariables[i].GetLabel())
+
         self.scatterLegendPosDefault.SetValue(scatterPlotOptions['defaultLegend'])
         for i in range(len(scatterPlotOptions['otherLegends'])):
             self.scatterLegendPosOther[i].SetValue(scatterPlotOptions['otherLegends'][i])
@@ -779,7 +831,8 @@ class BoxPlotInterface(wx.Dialog):
         self.radioBTsGroupBy = []
 
         for i in range(len(listOfCharacterValues)):
-            self.radioBTsGroupBy.append(wx.RadioButton(self, wx.ID_ANY, listOfCharacterValues[i], wx.DefaultPosition, wx.DefaultSize, 0))
+            self.radioBTsGroupBy.append(
+                wx.RadioButton(self, wx.ID_ANY, listOfCharacterValues[i], wx.DefaultPosition, wx.DefaultSize, 0))
             fgGroupbySizer.Add(self.radioBTsGroupBy[i], 0, wx.ALL, 1)
             self.Bind(wx.EVT_RADIOBUTTON, self.updateGroupByOption, self.radioBTsGroupBy[i])
 
@@ -829,7 +882,7 @@ class BoxPlotInterface(wx.Dialog):
             variables=[self.checkBoxesVariables[i].GetValue() for i in range(len(self.checkBoxesVariables))],
             secondVarSelected=self.groupByOption,
             noGroupBy=self.radioBTNoGroup.GetValue(),
-            groupBys = [self.radioBTsGroupBy[i].GetValue() for i in range(len(self.radioBTsGroupBy))]
+            groupBys=[self.radioBTsGroupBy[i].GetValue() for i in range(len(self.radioBTsGroupBy))]
 
         )
         return boxPlotOptions
