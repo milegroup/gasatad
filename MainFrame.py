@@ -851,7 +851,7 @@ class MainFrame(wx.Frame):
         remoteVersion = ""
         remoteVersionFile = ""
 
-        if (platform == "linux" or platform == "linux2") and argv[0] == "/usr/share/gasatad/MainApp.py":
+        if (platform == "linux" or platform == "linux2") and argv[0] == "/usr/share/gasatad/GASATaD_2_0.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/deb.txt"
 
         elif (platform == "darwin") and ("GASATaD.app" in os.path.realpath(__file__)):
@@ -860,7 +860,7 @@ class MainFrame(wx.Frame):
         elif platform == "win32" and argv[0].endswith(".exe"):
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/win.txt"
 
-        elif argv[0].endswith("MainApp.py"):
+        elif argv[0].endswith("GASATaD_2_0.py"):
             # print "# Running GASATaD from source"
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/src.txt"
 
