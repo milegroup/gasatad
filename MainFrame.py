@@ -52,7 +52,7 @@ class MainFrame(wx.Frame):
 
     def __init__(self, parent):
 
-        bmp = wx.Image(str(os.path.dirname(__file__)) + "/icons/SplashScreen1.6.png").ConvertToBitmap()
+        bmp = wx.Image(str(os.path.dirname(__file__)) + "/icons/SplashScreen2.0.png").ConvertToBitmap()
         splash = wx.adv.SplashScreen(bmp, wx.adv.SPLASH_CENTRE_ON_SCREEN | wx.adv.SPLASH_TIMEOUT, 3000, None,
                                      style=wx.STAY_ON_TOP | wx.FRAME_NO_TASKBAR)  # msec. of splash
 
@@ -851,7 +851,7 @@ class MainFrame(wx.Frame):
         remoteVersion = ""
         remoteVersionFile = ""
 
-        if platform == "linux" and argv[0] == "/usr/share/gasatad/MainApp.py":
+        if (platform == "linux" or platform == "linux2") and argv[0] == "/usr/share/gasatad/MainApp.py":
             remoteVersionFile = "https://raw.githubusercontent.com/milegroup/gasatad/master/docs/programVersions/deb.txt"
 
         elif (platform == "darwin") and ("GASATaD.app" in os.path.realpath(__file__)):
