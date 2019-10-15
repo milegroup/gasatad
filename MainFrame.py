@@ -48,6 +48,7 @@ class MainFrame(wx.Frame):
     scatterPlotOptions = {}
     boxPlotOptions = {}
     pieChartOptions = {}
+    barChartOptions = {}
 
     def __init__(self, parent):
 
@@ -1276,6 +1277,7 @@ class MainFrame(wx.Frame):
         self.scatterPlotOptions = {}
         self.boxPlotOptions = {}
         self.pieChartOptions = {}
+        self.barChartOptions = {}
 
         if not self.controller.programState.dataToAnalyse.empty:  # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
@@ -1520,11 +1522,11 @@ class MainFrame(wx.Frame):
         if (len(self.controller.integerValues + self.controller.floatValues) != 0):
 
             barChartFrame = BarChartInterface(self, self.controller.floatValues + self.controller.integerValues,
-                                              self.controller.characterValues)
+                                              self.controller.characterValues, self.barChartOptions)
 
             if barChartFrame.ShowModal() == wx.ID_OK:
-                barChartOptions = barChartFrame.getBarChartOptions()
-                self.controller.createBarChart(barChartOptions)
+                self.barChartOptions = barChartFrame.getBarChartOptions()
+                self.controller.createBarChart(self.barChartOptions)
 
         else:
 

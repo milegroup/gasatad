@@ -953,9 +953,11 @@ class ValidatorForBoxplot(wx.Validator):
 
 class BarChartInterface(wx.Dialog):
 
-    def __init__(self, parent, listOfVariables, listOfTags):
+    def __init__(self, parent, listOfVariables, listOfTags, barChartOptions):
 
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Bar chart", size=wx.DefaultSize, pos=wx.DefaultPosition)
+
+        self.listOfVariables = listOfVariables
 
         gbSizer1 = wx.GridBagSizer(0, 0)
         gbSizer1.SetFlexibleDirection(wx.BOTH)
@@ -1000,9 +1002,9 @@ class BarChartInterface(wx.Dialog):
         displayGridsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Display settings"), wx.HORIZONTAL)
 
         self.xAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "X-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
-        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL, 10)
+        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL, 4)
         self.yAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
-        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 10)
+        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 4)
 
         gbSizer1.Add(displayGridsSizer, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
@@ -1010,7 +1012,7 @@ class BarChartInterface(wx.Dialog):
 
         # Variables, tags and operations Options
 
-        sbBarChartVarsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"X variable"), wx.VERTICAL)
+        sbBarChartVarsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Variable"), wx.VERTICAL)
         sbBarChartTagsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Tag"), wx.VERTICAL)
         sbBarChartOpsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Operation"), wx.VERTICAL)
 
@@ -1018,40 +1020,43 @@ class BarChartInterface(wx.Dialog):
         fgSizer3.SetFlexibleDirection(wx.BOTH)
         fgSizer3.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
+        # xVariable
+
         fgSizer5 = wx.FlexGridSizer(0, 2, 0, 0)
         fgSizer5.SetFlexibleDirection(wx.BOTH)
         fgSizer5.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        # Here the RadioButtons are created
-        for i in listOfVariables:
-
-            # First element
-            if i == listOfVariables[0]:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+        self.radioBtnsXVariable = []
+        for i in range(len(listOfVariables)):
+            if i == 0:
+                self.radioBtnsXVariable.append(wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
             else:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+                self.radioBtnsXVariable.append(wx.RadioButton(self, wx.ID_ANY, listOfVariables[i], wx.DefaultPosition, wx.DefaultSize))
+                fgSizer5.Add(self.radioBtnsXVariable[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsXVariable[i])
+
+        # Tag
 
         fgSizer6 = wx.FlexGridSizer(0, 2, 0, 0)
         fgSizer6.SetFlexibleDirection(wx.BOTH)
         fgSizer6.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        # Not use a label (for example in Level: High, Low)
-        self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+        self.radioBtnDefaultTag = wx.RadioButton(self, wx.ID_ANY, "None", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
+        fgSizer6.Add(self.radioBtnDefaultTag, 0, wx.ALL, 1)
+        self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.radioBtnDefaultTag)
 
-        for i in listOfTags:
-            self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgSizer6.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.m_radioBtn16)
+        self.radioBtnsOtherTags = []
+        for i in range(len(listOfTags)):
+            self.radioBtnsOtherTags.append(wx.RadioButton(self, wx.ID_ANY, listOfTags[i], wx.DefaultPosition, wx.DefaultSize))
+            fgSizer6.Add(self.radioBtnsOtherTags[i], 0, wx.ALL, 1)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedTagsRadioButton, self.radioBtnsOtherTags[i])
 
         # As a default the name of the axis are the selected variables
         self.xAxisNameTextCtrl.SetValue('')
 
+        # Operations
         listOperations = ['Mean', 'Median', 'Std deviation', 'Variance']
         # By default, Mean selected
         self.selectedOperation = str(listOperations[0])
@@ -1062,18 +1067,17 @@ class BarChartInterface(wx.Dialog):
         fgSizer7.SetFlexibleDirection(wx.BOTH)
         fgSizer7.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
-        for i in listOperations:
-            # First
-            if i == listOperations[0]:
-
-                self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.m_radioBtn16)
+        self.radioBtnsOperations = []
+        for i in range(len(listOperations)):
+            if i == 0:
+                self.radioBtnsOperations.append(wx.RadioButton(self, wx.ID_ANY, listOperations[i], wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP))
+                fgSizer7.Add(self.radioBtnsOperations[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.radioBtnsOperations[i])
 
             else:
-                self.m_radioBtn16 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer7.Add(self.m_radioBtn16, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.m_radioBtn16)
+                self.radioBtnsOperations.append(wx.RadioButton(self, wx.ID_ANY, listOperations[i], wx.DefaultPosition, wx.DefaultSize))
+                fgSizer7.Add(self.radioBtnsOperations[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedOperationRadioButton, self.radioBtnsOperations[i])
 
         sbBarChartVarsSizer.Add(fgSizer5, 1, wx.EXPAND, 5)
         sbBarChartTagsSizer.Add(fgSizer6, 1, wx.EXPAND, 5)
@@ -1109,6 +1113,9 @@ class BarChartInterface(wx.Dialog):
         self.selectedRadioButtonVariables = listOfVariables[0]
         self.selectedRadioButtonTags = 'None'
 
+        if barChartOptions:
+            self.setBarChartOptions(barChartOptions)
+
         self.Fit()
         self.Show(True)
 
@@ -1131,15 +1138,44 @@ class BarChartInterface(wx.Dialog):
         self.yAxisNameTextCtrl.SetValue(self.selectedOperation.lower() + " (" + self.selectedRadioButtonVariables + ")")
 
     def getBarChartOptions(self):
-        barchartOptions = dict(
+        barChartOptions = dict(
             title=self.histogramNameTextCtrl.GetValue(),
             xAxisName=self.xAxisNameTextCtrl.GetValue(),
             yAxisName=self.yAxisNameTextCtrl.GetValue(),
             xAxisGrid=self.xAxischeckBox.IsChecked(),
             yAxisGrid=self.yAxischeckBox.IsChecked(),
+            xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
             firstVarSelected=self.selectedRadioButtonVariables,
+
+            otherTags=[self.radioBtnsOtherTags[i].GetValue() for i in range(len(self.radioBtnsOtherTags))],
             secondVarSelected=self.selectedRadioButtonTags,
+
+
             operation=self.selectedOperation
         )
 
-        return barchartOptions
+        return barChartOptions
+
+    def setBarChartOptions(self, barChartOptions):
+        self.histogramNameTextCtrl.SetValue(barChartOptions['title'])
+        self.xAxisNameTextCtrl.SetValue(barChartOptions['xAxisName'])
+        self.yAxisNameTextCtrl.SetValue(barChartOptions['yAxisName'])
+        self.xAxischeckBox.SetValue(barChartOptions['xAxisGrid'])
+        self.yAxischeckBox.SetValue(barChartOptions['yAxisGrid'])
+        for i in range(len(barChartOptions['xVariable'])):
+            self.radioBtnsXVariable[i].SetValue(barChartOptions['xVariable'][i])
+            if barChartOptions['xVariable'][i]:
+                self.selectedRadioButtonVariables = self.listOfVariables[i]
+
+        self.radioBtnDefaultTag.SetValue(True)
+        self.selectedRadioButtonTags = 'None'
+        for i in range(len(barChartOptions['otherTags'])):
+            self.radioBtnsOtherTags[i].SetValue(barChartOptions['otherTags'][i])
+            if barChartOptions['otherTags'][i]:
+                self.selectedRadioButtonTags = self.radioBtnsOtherTags[i].GetLabelText()
+
+        for i in range(len(self.radioBtnsOperations)):
+            if self.radioBtnsOperations[i].GetLabelText()==barChartOptions['operation']:
+                self.radioBtnsOperations[i].SetValue(True)
+        self.selectedOperation=barChartOptions['operation']
+
