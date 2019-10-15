@@ -47,6 +47,7 @@ class MainFrame(wx.Frame):
     histogramOptions = {}
     scatterPlotOptions = {}
     boxPlotOptions = {}
+    pieChartOptions = {}
 
     def __init__(self, parent):
 
@@ -1274,6 +1275,7 @@ class MainFrame(wx.Frame):
         self.histogramOptions = {}
         self.scatterPlotOptions = {}
         self.boxPlotOptions = {}
+        self.pieChartOptions = {}
 
         if not self.controller.programState.dataToAnalyse.empty:  # data present
             self.fillInGrid()  # Fills wxgrid from the data of the pandas dataframe
@@ -1488,12 +1490,12 @@ class MainFrame(wx.Frame):
 
         if (len(self.controller.characterValues) != 0):
 
-            pieChartFrame = PieChartInterface(self, self.controller.characterValues)
+            pieChartFrame = PieChartInterface(self, self.controller.characterValues, self.pieChartOptions)
 
             if pieChartFrame.ShowModal() == wx.ID_OK:
-                pieChartOptions = pieChartFrame.getPieChartOptions()
+                self.pieChartOptions = pieChartFrame.getPieChartOptions()
 
-                self.controller.createPieChart(pieChartOptions)
+                self.controller.createPieChart(self.pieChartOptions)
 
         else:
 

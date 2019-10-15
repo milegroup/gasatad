@@ -541,6 +541,7 @@ class ScatterPlotInterface(wx.Dialog):
         self.xAxischeckBox.SetValue(scatterPlotOptions['xAxisGrid'])
         self.yAxischeckBox.SetValue(scatterPlotOptions['yAxisGrid'])
         self.LFcheckBox.SetValue(scatterPlotOptions['linearFit'])
+
         for i in range(len(scatterPlotOptions['xVariable'])):
             self.radioBtnsXVariable[i].SetValue(scatterPlotOptions['xVariable'][i])
             if scatterPlotOptions['xVariable'][i]:
@@ -592,7 +593,9 @@ class ValidatorForScatter(wx.Validator):
 class PieChartInterface(wx.Dialog):
     legendPosition = 'default'
 
-    def __init__(self, parent, listOfTags):
+    def __init__(self, parent, listOfTags, pieChartOptions):
+
+        self.listOfTags = listOfTags
 
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title="Pie chart", size=wx.DefaultSize, pos=wx.DefaultPosition)
 
@@ -651,16 +654,15 @@ class PieChartInterface(wx.Dialog):
 
         legendPosSizer.Add(fgLegendSizer, 1, wx.EXPAND, 5)
 
-        self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-        fgLegendSizer.Add(self.m_radioBtn15, 0, wx.ALL, 1)
+        self.pieChartLegendPosDefault = wx.RadioButton(self, wx.ID_ANY, "Default", wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
+        fgLegendSizer.Add(self.pieChartLegendPosDefault, 0, wx.ALL, 1)
+        self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.pieChartLegendPosDefault)
 
-        self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn15)
-
-        for position in positions:
-            self.m_radioBtn = wx.RadioButton(self, wx.ID_ANY, position, wx.DefaultPosition, wx.DefaultSize, 0)
-            fgLegendSizer.Add(self.m_radioBtn, 0, wx.ALL, 1)
-
-            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.m_radioBtn)
+        self.pieChartLegendPosOther = []
+        for i in range(len(positions)):
+            self.pieChartLegendPosOther.append(wx.RadioButton(self, wx.ID_ANY, positions[i], wx.DefaultPosition, wx.DefaultSize, 0))
+            fgLegendSizer.Add(self.pieChartLegendPosOther[i], 0, wx.ALL, 1)
+            self.Bind(wx.EVT_RADIOBUTTON, self.updateLegendPosition, self.pieChartLegendPosOther[i])
 
         gbSizer1.Add(legendPosSizer, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
 
@@ -670,32 +672,29 @@ class PieChartInterface(wx.Dialog):
 
         sbSizer1 = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Tag"), wx.VERTICAL)
 
-        fgSizer3 = wx.FlexGridSizer(1, 0, 0, 0)
-        fgSizer3.SetFlexibleDirection(wx.BOTH)
-        fgSizer3.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
-
-        fgSizer5 = wx.FlexGridSizer(0, 2, 0, 0)
+        fgSizer5 = wx.FlexGridSizer(0, 3, 0, 0)
         fgSizer5.SetFlexibleDirection(wx.BOTH)
         fgSizer5.SetNonFlexibleGrowMode(wx.FLEX_GROWMODE_SPECIFIED)
 
         # Here the RadioButtons are created
-        for i in listOfTags:
+
+        self.radioBtnsTag = []
+
+        for i in range(len(listOfTags)):
 
             # First one
-            if i == listOfTags[0]:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+            if i == 0:
+                self.radioBtnsTag.append(wx.RadioButton(self, wx.ID_ANY, listOfTags[i], wx.DefaultPosition, wx.DefaultSize, wx.RB_GROUP))
+                fgSizer5.Add(self.radioBtnsTag[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsTag[i])
             else:
-                self.m_radioBtn15 = wx.RadioButton(self, wx.ID_ANY, i, wx.DefaultPosition, wx.DefaultSize, 0)
-                fgSizer5.Add(self.m_radioBtn15, 0, wx.ALL, 1)
-                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.m_radioBtn15)
+                self.radioBtnsTag.append(wx.RadioButton(self, wx.ID_ANY, listOfTags[i], wx.DefaultPosition, wx.DefaultSize))
+                fgSizer5.Add(self.radioBtnsTag[i], 0, wx.ALL, 1)
+                self.Bind(wx.EVT_RADIOBUTTON, self.updateSelectedVariablesRadioButton, self.radioBtnsTag[i])
 
         sbSizer1.Add(fgSizer5, 1, wx.EXPAND, 5)
 
-        fgSizer3.Add(sbSizer1, 1, wx.EXPAND | wx.ALL, 0)
-
-        gbSizer1.Add(fgSizer3, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        gbSizer1.Add(sbSizer1, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT | wx.TOP, 10)
 
         # -------------------------------
 
@@ -718,6 +717,10 @@ class PieChartInterface(wx.Dialog):
 
         # RadioButton selected by default
         self.selectedRadioButtonTags = listOfTags[0]
+        self.pieChartNameTextCtrl.SetValue(listOfTags[0])
+
+        if pieChartOptions:
+            self.setPieChartOptions(pieChartOptions)
 
         self.Fit()
         self.Show(True)
@@ -725,6 +728,7 @@ class PieChartInterface(wx.Dialog):
     def updateSelectedVariablesRadioButton(self, event):
         radioButton = event.GetEventObject()
         self.selectedRadioButtonTags = radioButton.GetLabelText()
+        self.pieChartNameTextCtrl.SetValue(self.selectedRadioButtonTags)
 
     def updateLegendPosition(self, event):
         radioButton = event.GetEventObject()
@@ -733,12 +737,28 @@ class PieChartInterface(wx.Dialog):
     def getPieChartOptions(self):
         pieChartOptions = dict(
             title=self.pieChartNameTextCtrl.GetValue(),
-            firstVarSelected=self.selectedRadioButtonTags,
-            legendPosition=self.legendPosition.lower(),
             offset=self.offsetCheckBox.IsChecked(),
-            numOfSlices=self.numOfSlices.GetValue()
+            numOfSlices=self.numOfSlices.GetValue(),
+            defaultLegend=self.pieChartLegendPosDefault.GetValue(),
+            otherLegends=[self.pieChartLegendPosOther[i].GetValue() for i in range(len(self.pieChartLegendPosOther))],
+            legendPosition=self.legendPosition.lower(),
+            tag=[self.radioBtnsTag[i].GetValue() for i in range(len(self.radioBtnsTag))],
+            firstVarSelected=self.selectedRadioButtonTags
         )
         return pieChartOptions
+
+    def setPieChartOptions(self, pieChartOptions):
+        self.pieChartNameTextCtrl.SetValue(pieChartOptions['title'])
+        self.offsetCheckBox.SetValue(pieChartOptions['offset'])
+        self.numOfSlices.SetValue(pieChartOptions['numOfSlices'])
+        self.pieChartLegendPosDefault.SetValue(pieChartOptions['defaultLegend'])
+        for i in range(len(pieChartOptions['otherLegends'])):
+            self.pieChartLegendPosOther[i].SetValue(pieChartOptions['otherLegends'][i])
+        self.legendPosition=pieChartOptions['legendPosition']
+        for i in range(len(pieChartOptions['tag'])):
+            self.radioBtnsTag[i].SetValue(pieChartOptions['tag'][i])
+            if pieChartOptions['tag'][i]:
+                self.selectedRadioButtonTags = self.listOfTags[i]
 
 
 class BoxPlotInterface(wx.Dialog):
