@@ -21,7 +21,7 @@ import wx.richtext as rt
 import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame
-from scipy.stats import shapiro
+from scipy.stats import shapiro, normaltest
 
 import Tools
 from numpy import nan as NaN
@@ -425,12 +425,16 @@ class BasicStatisticsInterface(wx.Dialog):
             # print(data.corr(method='pearson'))
 
             Tools.writeParam(self.textResultsWindow, "Kurtosis")
+            Tools.writeComment(self.textResultsWindow, "Fisher's kurtosis normalized by N-1 (normal = 0.0)")
             Tools.writeResults(self.textResultsWindow, data.kurtosis())
 
             Tools.writeParam(self.textResultsWindow, "Skew")
+            Tools.writeComment(self.textResultsWindow, "Unbiased skew normalized by N-1")
             Tools.writeResults(self.textResultsWindow, data.skew())
 
-            Tools.writeParam(self.textResultsWindow, "Shapiro-Wilk")
+            Tools.writeParam(self.textResultsWindow, "Shapiro-Wilk test")
+            Tools.writeComment(self.textResultsWindow, "H0: the sample follows a Gaussian distribution")
+            Tools.writeComment(self.textResultsWindow, "H1: the sample does not follow a Gaussian distribution")
             df_aux = DataFrame(columns=['statistic', 'p-value'])
             for key in data.columns:
                 try:
@@ -439,6 +443,19 @@ class BasicStatisticsInterface(wx.Dialog):
                 except ValueError:
                     df_aux.loc[key] = [NaN, NaN]
             Tools.writeResults(self.textResultsWindow, df_aux)
+
+            Tools.writeParam(self.textResultsWindow, "D'Agostino's K-squared test")
+            Tools.writeComment(self.textResultsWindow, "H0: the sample follows a Gaussian distribution")
+            Tools.writeComment(self.textResultsWindow, "H1: the sample does not follow a Gaussian distribution")
+            df_aux = DataFrame(columns=['statistic', 'p-value'])
+            for key in data.columns:
+                try:
+                    ss = normaltest(data[key].tolist())
+                    df_aux.loc[key] = [ss[0], ss[1]]
+                except ValueError:
+                    df_aux.loc[key] = [NaN, NaN]
+            Tools.writeResults(self.textResultsWindow, df_aux)
+
 
         # else:
         #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)

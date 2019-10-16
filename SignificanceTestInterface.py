@@ -16,7 +16,8 @@ along with GASATaD.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import wx.lib.scrolledpanel
-from scipy.stats.stats import ks_2samp, ranksums, ttest_ind
+from scipy.stats.stats import ks_2samp, ranksums, ttest_ind, kruskal, f_oneway
+from scipy.stats import levene
 import wx.richtext as rt
 from pandas.core.frame import Series
 
@@ -552,29 +553,62 @@ class SignificanceTestInterface(wx.Dialog):
                                  index=[self.clickedRadiobuttonLeft, self.clickedRadiobuttonRight])
             Tools.writeResults(self.textResultsWindow, series_data)
 
-            Tools.writeParam(self.textResultsWindow, "Standard t-test (equal variances)")
+            Tools.writeParam(self.textResultsWindow, "Student's t-test")
+            Tools.writeComment(self.textResultsWindow, "H0: the means of the samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the means of the samples are not equal")
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, nan_policy='omit')
             series_data = Series([temp1, temp2],
                                  index=['statistic', 'p-value'])
             Tools.writeResults(self.textResultsWindow, series_data)
 
-            Tools.writeParam(self.textResultsWindow, "Welch's unequal variances t-test)")
+            Tools.writeParam(self.textResultsWindow, "Analysis of variance (ANOVA) test")
+            Tools.writeComment(self.textResultsWindow, "H0: the means of the samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the means of the samples are not equal")
+            temp1, temp2 = f_oneway(dataSelectedLP.dropna(), dataSelectedRP.dropna())
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
+
+            Tools.writeParam(self.textResultsWindow, "Welch's unequal variances t-test")
+            Tools.writeComment(self.textResultsWindow, "H0: the means of the samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the means of the samples are not equal")
             temp1, temp2 = ttest_ind(dataSelectedLP, dataSelectedRP, equal_var=False, nan_policy='omit')
             series_data = Series([temp1, temp2],
                                  index=['statistic', 'p-value'])
             Tools.writeResults(self.textResultsWindow, series_data)
 
-            Tools.writeParam(self.textResultsWindow, "Kolmogorov-Smirnov test)")
+            Tools.writeParam(self.textResultsWindow, "Levene’s test for homogeneity of variances")
+            Tools.writeComment(self.textResultsWindow, "H0: the variaces of the samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the variaces of the samples are not equal")
+            temp1, temp2 = levene(dataSelectedLP.dropna(), dataSelectedRP.dropna())
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
+
+            Tools.writeParam(self.textResultsWindow, "Kolmogorov-Smirnov test")
+            Tools.writeComment(self.textResultsWindow, "H0: samples are drawn from the same distribution")
+            Tools.writeComment(self.textResultsWindow, "H1: samples are not drawn from the same distribution")
             temp1, temp2 = ks_2samp(dataSelectedLP, dataSelectedRP)
             series_data = Series([temp1, temp2],
                                  index=['statistic', 'p-value'])
             Tools.writeResults(self.textResultsWindow, series_data)
 
-            Tools.writeParam(self.textResultsWindow, "Wilcoxon rank-sum test)")
+            Tools.writeParam(self.textResultsWindow, "Wilcoxon rank-sum test")
+            Tools.writeComment(self.textResultsWindow, "H0: the distribution of both samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the distribution of both samples are not equal")
             temp1, temp2 = ranksums(dataSelectedLP, dataSelectedRP)
             series_data = Series([temp1, temp2],
                                  index=['statistic', 'p-value'])
             Tools.writeResults(self.textResultsWindow, series_data)
+
+            Tools.writeParam(self.textResultsWindow, "Krusal-Wallis H test")
+            Tools.writeComment(self.textResultsWindow, "H0: the distribution of both samples are equal")
+            Tools.writeComment(self.textResultsWindow, "H1: the distribution of both samples are not equal")
+            temp1, temp2 = kruskal(dataSelectedLP.dropna(), dataSelectedRP.dropna())
+            series_data = Series([temp1, temp2],
+                                 index=['statistic', 'p-value'])
+            Tools.writeResults(self.textResultsWindow, series_data)
+
 
         else:
 

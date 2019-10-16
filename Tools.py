@@ -20,6 +20,8 @@ import wx
 title_font_size = 12
 subtitle_font_size = 11
 param_font_size = 10
+comment_font_size = 9
+commentsOn = True
 num_decimals = 3
 
 
@@ -57,14 +59,24 @@ def writeSubTitle(results_window, string_text):
 def writeParam(results_window, string_text):
     results_window.Newline()
     results_window.BeginBold()
-    results_window.BeginItalic()
+    # results_window.BeginItalic()
+    results_window.BeginUnderline()
     results_window.BeginFontSize(param_font_size)
     results_window.WriteText(string_text)
     results_window.EndFontSize()
-    results_window.EndItalic()
+    # results_window.EndItalic()
+    results_window.EndUnderline()
     results_window.EndBold()
     results_window.Newline()
 
+def writeComment(results_window, string_text):
+    if commentsOn:
+        results_window.BeginItalic()
+        results_window.BeginFontSize(comment_font_size)
+        results_window.WriteText(string_text)
+        results_window.EndFontSize()
+        results_window.EndItalic()
+        results_window.Newline()
 
 def writeResults(results_window, results):
     if type(results) == DataFrame:
