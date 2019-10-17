@@ -213,26 +213,15 @@ class Controller():
             dataForChart = [x for x in dataForChart if str(x) != 'nan']
 
             n, bins, patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75,
-                                        bins=histogramOptions['numOfBins'])
+                                        # bins=histogramOptions['numOfBins']
+                                        bins='auto'
+                                        )
 
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
             plt.ylim(0, max(n) * 1.1)
             for patch in patches:
                 patch.set_edgecolor('white')
-
-            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):
-                plt.grid()
-
-            elif histogramOptions['xAxisGrid']:
-                plt.grid(axis='x')
-
-            elif histogramOptions['yAxisGrid']:
-                plt.grid(axis='y')
-
-            plt.title(histogramOptions['title'], fontsize=18)
-            plt.tight_layout()
-            plt.show()
 
         else:  # Some tag has been selected
 
@@ -257,7 +246,10 @@ class Controller():
             if len(self.colorsPatch) >= len(dataForChart.keys()):
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
             n, bins, patches = plt.hist(dataForChart.values(), histtype='bar', label=dataForChart.keys(),
-                                        color=colorsTmp, bins=histogramOptions['numOfBins'])
+                                        color=colorsTmp,
+                                        bins='auto',
+                                        # bins=histogramOptions['numOfBins']
+                                        )
 
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
@@ -272,23 +264,23 @@ class Controller():
             for patch in patches:
                 patch.set_edgecolor('white')
 
-            if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):
-                plt.grid()
-
-            elif histogramOptions['xAxisGrid']:
-                plt.grid(axis='x')
-
-            elif histogramOptions['yAxisGrid']:
-                plt.grid(axis='y')
-
             if histogramOptions['legendPosition'] == "default":
                 plt.legend()
             else:
                 plt.legend(loc=histogramOptions['legendPosition'])
 
-            plt.title(histogramOptions['title'], fontsize=18)
-            plt.tight_layout()
-            plt.show()
+        if (histogramOptions['xAxisGrid'] & histogramOptions['yAxisGrid']):
+            plt.grid()
+
+        elif histogramOptions['xAxisGrid']:
+            plt.grid(axis='x')
+
+        elif histogramOptions['yAxisGrid']:
+            plt.grid(axis='y')
+
+        plt.title(histogramOptions['title'], fontsize=18)
+        plt.tight_layout()
+        plt.show()
 
     def createScatterPlot(self, scatterOptions):
 
