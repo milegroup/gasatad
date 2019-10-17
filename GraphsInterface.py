@@ -997,7 +997,7 @@ class BarChartInterface(wx.Dialog):
 
         # -------------------------------
 
-        # Display Grid        
+        # Display settings
 
         displayGridsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Display settings"), wx.HORIZONTAL)
 
@@ -1005,6 +1005,10 @@ class BarChartInterface(wx.Dialog):
         displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL, 4)
         self.yAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL, 4)
+        displayGridsSizer.AddStretchSpacer()
+
+        self.valuescheckBox = wx.CheckBox(self, wx.ID_ANY, "Show values", wx.DefaultPosition, wx.DefaultSize)
+        displayGridsSizer.Add(self.valuescheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
 
         gbSizer1.Add(displayGridsSizer, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
@@ -1144,6 +1148,7 @@ class BarChartInterface(wx.Dialog):
             yAxisName=self.yAxisNameTextCtrl.GetValue(),
             xAxisGrid=self.xAxischeckBox.IsChecked(),
             yAxisGrid=self.yAxischeckBox.IsChecked(),
+            showValues=self.valuescheckBox.IsChecked(),
             xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
             firstVarSelected=self.selectedRadioButtonVariables,
 
@@ -1162,6 +1167,7 @@ class BarChartInterface(wx.Dialog):
         self.yAxisNameTextCtrl.SetValue(barChartOptions['yAxisName'])
         self.xAxischeckBox.SetValue(barChartOptions['xAxisGrid'])
         self.yAxischeckBox.SetValue(barChartOptions['yAxisGrid'])
+        self.valuescheckBox.SetValue(barChartOptions['showValues'])
         for i in range(len(barChartOptions['xVariable'])):
             self.radioBtnsXVariable[i].SetValue(barChartOptions['xVariable'][i])
             if barChartOptions['xVariable'][i]:

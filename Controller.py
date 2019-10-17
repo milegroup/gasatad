@@ -493,22 +493,13 @@ class Controller():
 
             plt.bar(y_pos, dataForChart, align='center', edgecolor='white', color=self.colorsPatch[0])
 
+            if barChartOptions['showValues']:
+                plt.text(y_pos, dataForChart, f'{dataForChart:.3g}', ha='center', va='bottom',
+                         fontsize=9)
+
             plt.xticks(y_pos, '')
             plt.xlim(-0.5, 0.5)
             plt.ylim(0, dataForChart * 1.1)
-
-            plt.title(barChartOptions['title'], fontsize=18)
-            plt.xlabel(barChartOptions['xAxisName'])
-            plt.ylabel(barChartOptions['yAxisName'])
-
-            if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
-                plt.grid()
-            elif barChartOptions['xAxisGrid']:
-                plt.grid(axis='x')
-            elif barChartOptions['yAxisGrid']:
-                plt.grid(axis='y')
-            plt.tight_layout()
-            plt.show()
 
         else:  # Some tag has been selected
 
@@ -557,28 +548,34 @@ class Controller():
                     results.append(temp2.std())
 
             tags = np.asarray(tags)
-            if (len(dataForChart) <= len(self.colorsPatch)):
+            if len(dataForChart) <= len(self.colorsPatch):
                 plt.bar(range(len(dataForChart)), results, align='center', edgecolor='white',
                         color=self.colorsPatch[0:len(dataForChart)])
             else:
                 plt.bar(range(len(dataForChart)), results, align='center', edgecolor='white')
+
+            if barChartOptions['showValues']:
+                for i in range(len(dataForChart)):
+                    plt.text(i, results[i], f'{results[i]:.3g}', ha='center', va='bottom',
+                             fontsize=9)
+
             plt.xticks(range(len(dataForChart)), dataForChart.keys())
             plt.xlim(-0.5, len(dataForChart) - 0.5)
             plt.ylim(0, 1.1 * max(results))
 
-            plt.xlabel(barChartOptions['xAxisName'])
-            plt.ylabel(barChartOptions['yAxisName'])
+        plt.title(barChartOptions['title'], fontsize=18)
+        plt.xlabel(barChartOptions['xAxisName'])
+        plt.ylabel(barChartOptions['yAxisName'])
 
-            if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
-                plt.grid()
-            elif barChartOptions['xAxisGrid']:
-                plt.grid(axis='x')
-            elif barChartOptions['yAxisGrid']:
-                plt.grid(axis='y')
+        if (barChartOptions['xAxisGrid'] & barChartOptions['yAxisGrid']):
+            plt.grid()
+        elif barChartOptions['xAxisGrid']:
+            plt.grid(axis='x')
+        elif barChartOptions['yAxisGrid']:
+            plt.grid(axis='y')
 
-            plt.title(barChartOptions['title'], fontsize=18)
-            plt.tight_layout()
-            plt.show()
+        plt.tight_layout()
+        plt.show()
 
     def nullValuesInFile(self, data):
         return pandas.isnull(data).values.any()
