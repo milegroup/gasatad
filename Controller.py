@@ -206,16 +206,18 @@ class Controller():
 
     def createHistogram(self, histogramOptions):
 
+        numOfBins = histogramOptions['numOfBins']
+        if numOfBins == 0:
+            numOfBins = 'auto'
+
         # No tag selected
         if histogramOptions['secondVarSelected'] == 'None':
 
             dataForChart = self.programState.dataToAnalyse[histogramOptions['firstVarSelected']]
             dataForChart = [x for x in dataForChart if str(x) != 'nan']
 
-            n, bins, patches = plt.hist(dataForChart, histtype='bar', color=self.colorsPatch[0], rwidth=0.75,
-                                        # bins=histogramOptions['numOfBins']
-                                        bins='auto'
-                                        )
+            n, bins, patches = plt.hist(dataForChart, histtype='bar',
+                                        color=self.colorsPatch[0], rwidth=0.75, bins=numOfBins)
 
             plt.xlabel(histogramOptions['xAxisName'])
             plt.ylabel(histogramOptions['yAxisName'])
@@ -247,8 +249,7 @@ class Controller():
                 colorsTmp = self.colorsPatch[0:len(dataForChart)]
             n, bins, patches = plt.hist(dataForChart.values(), histtype='bar', label=dataForChart.keys(),
                                         color=colorsTmp,
-                                        bins='auto',
-                                        # bins=histogramOptions['numOfBins']
+                                        bins=numOfBins,
                                         )
 
             plt.xlabel(histogramOptions['xAxisName'])
@@ -287,20 +288,24 @@ class Controller():
         if len(scatterOptions['selectedCheckBoxes']) == 1:
             xdata = self.programState.dataToAnalyse[scatterOptions['firstVarSelected']]
             ydata = self.programState.dataToAnalyse[scatterOptions['selectedCheckBoxes'][0]]
-            plt.scatter(xdata, ydata, s=50)
+            plt.scatter(xdata, ydata, s=20)
             xf = 0.05 * (max(xdata) - min(xdata))
             yf = 0.05 * (max(ydata) - min(ydata))
             xmin = min(xdata) - xf
             xmax = max(xdata) + xf
             plt.xlim(xmin, xmax)
             plt.ylim(min(ydata) - yf, max(ydata) + yf)
-
             if scatterOptions['linearFit']:
                 m, b = np.polyfit(xdata, ydata, 1)
                 xplotdata = np.array([xmin, xmax])
                 plt.plot(xplotdata, m * xplotdata + b, linewidth=2)
-
-
+            if scatterOptions['showValues']:
+                for x, y in zip(xdata, ydata):
+                    plt.annotate(f'({x:.3g}, {y:.3g})', (x, y), xytext=(5, 8), textcoords='offset pixels', fontsize=8,
+                                 # bbox=dict(boxstyle="round", fc="none", ec="gray"),
+                                 ha='center', va='center',
+                                 # arrowprops=dict(arrowstyle="->"),
+                                 annotation_clip=True)
 
         else:
             for i in range(len(scatterOptions['selectedCheckBoxes'])):

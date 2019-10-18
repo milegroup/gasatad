@@ -69,18 +69,25 @@ class HistogramInterface(wx.Dialog):
 
         # Display Grid 
 
-        displayGridsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Display settings"), wx.HORIZONTAL)
+        displayGridsSizer = wx.StaticBoxSizer(wx.StaticBox(self, wx.ID_ANY, u"Display settings"), wx.VERTICAL)
 
+        gridBoxSizer = wx.BoxSizer(wx.HORIZONTAL)
         self.xAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "X-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
-        displayGridsSizer.Add(self.xAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        gridBoxSizer.Add(self.xAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         self.yAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
-        displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
-        displayGridsSizer.AddStretchSpacer()
-        displayGridsSizer.Add(wx.StaticText(self, wx.ID_ANY, u"No. of bins:", wx.DefaultPosition, wx.DefaultSize, 0), 0,
-                              wx.CENTER, 5)
-        self.numOfBins = wx.SpinCtrl(self, wx.ID_ANY, value='10', size=(130, -1))
-        self.numOfBins.SetRange(1, 100)
-        displayGridsSizer.Add(self.numOfBins, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        gridBoxSizer.Add(self.yAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        gridBoxSizer.AddStretchSpacer()
+        displayGridsSizer.Add(gridBoxSizer, 0, wx.TOP|wx.LEFT|wx.RIGHT|wx.EXPAND, 4)
+
+
+
+        binsBoxSizer = wx.BoxSizer(wx.HORIZONTAL)
+        binsBoxSizer.Add(wx.StaticText(self, wx.ID_ANY, u"No. of bins (0=auto):", wx.DefaultPosition, wx.DefaultSize, 0), 0,
+                              wx.CENTER|wx.LEFT, 4)
+        self.numOfBins = wx.SpinCtrl(self, wx.ID_ANY, value='0', size=(130, -1))
+        # self.numOfBins.SetRange(0, 100)
+        binsBoxSizer.Add(self.numOfBins, 0, wx.LEFT | wx.ALIGN_CENTER_VERTICAL, 4)
+        displayGridsSizer.Add(binsBoxSizer, 0, wx.ALL, 8)
 
         gbSizer1.Add(displayGridsSizer, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
@@ -345,9 +352,10 @@ class ScatterPlotInterface(wx.Dialog):
         self.yAxischeckBox = wx.CheckBox(self, wx.ID_ANY, "Y-axis grid", wx.DefaultPosition, wx.DefaultSize, 0)
         displayGridsSizer.Add(self.yAxischeckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
         displayGridsSizer.AddStretchSpacer()
-
         self.LFcheckBox = wx.CheckBox(self, wx.ID_ANY, "Plot linear fit", wx.DefaultPosition, wx.DefaultSize)
         displayGridsSizer.Add(self.LFcheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
+        self.valuescheckBox = wx.CheckBox(self, wx.ID_ANY, "Show values", wx.DefaultPosition, wx.DefaultSize)
+        displayGridsSizer.Add(self.valuescheckBox, 0, wx.ALL | wx.ALIGN_CENTER_VERTICAL, 4)
 
         gbSizer1.Add(displayGridsSizer, wx.GBPosition(1, 0), wx.GBSpan(1, 1), wx.EXPAND | wx.LEFT | wx.RIGHT, 10)
 
@@ -361,7 +369,7 @@ class ScatterPlotInterface(wx.Dialog):
         legendPosSizer = wx.StaticBoxSizer(self.scatterLegendPosText, wx.HORIZONTAL)
         self.scatterLegendPosText.Enable(False)
 
-        gbSizer1.Add(legendPosSizer, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        gbSizer1.Add(legendPosSizer, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT | wx.TOP | wx.EXPAND, 10)
 
         fgLegendSizer = wx.FlexGridSizer(0, 4, 0, 0)
         fgLegendSizer.SetFlexibleDirection(wx.BOTH)
@@ -520,6 +528,7 @@ class ScatterPlotInterface(wx.Dialog):
             yAxisName=self.yAxisNameTextCtrl.GetValue(),
             xAxisGrid=self.xAxischeckBox.IsChecked(),
             yAxisGrid=self.yAxischeckBox.IsChecked(),
+            showValues=self.valuescheckBox.IsChecked(),
             linearFit=self.LFcheckBox.IsChecked(),
             xVariable=[self.radioBtnsXVariable[i].GetValue() for i in range(len(self.radioBtnsXVariable))],
             yVariables=[self.checkboxesYVariables[i].GetValue() for i in range(len(self.checkboxesYVariables))],
@@ -540,6 +549,7 @@ class ScatterPlotInterface(wx.Dialog):
         self.yAxisNameTextCtrl.SetValue(scatterPlotOptions['yAxisName'])
         self.xAxischeckBox.SetValue(scatterPlotOptions['xAxisGrid'])
         self.yAxischeckBox.SetValue(scatterPlotOptions['yAxisGrid'])
+        self.valuescheckBox.SetValue(scatterPlotOptions['showValues'])
         self.LFcheckBox.SetValue(scatterPlotOptions['linearFit'])
 
         for i in range(len(scatterPlotOptions['xVariable'])):
@@ -1092,7 +1102,7 @@ class BarChartInterface(wx.Dialog):
 
         gbSizer1.Add(fgSizer3, wx.GBPosition(2, 0), wx.GBSpan(1, 1), wx.ALIGN_RIGHT | wx.EXPAND | wx.ALL, 5)
 
-        gbSizer1.Add(sbBarChartOpsSizer, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT, 10)
+        gbSizer1.Add(sbBarChartOpsSizer, wx.GBPosition(3, 0), wx.GBSpan(1, 1), wx.LEFT | wx.RIGHT | wx.EXPAND, 10)
 
         # -------------------------------     
 
