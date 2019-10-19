@@ -293,6 +293,9 @@ class Controller():
             yf = 0.05 * (max(ydata) - min(ydata))
             xmin = min(xdata) - xf
             xmax = max(xdata) + xf
+            if scatterOptions['showValues']:
+                xmin = min(xdata) - 1.2 * xf
+                xmax = max(xdata) + 1.5*xf
             plt.xlim(xmin, xmax)
             plt.ylim(min(ydata) - yf, max(ydata) + yf)
             if scatterOptions['linearFit']:
@@ -320,11 +323,22 @@ class Controller():
                     if max(ydata) > ymax:
                         ymax = max(ydata)
 
-                plt.scatter(xdata, ydata, s=50, color=self.colorsLine[i], label=scatterOptions['selectedCheckBoxes'][i])
+                plt.scatter(xdata, ydata, s=20, color=self.colorsLine[i], label=scatterOptions['selectedCheckBoxes'][i])
+                if scatterOptions['showValues']:
+                    for x, y in zip(xdata, ydata):
+                        plt.annotate(f'({x:.3g}, {y:.3g})', (x, y), xytext=(5, 8), textcoords='offset pixels',
+                                     fontsize=8,
+                                     # bbox=dict(boxstyle="round", fc="none", ec="gray"),
+                                     ha='center', va='center',
+                                     # arrowprops=dict(arrowstyle="->"),
+                                     annotation_clip=True)
             xf = 0.05 * (max(xdata) - min(xdata))
             yf = 0.05 * (ymax - ymin)
             xmin = min(xdata) - xf
             xmax = max(xdata) + xf
+            if scatterOptions['showValues']:
+                xmin = min(xdata) - 1.2 * xf
+                xmax = max(xdata) + 1.5*xf
             plt.xlim(xmin, xmax)
             plt.ylim(ymin - yf, ymax + yf)
 
