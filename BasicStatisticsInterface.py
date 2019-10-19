@@ -20,11 +20,12 @@ import wx.xrc
 import wx.richtext as rt
 import wx.lib.scrolledpanel
 
-from pandas.core.frame import DataFrame
+from pandas.core.frame import DataFrame, Series
 from scipy.stats import shapiro, normaltest
 
 import Tools
 from numpy import nan as NaN
+import numpy as np
 
 
 class BasicStatisticsInterface(wx.Dialog):
@@ -400,7 +401,12 @@ class BasicStatisticsInterface(wx.Dialog):
             Tools.writeResults(self.textResultsWindow, data.median())
 
             Tools.writeParam(self.textResultsWindow, "Mode")
-            Tools.writeResults(self.textResultsWindow, data.mode())
+            dd = data.mode()
+            Tools.writeResults(self.textResultsWindow, dd.head(10))
+            numDataMode = dd.count().tolist()
+            if any(t > 10 for t in numDataMode):
+                Tools.writeComment(self.textResultsWindow, 'Mode data truncated. Number of elements is')
+                Tools.writeComment(self.textResultsWindow, dd.count().to_string())
 
             Tools.writeParam(self.textResultsWindow, "Std Deviation")
             Tools.writeResults(self.textResultsWindow, data.std())
@@ -438,7 +444,7 @@ class BasicStatisticsInterface(wx.Dialog):
             df_aux = DataFrame(columns=['statistic', 'p-value'])
             for key in data.columns:
                 try:
-                    ss = shapiro(data[key].tolist())
+                    ss = shapiro(data[key].dropna().tolist())
                     df_aux.loc[key] = [ss[0], ss[1]]
                 except ValueError:
                     df_aux.loc[key] = [NaN, NaN]
@@ -450,16 +456,34 @@ class BasicStatisticsInterface(wx.Dialog):
             df_aux = DataFrame(columns=['statistic', 'p-value'])
             for key in data.columns:
                 try:
-                    ss = normaltest(data[key].tolist())
+                    ss = normaltest(data[key].dropna().tolist())
                     df_aux.loc[key] = [ss[0], ss[1]]
                 except ValueError:
                     df_aux.loc[key] = [NaN, NaN]
             Tools.writeResults(self.textResultsWindow, df_aux)
 
+            Tools.writeParam(self.textResultsWindow, "Gini coefficient")
+            series_data = Series()
+            for key in data.columns:
+                dd = np.array(data[key].dropna(), dtype='float64')
+                if np.amin(dd) < 0:
+                    # Values cannot be negative:
+                    dd -= np.amin(dd)
+                # Values cannot be 0:
+                dd += 0.0000001
+                # Values must be sorted:
+                dd = np.sort(dd)
+                # Index per array element:
+                index = np.arange(1, len(dd) + 1)
+                # Number of array elements:
+                n = len(dd)
+                # Gini coefficient:
+                gini = ((np.sum((2 * index - n - 1) * dd)) / (n * np.sum(dd)))
+                series_data[key] = gini
+            Tools.writeResults(self.textResultsWindow, series_data)
 
         # else:
         #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)
-
 
     def noCheckBoxSelectedWarning(self):
 
