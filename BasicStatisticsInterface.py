@@ -21,7 +21,7 @@ import wx.richtext as rt
 import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame, Series
-from scipy.stats import shapiro, normaltest
+from scipy.stats import shapiro, normaltest, gmean
 
 import Tools
 from numpy import nan as NaN
@@ -396,6 +396,17 @@ class BasicStatisticsInterface(wx.Dialog):
 
             Tools.writeParam(self.textResultsWindow, "Mean")
             Tools.writeResults(self.textResultsWindow, data.mean())
+
+            Tools.writeParam(self.textResultsWindow, "Geometric mean")
+            series_data = Series()
+            for key in data.columns:
+                dd = np.array(data[key].dropna(), dtype='float64')
+                if np.amin(dd) < 0:
+                    series_data[key] = '--'
+                else:
+                    series_data[key]=gmean(dd)
+            Tools.writeResults(self.textResultsWindow, series_data)
+
 
             Tools.writeParam(self.textResultsWindow, "Median")
             Tools.writeResults(self.textResultsWindow, data.median())
