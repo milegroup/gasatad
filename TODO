@@ -1,7 +1,6 @@
 ALL:
 	Help
 	Increase data information: number of text, integer and float columns?
-	Add harmonic mean to basic statistics?
 
 WIN:
 

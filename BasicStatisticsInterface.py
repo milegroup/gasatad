@@ -21,7 +21,7 @@ import wx.richtext as rt
 import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame, Series
-from scipy.stats import shapiro, normaltest, gmean
+from scipy.stats import shapiro, normaltest, gmean, hmean
 
 import Tools
 from numpy import nan as NaN
@@ -405,6 +405,16 @@ class BasicStatisticsInterface(wx.Dialog):
                     series_data[key] = '--'
                 else:
                     series_data[key]=gmean(dd)
+            Tools.writeResults(self.textResultsWindow, series_data)
+
+            Tools.writeParam(self.textResultsWindow, "Harmonic mean")
+            series_data = Series()
+            for key in data.columns:
+                dd = np.array(data[key].dropna(), dtype='float64')
+                if np.amin(dd) < 0:
+                    series_data[key] = '--'
+                else:
+                    series_data[key] = hmean(dd)
             Tools.writeResults(self.textResultsWindow, series_data)
 
 
