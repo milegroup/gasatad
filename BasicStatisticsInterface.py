@@ -21,7 +21,7 @@ import wx.richtext as rt
 import wx.lib.scrolledpanel
 
 from pandas.core.frame import DataFrame, Series
-from scipy.stats import shapiro, normaltest, gmean, hmean
+from scipy.stats import shapiro, normaltest, gmean, hmean, kstest
 
 import Tools
 from numpy import nan as NaN
@@ -72,9 +72,13 @@ class BasicStatisticsInterface(wx.Dialog):
 
         self.scrollSizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        self.leftSizer = wx.BoxSizer(wx.VERTICAL)
+
         dataSelectionSizer = wx.StaticBoxSizer(wx.StaticBox(self.scrolledPanel, wx.ID_ANY, u"Data set"), wx.VERTICAL)
 
-        self.scrollSizer.Add(dataSelectionSizer, 0, wx.EXPAND | wx.ALL, 10)
+        self.leftSizer.Add(dataSelectionSizer, 0, wx.EXPAND | wx.ALL, 10)
+
+        self.scrollSizer.Add(self.leftSizer)
 
         fgSizer = wx.FlexGridSizer(0, 1, 0, 0)
         fgSizer.SetFlexibleDirection(wx.BOTH)
@@ -167,6 +171,7 @@ class BasicStatisticsInterface(wx.Dialog):
 
                 self.listOfSpinCtrl.append(self.m_spinCtrl11)
                 self.listOfSpinCtrl.append(self.m_spinCtrl21)
+
 
         self.textResultsWindow = rt.RichTextCtrl(self.scrolledPanel, wx.ID_ANY, wx.EmptyString, wx.DefaultPosition,
                                                  wx.DefaultSize,
@@ -404,7 +409,7 @@ class BasicStatisticsInterface(wx.Dialog):
                 if np.amin(dd) < 0:
                     series_data[key] = '--'
                 else:
-                    series_data[key]=gmean(dd)
+                    series_data[key] = gmean(dd)
             Tools.writeResults(self.textResultsWindow, series_data)
 
             Tools.writeParam(self.textResultsWindow, "Harmonic mean")
@@ -416,7 +421,6 @@ class BasicStatisticsInterface(wx.Dialog):
                 else:
                     series_data[key] = hmean(dd)
             Tools.writeResults(self.textResultsWindow, series_data)
-
 
             Tools.writeParam(self.textResultsWindow, "Median")
             Tools.writeResults(self.textResultsWindow, data.median())
@@ -449,11 +453,32 @@ class BasicStatisticsInterface(wx.Dialog):
 
             Tools.writeParam(self.textResultsWindow, "Correlation (Pearson)")
             Tools.writeResults(self.textResultsWindow, data.corr(method='pearson'))
-            # print(data.corr(method='pearson'))
+
+            Tools.writeParam(self.textResultsWindow, "Gini coefficient")
+            series_data = Series()
+            for key in data.columns:
+                dd = np.array(data[key].dropna(), dtype='float64')
+                if np.amin(dd) < 0:
+                    # Values cannot be negative:
+                    dd -= np.amin(dd)
+                # Values cannot be 0:
+                dd += 0.0000001
+                # Values must be sorted:
+                dd = np.sort(dd)
+                # Index per array element:
+                index = np.arange(1, len(dd) + 1)
+                # Number of array elements:
+                n = len(dd)
+                # Gini coefficient:
+                gini = ((np.sum((2 * index - n - 1) * dd)) / (n * np.sum(dd)))
+                series_data[key] = gini
+            Tools.writeResults(self.textResultsWindow, series_data)
 
             Tools.writeParam(self.textResultsWindow, "Kurtosis")
             Tools.writeComment(self.textResultsWindow, "Fisher's kurtosis normalized by N-1 (normal = 0.0)")
             Tools.writeResults(self.textResultsWindow, data.kurtosis())
+            if len(data[data.columns[0]])<20:
+                Tools.writeComment(self.textResultsWindow, 'Warning: kurtosis test only valid for n>=20')
 
             Tools.writeParam(self.textResultsWindow, "Skew")
             Tools.writeComment(self.textResultsWindow, "Unbiased skew normalized by N-1")
@@ -483,25 +508,6 @@ class BasicStatisticsInterface(wx.Dialog):
                     df_aux.loc[key] = [NaN, NaN]
             Tools.writeResults(self.textResultsWindow, df_aux)
 
-            Tools.writeParam(self.textResultsWindow, "Gini coefficient")
-            series_data = Series()
-            for key in data.columns:
-                dd = np.array(data[key].dropna(), dtype='float64')
-                if np.amin(dd) < 0:
-                    # Values cannot be negative:
-                    dd -= np.amin(dd)
-                # Values cannot be 0:
-                dd += 0.0000001
-                # Values must be sorted:
-                dd = np.sort(dd)
-                # Index per array element:
-                index = np.arange(1, len(dd) + 1)
-                # Number of array elements:
-                n = len(dd)
-                # Gini coefficient:
-                gini = ((np.sum((2 * index - n - 1) * dd)) / (n * np.sum(dd)))
-                series_data[key] = gini
-            Tools.writeResults(self.textResultsWindow, series_data)
 
         # else:
         #     wx.MessageBox("There is no data that match the selected filters", "ERROR", wx.OK | wx.ICON_EXCLAMATION)

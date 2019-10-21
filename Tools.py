@@ -80,7 +80,7 @@ def writeComment(results_window, string_text):
 
 def writeResults(results_window, results):
     if type(results) == DataFrame:
-        results_window.WriteText(results.to_string(col_space=8, na_rep='--', float_format='%7.3g', justify='right'))
+        results_window.WriteText(results.to_string(col_space=8, na_rep='--', float_format=lambda x: '%7.3g' % x, justify='right'))
     else:  # Pandas series
         results_window.WriteText(results.to_string(na_rep='--', float_format=lambda x: '%7.3g' % x))
     results_window.Newline()

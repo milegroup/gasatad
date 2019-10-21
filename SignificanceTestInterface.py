@@ -601,7 +601,7 @@ class SignificanceTestInterface(wx.Dialog):
                                  index=['statistic', 'p-value'])
             Tools.writeResults(self.textResultsWindow, series_data)
 
-            Tools.writeParam(self.textResultsWindow, "Krusal-Wallis H test")
+            Tools.writeParam(self.textResultsWindow, "Kruskal-Wallis H test")
             Tools.writeComment(self.textResultsWindow, "H0: the distribution of both samples are equal")
             Tools.writeComment(self.textResultsWindow, "H1: the distribution of both samples are not equal")
             temp1, temp2 = kruskal(dataSelectedLP.dropna(), dataSelectedRP.dropna())
