@@ -199,7 +199,7 @@ class AddColumnInterface(wx.Dialog):
 
         # Aumentamos el índice para así poder diferenciar los diferentes spinCtrl
 
-        if self.indiceSpinCtrl is 5:
+        if self.indiceSpinCtrl == 5:
 
             self.showWarningTooManyIntervals()
 
@@ -276,7 +276,7 @@ class AddColumnInterface(wx.Dialog):
 
     def deleteFactor(self, event):
 
-        if self.indiceSpinCtrl is 1:
+        if self.indiceSpinCtrl == 1:
 
             self.showWarningNonDeleted()
 
@@ -315,7 +315,7 @@ class AddColumnInterface(wx.Dialog):
         for i in range(len(self.spinControlList)):
 
             # Se agrupa el valor inicial y final de cada etiqueta para posteriormente comprobar si hay algún solapamiento
-            if i % 2 is 0:
+            if i % 2 == 0:
                 self.firstValue = self.spinControlList[i].GetValue()
                 self.secondValue = self.spinControlList[i + 1].GetValue()
 
@@ -391,7 +391,7 @@ class ValidatorForFactors(wx.Validator):
         for i in range(len(self.spinControlList)):
 
             # Se agrupa el valor inicial y final de cada etiqueta para posteriormente comprobar si hay algún solapamiento
-            if i % 2 is 0:
+            if i % 2 == 0:
                 firstValue = self.spinControlList[i].GetValue()
                 secondValue = self.spinControlList[i + 1].GetValue()
                 sortedPaarList.append([firstValue, secondValue])
