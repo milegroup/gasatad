@@ -52,7 +52,6 @@ for key in MainFrame.params['optionsdefault'].keys():
 # Uncomment the following line before build .deb package
 # os.chdir("/usr/share/gasatad")
 
-
 app = wx.App(False)
 mainFrame = MainFrame(None)
 mainFrame.Centre()
