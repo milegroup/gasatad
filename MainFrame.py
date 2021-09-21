@@ -1556,7 +1556,7 @@ class MainFrame(wx.Frame):
         info.SetName('GASATaD')
         info.SetVersion(str(self.params['version']))
         info.SetDescription(description)
-        info.SetCopyright(u"\u00A9 2019");
+        info.SetCopyright(u"\u00A9 2021");
         info.SetIcon(wx.Icon(os.path.dirname(os.path.abspath(__file__)) + "/GasatadLogo.ico", wx.BITMAP_TYPE_ICO))
         info.SetWebSite("https://milegroup.github.io/gasatad/")
 
