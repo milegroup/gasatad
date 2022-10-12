@@ -1,7 +1,7 @@
 # GASATaD
 Graphical Application for Statistical Analysis of Tabulated Data
 
- 
+
 What is GASATaD?
 
 GASATaD reads .csv or .xls files and allows users to perform different statistical tests across columns of data. It generates high quality plots and it can export them to pdf, svg, png, tiff or eps files.
